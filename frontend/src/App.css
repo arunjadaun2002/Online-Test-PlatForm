@@ -1,0 +1,49 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.admin-layout {
+  display: flex;
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+.main-content {
+  flex: 1;
+  margin-left: 250px; /* Should match sidebar width */
+  padding: 80px 20px 20px 20px; /* Top padding for header */
+  min-height: 100vh;
+  background-color: #f5f5f5;
+}
+
+/* Add these utility classes */
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Ensure header stays on top */
+.admin-header {
+  position: fixed;
+  top: 0;
+  right: 0;
+  left: 250px; /* Should match sidebar width */
+  height: 60px;
+  background: white;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Ensure sidebar stays fixed */
+.sidebar {
+  position: fixed;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 250px;
+  overflow-y: auto;
+  z-index: 101;
+} 

@@ -1,0 +1,54 @@
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  height: 60px;
+  background: white;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.header-logo {
+  height: 40px;
+  width: auto;
+}
+
+.header-left h1 {
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.header-nav {
+  display: flex;
+  gap: 20px;
+}
+
+.header-nav a {
+  color: #333;
+  text-decoration: none;
+  padding: 5px 10px;
+  transition: color 0.3s;
+}
+
+.header-nav a:hover {
+  color: #2c5e1e;
+}
+
+.header-right .profile-btn {
+  padding: 8px 20px;
+  background: #4285f4;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.header-right .profile-btn:hover {
+  background: #3367d6;
+}
