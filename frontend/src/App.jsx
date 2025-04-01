@@ -21,11 +21,11 @@ const AdminLayout = () => {
         <Routes>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="students" element={<Students />} />
-            <Route path="/admin/quiz" element={<Quiz />} />
-            <Route path="/admin/create-test" element={<CreateTest />} />
-            <Route path="/admin/reports" element={<Reports />} />
-            <Route path="/admin/top-students" element={<TopStudents />} />
-            <Route path="/admin/settings" element={<Settings />} />
+            <Route path="quiz" element={<Quiz />} />
+            <Route path="create-test" element={<CreateTest />} />
+            <Route path="reports" element={<Reports />} />
+            <Route path="top-students" element={<TopStudents />} />
+            <Route path="settings" element={<Settings />} />
           {/* Add other admin routes here */}
         </Routes>
       </div>

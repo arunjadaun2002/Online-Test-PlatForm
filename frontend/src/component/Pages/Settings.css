@@ -1,0 +1,36 @@
+.settings-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f5f5f5;
+  }
+  
+  .settings-box {
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  
+  .settings-button {
+    width: 100%;
+    padding: 15px; 
+    font-size: 18px;
+    background-color: #c2a2f0;
+    color: white;
+    font-weight: bold;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+    transition: background 0.3s ease;
+  }
+  
+  .settings-button:hover {
+    background-color: #a985d3;
+  }
+  .settings-text {
+       font-size: 20px; /* Increased text size */
+      }
+  

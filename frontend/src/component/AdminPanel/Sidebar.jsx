@@ -1,12 +1,14 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
 import './Sidebar.css';
+import examIcon from '../../assets/images/exam-icon.jpeg';
+import AdminIcon from '../../assets/images/Admin-logo.png';
 
 function Sidebar() {
   return (
     <div className="sidebar">
       <div className="admin-profile">
-        <img src="/admin-avatar.png" alt="Admin" className="admin-avatar" />
+        <img src={AdminIcon} alt="Admin" className="admin-avatar" />
         <h3>Admin</h3>
       </div>
       
