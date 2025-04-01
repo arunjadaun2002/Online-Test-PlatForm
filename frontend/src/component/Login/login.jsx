@@ -47,9 +47,7 @@ const Login = () => {
                 <button type="button" className="btn sign-in">
                   Sign In <span>→</span>
                 </button>
-                <button type="button" className="btn login">
-                  Login <span>→</span>
-                </button>
+              
               </div>
               
               <a href="#" className="forget-password">
@@ -62,13 +60,13 @@ const Login = () => {
                   className="role-btn admin"
                   onClick={handleAdminClick}  // This will directly navigate to admin dashboard
                 >
-                  Admin
+                  Admin Login
                 </button>
                 <button 
                   type="button" 
                   className="role-btn student"
                 >
-                  Student
+                  Student Login
                 </button>
               </div>
             </form>

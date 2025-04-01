@@ -73,43 +73,41 @@
     border-color: #7c4dff;
   }
   
-  .button-group {
+  .auth-buttons {
     display: flex;
-    justify-content: space-between;
-    gap: 1rem;
+    justify-content: center;
     margin-top: 2rem;
   }
   
-  .btn {
-    padding: 0.8rem 1.5rem;
+  .btn.sign-in {
+    padding: 0.8rem 2.5rem;
     border: none;
     border-radius: 5px;
     background-color: #0a0a23;
     color: white;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: background-color 0.3s;
     display: flex;
     align-items: center;
     gap: 0.5rem;
   }
   
-  .btn:hover {
+  .btn.sign-in:hover {
     background-color: #1a1a3a;
-    transform: translateY(-1px);
   }
   
-  .forgot-password {
+  .forget-password-container {
     text-align: center;
-    margin: 1.5rem 0;
+    margin: 2rem 0;
   }
   
-  .forgot-password a {
+  .forget-password {
     color: #dc6b6b;
     text-decoration: none;
     transition: color 0.3s;
   }
   
-  .forgot-password a:hover {
+  .forget-password:hover {
     color: #c74b4b;
   }
   
