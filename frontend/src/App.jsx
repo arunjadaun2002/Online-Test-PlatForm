@@ -6,11 +6,13 @@ import Sidebar from "./component/AdminPanel/Sidebar";
 import Login from "./component/Login/login";
 import CreateTest from "./component/Pages/CreateTest";
 import Quiz from "./component/Pages/Quiz";
+import { QuizProvider } from './component/Pages/QuizContext';
 import Reports from "./component/Pages/Reports";
 import Settings from "./component/Pages/Settings";
 import { StudentProvider } from './component/Pages/StudentContext';
 import Students from "./component/pages/students";
 import TopStudents from "./component/Pages/TopStudents";
+
 
 
 const AdminLayout = () => {
@@ -37,11 +39,17 @@ const AdminLayout = () => {
 function App() {
   return (
     <StudentProvider>
-      <Routes>
-        <Route path="/" element={<Login />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/admin/*" element={<AdminLayout />} />
-      </Routes>
+      <QuizProvider>
+        <Routes>
+          <Route path="/" element={<Login />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/admin/*" element={<AdminLayout />} />
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/students" element={<Students />} />
+          <Route path="/create-test" element={<CreateTest />} />
+          <Route path="/quiz" element={<Quiz />} />
+        </Routes>
+      </QuizProvider>
     </StudentProvider>
   );
 }

@@ -1,8 +1,7 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import './Sidebar.css';
-import examIcon from '../../assets/images/exam-icon.jpeg';
 import AdminIcon from '../../assets/images/Admin-logo.png';
+import './Sidebar.css';
 
 function Sidebar() {
   return (
@@ -29,8 +28,8 @@ function Sidebar() {
         </NavLink>
         
         <NavLink to="/admin/create-test" className="nav-item">
-          <i className="fas fa-plus-circle"></i>
-          Create Test
+          <i className="fas fa-plus"></i>
+          <span>Create Test</span>
         </NavLink>
         
         <NavLink to="/admin/reports" className="nav-item">

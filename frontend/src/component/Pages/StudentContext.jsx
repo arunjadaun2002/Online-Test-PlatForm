@@ -30,8 +30,19 @@ export function StudentProvider({ children }) {
     }
   ]);
 
+  const getNextRollNumber = () => {
+    if (students.length === 0) return "1";
+    const maxRollNo = Math.max(...students.map(s => parseInt(s.rollNo)));
+    return String(maxRollNo + 1);
+  };
+
   const addStudent = (newStudent) => {
-    setStudents(prev => [...prev, newStudent]);
+    const nextRollNo = getNextRollNumber();
+    setStudents(prev => [...prev, {
+      ...newStudent,
+      rollNo: nextRollNo,
+      id: Date.now()
+    }]);
   };
 
   const deleteStudent = (id) => {
