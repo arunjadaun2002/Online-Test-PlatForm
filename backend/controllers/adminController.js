@@ -35,7 +35,7 @@ exports.adminSignup = async (req, res) => {
 exports.adminLogin = async (req, res) => {
     try{
         const {email, password} = req.body;
-        const user = await  User.finOne({email, role: 'admin'});
+        const user = await  User.findOne({email, role: 'admin'});
         if(!user || !await bcrypt.compare(password, user.password)){
             return res.status(401).json({
                 Success: false,
