@@ -138,3 +138,40 @@ exports.registerStudent = async (req, res) => {
         })
     }
 }
+
+exports.verifyAdmin = async (req, res) => {
+    try {
+        // const {token} = req.query;
+        const {token} = req.body;
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        const user = await User.findById(decoded.id);
+        if(!user || user.role !== 'admin'){
+            return res.status(404).json({
+                success: false,
+                message:'Admin not found or invailid token'
+            })
+        }
+        if ( user.verified){
+            return res.status(400).json({
+                success: false,
+                message: 'Already verified'
+            })
+        }
+
+        user.verified = true;
+        await user.save();
+        res.status(200).json({
+            success: true,
+            message:'Account verified successfully'
+        })
+
+    }catch(err){
+        console.log("Error: verifyAdmin");
+        console.log(err);
+        res.status(400).json({
+            success: false,
+            message: "Error verifying account",
+            error: err.message
+        })
+    }
+}
