@@ -1,11 +1,14 @@
 import React from 'react';
+import { useStudents } from '../Pages/StudentContext';
 import './Dashboard.css';
 
 function Dashboard() {
+  const { studentCount } = useStudents();
+
   const stats = [
     {
       title: "Total Students",
-      count: 4,
+      count: studentCount,
       color: "#B4D147",
       icon: "fas fa-user-plus"
     },

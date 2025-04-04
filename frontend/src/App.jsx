@@ -4,12 +4,13 @@ import Dashboard from "./component/AdminPanel/Dashboard";
 import Header from "./component/AdminPanel/Header";
 import Sidebar from "./component/AdminPanel/Sidebar";
 import Login from "./component/Login/login";
-import Students from "./component/Pages/Students"
-import Quiz from "./component/Pages/Quiz";
 import CreateTest from "./component/Pages/CreateTest";
+import Quiz from "./component/Pages/Quiz";
 import Reports from "./component/Pages/Reports";
-import TopStudents from "./component/Pages/TopStudents";
 import Settings from "./component/Pages/Settings";
+import { StudentProvider } from './component/Pages/StudentContext';
+import Students from "./component/pages/students";
+import TopStudents from "./component/Pages/TopStudents";
 
 
 const AdminLayout = () => {
@@ -35,11 +36,13 @@ const AdminLayout = () => {
 
 function App() {
   return (
-    <Routes>
-      <Route path="/" element={<Login />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/admin/*" element={<AdminLayout />} />
-    </Routes>
+    <StudentProvider>
+      <Routes>
+        <Route path="/" element={<Login />} />
+        <Route path="/login" element={<Login />} />
+        <Route path="/admin/*" element={<AdminLayout />} />
+      </Routes>
+    </StudentProvider>
   );
 }
 
