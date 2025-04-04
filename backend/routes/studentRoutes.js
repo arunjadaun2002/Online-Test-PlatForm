@@ -3,7 +3,7 @@ const { studentLogin, forgotPassword } = require('../controllers/studentControll
 
 const router = express.Router();
 
-router.post('login', studentLogin);
+router.post('/login', studentLogin);
 router.post('/forget-password', forgotPassword);
 
 module.exports = router;
