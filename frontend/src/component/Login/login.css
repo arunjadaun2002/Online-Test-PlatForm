@@ -101,6 +101,10 @@
     margin: 2rem 0;
   }
   
+  .heading{
+    text-align: center;
+    color: #2c5e1e;
+  }
   .forget-password {
     color: #dc6b6b;
     text-decoration: none;
