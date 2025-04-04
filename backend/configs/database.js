@@ -21,7 +21,7 @@ let dbURL = uri
 mongoose
   .connect(dbURL)
   .then(() => {
-    console.log("----------------- DB Connected ----------------------");
+    console.log(`DB Connected Successfully`);
   })
   .catch((err) => {
     console.log("DB Connect Failed:\n");
