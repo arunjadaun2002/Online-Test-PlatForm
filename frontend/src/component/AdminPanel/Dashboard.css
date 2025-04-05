@@ -1,106 +1,89 @@
 .dashboard {
-    padding: 15px;
-    margin-top: 15px;
-    margin-left: 30px; /* Add margin from left */
+  padding: 15px;
+  margin-top: 15px;
+  margin-left: 270px;
+}
+
+.stats-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding: 15px;
+}
+
+.stats-row {
+  display: flex;
+  gap: 50px;
+  justify-content: flex-start;
+}
+
+.stat-card {
+  width: 400px;
+  height: 160px;
+  border-radius: 8px;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+
+.stat-content {
+  position: relative;
+  z-index: 1;
+}
+
+.stat-number {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 5px;
+}
+
+.stat-title {
+  font-size: 24px;
+  font-weight: 500;
+}
+
+.stat-icon {
+  position: absolute;
+  right: 20px;
+  top: 20px;
+  font-size: 80px;
+  opacity: 0.3;
+}
+
+.more-info {
+  background: rgba(255, 255, 255, 0.2);
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: auto;
+  transition: background-color 0.3s;
+}
+
+.more-info:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.more-info i {
+  margin-left: 5px;
+}
+
+@media (max-width: 768px) {
+  .dashboard {
+    margin-left: 0;
+    padding: 10px;
   }
-  
-  .stats-grid {
-    display: flex;
+
+  .stats-row {
     flex-direction: column;
     gap: 15px;
-    padding: 15px 15px 15px 30px;
   }
-  
-  .stats-row {
-    display: flex;
-    gap: 50px;
-    justify-content: center; /* Changed to center */
-    margin-left: 0; /* Removed left margin */
-    margin-right: 40; /* Removed right margin */
-  }
-  
-  .stats-row:first-child {
-    justify-content: center; /* Changed to center */
-    margin-left: 0;
-    margin-right: 0;
-  }
-  
-  .stats-row:last-child {
-    justify-content: center; /* Changed to center */
-    margin-left: 0;
-    margin-right: 0;
-  }
-  
+
   .stat-card {
-    flex: 0 1 auto;
-    width: 300px;
-    padding: 15px;
-    border-radius: 10px;
-    color: white;
-    position: relative;
-    height: 160px; /* Increased height from 140px to 160px */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    transition: transform 0.3s ease, box-shadow 0.3s ease;
-  }
-  
-  .stat-card:hover {
-    transform: translateY(-5px);
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  }
-  
-  .stat-info h2 {
-    font-size: 2.5rem;
-    margin: 0;
-    font-weight: 600;
-  }
-  
-  .stat-info h3 {
-    font-size: 1.2rem;
-    margin: 8px 0;
-    font-weight: 500;
-  }
-  
-  .stat-icon {
-    position: absolute;
-    right: 15px;
-    top: 15px;
-    font-size: 1.8rem;
-    opacity: 0.5;
-  }
-  
-  .more-info {
-    background: rgba(255, 255, 255, 0.2);
-    border: none;
-    padding: 8px;
-    color: white;
-    cursor: pointer;
     width: 100%;
-    text-align: center;
-    border-radius: 5px;
-    margin-top: auto;
-    font-size: 0.9rem;
-    transition: background-color 0.3s;
   }
-  
-  .more-info:hover {
-    background: rgba(255, 255, 255, 0.3);
-  }
-  
-  .more-info i {
-    margin-left: 5px;
-  }
-  
-  @media (max-width: 768px) {
-    .stats-row {
-      flex-direction: column;
-      align-items: center;
-    }
-    
-    .stat-card {
-      width: 100%;
-      max-width: 300px;
-    }
-  }
+}

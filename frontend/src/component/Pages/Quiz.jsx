@@ -1,27 +1,43 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Quiz.css';
-import { useQuizzes } from './QuizContext'; // Import the context
 
 function Quiz() {
   const navigate = useNavigate();
-  const { quizzes, deleteQuiz, deleteAllQuizzes } = useQuizzes(); // Get data and functions from context
+  const [selectedQuiz, setSelectedQuiz] = useState(null);
+  const [showQuestionsModal, setShowQuestionsModal] = useState(false);
+
+  // Get quizzes from localStorage
+  const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
 
   const handleAddQuiz = () => {
     navigate('/create-test');
   };
 
   const handleDelete = (id) => {
-    deleteQuiz(id);
+    const updatedQuizzes = quizzes.filter(quiz => quiz.id !== id);
+    localStorage.setItem('quizzes', JSON.stringify(updatedQuizzes));
+    window.location.reload(); // Refresh to update the list
   };
 
   const handleDeleteAll = () => {
-    deleteAllQuizzes();
+    localStorage.removeItem('quizzes');
+    window.location.reload(); // Refresh to update the list
   };
 
   const handleEdit = (id) => {
     // Implement edit functionality
     console.log('Edit quiz:', id);
+  };
+
+  const handleViewQuestions = (quiz) => {
+    setSelectedQuiz(quiz);
+    setShowQuestionsModal(true);
+  };
+
+  const closeModal = () => {
+    setShowQuestionsModal(false);
+    setSelectedQuiz(null);
   };
 
   return (
@@ -62,6 +78,12 @@ function Quiz() {
                 <td>{quiz.time}</td>
                 <td className="action-buttons">
                   <button 
+                    className="view-questions-btn"
+                    onClick={() => handleViewQuestions(quiz)}
+                  >
+                    View Questions
+                  </button>
+                  <button 
                     className="edit-btn"
                     onClick={() => handleEdit(quiz.id)}
                   >
@@ -79,6 +101,35 @@ function Quiz() {
           </tbody>
         </table>
       </div>
+
+      {/* Questions Modal */}
+      {showQuestionsModal && selectedQuiz && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Questions for: {selectedQuiz.title}</h2>
+              <button className="close-btn" onClick={closeModal}>×</button>
+            </div>
+            <div className="questions-list">
+              {selectedQuiz.questions.map((question, index) => (
+                <div key={index} className="question-item">
+                  <h3>Question {index + 1}: {question.question}</h3>
+                  <div className="options">
+                    {question.options.map((option, optIndex) => (
+                      <div 
+                        key={optIndex} 
+                        className={`option ${question.correctAnswer === String.fromCharCode(65 + optIndex) ? 'correct' : ''}`}
+                      >
+                        {String.fromCharCode(65 + optIndex)}) {option}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
