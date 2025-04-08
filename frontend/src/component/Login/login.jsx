@@ -72,8 +72,8 @@ const Login = () => {
               )}
 
               <div className="button-group">
-                <button type="submit" className="sign-in-btn">
-                  Sign In <span>→</span>
+                <button type="submit" className="Log-in-btn">
+                  LogIn <span>→</span>
                 </button>
               </div>
 
@@ -95,6 +95,17 @@ const Login = () => {
                   onClick={handleStudentClick}
                 >
                   Student Login
+                </button>
+              </div>
+
+              <div className="signup-link">
+                Don't have an account?{' '}
+                <button 
+                  type="button" 
+                  className="link-btn"
+                  onClick={() => navigate('/signup')}
+                >
+                  Sign Up
                 </button>
               </div>
             </form>
