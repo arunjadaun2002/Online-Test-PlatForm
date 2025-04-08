@@ -1,10 +1,17 @@
 const ExcelJS = require("exceljs");
 const fs = require("fs");
 const Test = require("../models/testModel");
+const User = require("../models/userModel");
 const { uploadFileToBlob } = require("../services/azureBlobService");
 
 const createTestWithFile = async (req, res) => {
   try {
+    const admin = await User.findById(req.user.id)
+    if(!admin || admin.role != 'admin'){
+        return res.status(403).json({
+            message: 'Unauthorized'
+        })
+    }
     const fileUrl = await uploadFileToBlob(req.file);
 
     const testData = {
@@ -15,6 +22,7 @@ const createTestWithFile = async (req, res) => {
       rightMarks: req.body.rightMarks,
       wrongMarks: req.body.wrongMarks,
       sectionId: req.body.sectionId,
+      subject: req.body.subject,
       excelUrl: fileUrl,
     };
 
@@ -36,6 +44,12 @@ const createTestWithFile = async (req, res) => {
 const SHEET_NAME = "TypedTest"; // Use one consistent name
 
 const addTypedQuestion = async (req, res) => {
+  const admin = await User.findById(req.user.id)
+  if(!admin || admin.role != 'admin'){
+      return res.status(403).json({
+          message: 'Unauthorized'
+      })
+  }
   const filePath = "./tempTypedTest.xlsx";
   let workbook;
   try {
@@ -97,6 +111,12 @@ const addTypedQuestion = async (req, res) => {
 
 const uplaodTypedTest = async (req, res) => {
   try {
+    const admin = await User.findById(req.user.id)
+    if(!admin || admin.role != 'admin'){
+        return res.status(403).json({
+            message: 'Unauthorized'
+        })
+    }
     const filePath = "./tempTypedtest.xlsx";
 
     // if there is no file is there
@@ -120,6 +140,7 @@ const uplaodTypedTest = async (req, res) => {
       rightMarks: req.body.rightMarks,
       wrongMarks: req.body.wrongMarks,
       sectionId: req.body.sectionId,
+      subject: req.body.subject,
       excelUrl: fileUrl,
     };
 
@@ -140,4 +161,20 @@ const uplaodTypedTest = async (req, res) => {
   }
 };
 
-module.exports = { createTestWithFile, addTypedQuestion, uplaodTypedTest };
+const getAllTests = async (req, res) => {
+  try {
+    const tests = await Test.find({}, 'title subject sectionId');
+    return res.status(200).json({
+      success: true,
+      data: tests
+    })
+  }catch (err) {
+    console.log("Error fetching tests: ", err);
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server Error'
+    })
+  }
+}
+
+module.exports = { createTestWithFile, addTypedQuestion, uplaodTypedTest, getAllTests };

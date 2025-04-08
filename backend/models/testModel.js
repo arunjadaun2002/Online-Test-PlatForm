@@ -17,6 +17,7 @@ const testSchema = new mongoose.Schema(
       type: String,
       unique: true,
     },
+    subject: String,
     excelUrl: String,
   },
   { timestamps: true }
