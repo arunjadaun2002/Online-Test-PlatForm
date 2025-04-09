@@ -23,6 +23,7 @@ function App() {
           {/* Admin Routes */}
           <Route path="/admin/*" element={<AdminLayout />} />
 
+
           {/* Student Routes */}
           <Route path="/student" element={<StudentLayout />}>
             <Route path="dashboard" element={<StudentDashboard />} />

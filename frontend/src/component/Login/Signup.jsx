@@ -1,30 +1,47 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import examIcon from '../../assets/images/exam-icon.jpeg';
-import './Signup.css';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
+import examIcon from "../../assets/images/exam-icon.jpeg";
+import "./Signup.css";
 
 const Signup = () => {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    password: ''
+    name: "",
+    email: "",
+    password: "",
   });
-  const [error, setError] = useState('');
-
+  const [error, setError] = useState("");
+``
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({
+    setFormData((prev) => ({
       ...prev,
-      [name]: value
+      [name]: value,
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Here you would typically make an API call to register the user
-    // For now, we'll just navigate to the login page
-    navigate('/login');
+    try {
+      console.log("Submitting form data:", formData); // Debugging
+      const response = await fetch("http://localhost:4000/api/admin/signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
+
+      const data = await response.json();
+      console.log("Response from server:", data); // Debugging
+
+      if (data.success) {
+        navigate("/login");
+      } else {
+        setError(data.message || "Signup failed");
+      }
+    } catch (err) {
+      setError("Something went wrong");
+      console.error(err);
+    }
   };
 
   return (
@@ -78,11 +95,7 @@ const Signup = () => {
                 />
               </div>
 
-              {error && (
-                <div className="error-message">
-                  {error}
-                </div>
-              )}
+              {error && <div className="error-message">{error}</div>}
 
               <div className="button-group">
                 <button type="submit" className="signup-btn">
@@ -91,11 +104,11 @@ const Signup = () => {
               </div>
 
               <div className="login-link">
-                Already have an account?{' '}
-                <button 
-                  type="button" 
+                Already have an account?{" "}
+                <button
+                  type="button"
                   className="link-btn"
-                  onClick={() => navigate('/login')}
+                  onClick={() => navigate("/login")}
                 >
                   Sign In
                 </button>
@@ -112,4 +125,4 @@ const Signup = () => {
   );
 };
 
-export default Signup; 
+export default Signup;

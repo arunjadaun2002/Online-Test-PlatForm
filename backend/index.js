@@ -3,7 +3,7 @@ require("dotenv").config;
 require("./configs/database");
 const app = express();
 const cors = require("cors");
-app.use(cors({origin: "true"}))
+app.use(cors({ origin: "http://localhost:5173" }));
 
 //Middlewares
 app.use(cors());
