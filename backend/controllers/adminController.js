@@ -10,25 +10,27 @@ exports.adminSignup = async (req, res) => {
         const hashedPassword = await bcrypt.hash(password, 10);
         const user = await User.create({name, email, password: hashedPassword, role: 'admin'});
         const token = jwt.sign({id: user._id}, process.env.JWT_SECRET, {expiresIn: '1h'});
+        
+        const verificationLink = `${process.env.FRONTEND_URL}/verify/${token}`;
         await sendEmail(
             email,
             'Verify your Admin account',
-            `<p>Click <a href="${process.env.FRONTEND_URL}/verify?token=${token}">here</a> to verify your admin account.</p>`
-          );
+            `<p>Click <a href="${verificationLink}">here</a> to verify your admin account.</p>`
+        );
 
         res.status(201).json({
             success: true,
-            message: "Admin register. Check email for verification"
-        })
+            message: "Admin registered. Check email for verification"
+        });
 
     }catch(err){
         console.log(err);
         console.log("Error: adminSignup");
         res.status(400).json({
            success: false,
-           message: "Admin not register",
+           message: "Admin not registered",
            error: err.message
-        })
+        });
     }
 }
 
@@ -141,37 +143,48 @@ exports.registerStudent = async (req, res) => {
 
 exports.verifyAdmin = async (req, res) => {
     try {
-        // const {token} = req.query;
-        const {token} = req.body;
+        // Get token from either query params (GET) or body (POST)
+        const token = req.params.token || req.body.token;
+        
+        if (!token) {
+            return res.status(400).json({
+                success: false,
+                message: 'Verification token is required'
+            });
+        }
+
         const decoded = jwt.verify(token, process.env.JWT_SECRET);
         const user = await User.findById(decoded.id);
+        
         if(!user || user.role !== 'admin'){
             return res.status(404).json({
                 success: false,
-                message:'Admin not found or invailid token'
-            })
+                message: 'Admin not found or invalid token'
+            });
         }
-        if ( user.verified){
+
+        if (user.verified){
             return res.status(400).json({
                 success: false,
-                message: 'Already verified'
-            })
+                message: 'Account is already verified'
+            });
         }
 
         user.verified = true;
         await user.save();
+        
         res.status(200).json({
             success: true,
-            message:'Account verified successfully'
-        })
+            message: 'Account verified successfully'
+        });
 
-    }catch(err){
+    } catch(err) {
         console.log("Error: verifyAdmin");
         console.log(err);
         res.status(400).json({
             success: false,
             message: "Error verifying account",
             error: err.message
-        })
+        });
     }
 }

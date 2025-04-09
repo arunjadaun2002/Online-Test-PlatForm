@@ -70,6 +70,13 @@
     border: 1px solid #ddd;
     border-radius: 5px;
     font-size: 1rem;
+    transition: border-color 0.3s;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #4CAF50;
+    box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.1);
 }
 
 .error-message {
@@ -86,24 +93,30 @@
     margin: 25px 0;
 }
 
-.sign-in-btn {
+.Log-in-btn {
     width: 100%;
     padding: 12px;
-    background-color: #1a1a1a;
+    background-color: #4CAF50;
     color: white;
     border: none;
     border-radius: 5px;
     font-size: 1rem;
     cursor: pointer;
+    transition: all 0.3s;
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
-    transition: background-color 0.3s;
 }
 
-.sign-in-btn:hover {
-    background-color: #333;
+.Log-in-btn:disabled {
+    background-color: #cccccc;
+    cursor: not-allowed;
+}
+
+.Log-in-btn:hover:not(:disabled) {
+    background-color: #45a049;
+    transform: translateY(-1px);
 }
 
 .forget-password {

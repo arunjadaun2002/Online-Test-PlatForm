@@ -8,15 +8,41 @@ const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  const handleSignIn = (e) => {
+  const handleSignIn = async (e) => {
     e.preventDefault();
-    // For demo purposes, using hardcoded credentials
-    if (email === "admin@test.com" && password === "admin123") {
-      localStorage.setItem('user', JSON.stringify({ role: 'admin', name: 'Admin' }));
-      navigate('/admin/dashboard');
-    } else {
-      setError('Invalid email or password');
+    setLoading(true);
+    setError('');
+
+    try {
+      const response = await fetch('http://localhost:4000/api/admin/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+      console.log('Login response:', data); // Debug log
+
+      if (data.success) {
+        // Store the token in localStorage
+        localStorage.setItem('token', data.token);
+        localStorage.setItem('user', JSON.stringify({ 
+          role: 'admin', 
+          name: email.split('@')[0] // Simple way to get a name from email
+        }));
+        navigate('/admin/dashboard');
+      } else {
+        setError(data.message || 'Login failed');
+      }
+    } catch (err) {
+      console.error('Login error:', err);
+      setError('An error occurred during login');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -51,6 +77,7 @@ const Login = () => {
                   placeholder="Username or Email ID"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
+                  required
                 />
               </div>
 
@@ -62,6 +89,7 @@ const Login = () => {
                   placeholder="Enter Password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
+                  required
                 />
               </div>
 
@@ -72,8 +100,12 @@ const Login = () => {
               )}
 
               <div className="button-group">
-                <button type="submit" className="Log-in-btn">
-                  LogIn <span>→</span>
+                <button 
+                  type="submit" 
+                  className="Log-in-btn"
+                  disabled={loading}
+                >
+                  {loading ? 'Logging in...' : 'LogIn'} <span>→</span>
                 </button>
               </div>
 

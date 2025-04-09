@@ -8,6 +8,7 @@ router.post('/signup', adminSignup);
 router.post('/login', adminLogin);
 router.post('/forgot-password', adminForgotPassword);
 router.post('/register-student', authentication, registerStudent);
-router.get('/verify', verifyAdmin);
+router.post('/verify', verifyAdmin);
+router.get('/verify/:token', verifyAdmin);
 
 module.exports = router;

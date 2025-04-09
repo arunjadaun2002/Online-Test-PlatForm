@@ -3,6 +3,7 @@ import { Navigate, Route, Routes } from "react-router-dom";
 import AdminLayout from "./component/AdminPanel/AdminLayout";
 import Login from "./component/Login/login";
 import Signup from "./component/Login/Signup";
+import VerifyEmail from "./component/Login/VerifyEmail";
 import { QuizProvider } from './component/Pages/QuizContext';
 import { StudentProvider } from './component/Pages/StudentContext';
 import Attempt from './StudentPanel/Panel/Attempt';
@@ -18,11 +19,11 @@ function App() {
           {/* Public Routes */}
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
+          <Route path="/verify/:token" element={<VerifyEmail />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
 
           {/* Admin Routes */}
           <Route path="/admin/*" element={<AdminLayout />} />
-
 
           {/* Student Routes */}
           <Route path="/student" element={<StudentLayout />}>
