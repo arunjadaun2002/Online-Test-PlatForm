@@ -46,7 +46,7 @@
     padding: 40px;
 }
 
-.admin-login-title {
+.login-title {
     color: #2d6a4f;
     font-size: 2rem;
     margin-bottom: 30px;
@@ -153,9 +153,33 @@
     color: white;
 }
 
+.role-btn.active {
+    transform: scale(1.05);
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
+
 .role-btn:hover {
     opacity: 0.9;
     transform: translateY(-1px);
+}
+
+.signup-link {
+    text-align: center;
+    margin-top: 20px;
+    color: #666;
+}
+
+.link-btn {
+    background: none;
+    border: none;
+    color: #4CAF50;
+    cursor: pointer;
+    font-weight: 500;
+    padding: 0;
+}
+
+.link-btn:hover {
+    text-decoration: underline;
 }
 
 footer {

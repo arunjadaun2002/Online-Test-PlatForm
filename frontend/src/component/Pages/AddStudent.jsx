@@ -6,11 +6,11 @@ function AddStudent({ onClose, onAddStudent }) {
     name: '',
     userId: '',
     password: '',
-    phone: '',
     email: '',
-    class: '',
-    address: ''
+    section: ''
   });
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -20,37 +20,43 @@ function AddStudent({ onClose, onAddStudent }) {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const newStudent = {
-      id: Date.now(),
-      rollNo: String(Math.floor(Math.random() * 1000)),
-      name: studentData.name,
-      email: studentData.email,
-      phone: studentData.phone,
-      role: 'Student'
-    };
-    onAddStudent(newStudent);
-    onClose();
-  };
+    setLoading(true);
+    setError('');
 
-  const handleReset = () => {
-    setStudentData({
-      name: '',
-      userId: '',
-      password: '',
-      phone: '',
-      email: '',
-      class: '',
-      address: ''
-    });
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:4000/api/admin/register-student', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(studentData)
+      });
+
+      const data = await response.json();
+      
+      if (data.success) {
+        onAddStudent(data.student);
+        onClose();
+      } else {
+        setError(data.message || 'Failed to add student');
+      }
+    } catch (err) {
+      setError('An error occurred while adding student');
+      console.error('Add student error:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <div className="add-student-modal">
       <div className="modal-content">
         <div className="modal-header">
-          <h2>Student</h2>
+          <h2>Add Student</h2>
           <button className="back-btn" onClick={onClose}>
             ×
           </button>
@@ -70,25 +76,13 @@ function AddStudent({ onClose, onAddStudent }) {
             </div>
 
             <div className="form-group">
-              <label>Phone</label>
-              <input
-                type="tel"
-                name="phone"
-                value={studentData.phone}
-                onChange={handleChange}
-                placeholder="+1 800 123-34-45"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>User-ID</label>
+              <label>User ID</label>
               <input
                 type="text"
                 name="userId"
                 value={studentData.userId}
                 onChange={handleChange}
-                placeholder="user id"
+                placeholder="Enter user ID"
                 required
               />
             </div>
@@ -100,7 +94,7 @@ function AddStudent({ onClose, onAddStudent }) {
                 name="email"
                 value={studentData.email}
                 onChange={handleChange}
-                placeholder="Enter your email"
+                placeholder="Enter email"
                 required
               />
             </div>
@@ -112,40 +106,37 @@ function AddStudent({ onClose, onAddStudent }) {
                 name="password"
                 value={studentData.password}
                 onChange={handleChange}
+                placeholder="Enter password"
                 required
               />
             </div>
 
             <div className="form-group">
-              <label>Class</label>
+              <label>Section</label>
               <input
                 type="text"
-                name="class"
-                value={studentData.class}
+                name="section"
+                value={studentData.section}
                 onChange={handleChange}
-                placeholder="Enter Class Name"
+                placeholder="Enter section"
                 required
               />
             </div>
           </div>
 
-          <div className="form-group full-width">
-            <label>Address</label>
-            <textarea
-              name="address"
-              value={studentData.address}
-              onChange={handleChange}
-              placeholder="Student Address"
-              required
-            />
-          </div>
+          {error && (
+            <div className="error-message">
+              {error}
+            </div>
+          )}
 
-          <div className="button-group">
-            <button type="button" className="reset-btn" onClick={handleReset}>
-              Reset
-            </button>
-            <button type="submit" className="add-btn">
-              Add
+          <div className="modal-footer">
+            <button 
+              type="submit" 
+              className="submit-btn"
+              disabled={loading}
+            >
+              {loading ? 'Adding...' : 'Add Student'}
             </button>
           </div>
         </form>

@@ -9,6 +9,7 @@ const Login = () => {
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [isStudentLogin, setIsStudentLogin] = useState(false);
 
   const handleSignIn = async (e) => {
     e.preventDefault();
@@ -16,7 +17,8 @@ const Login = () => {
     setError('');
 
     try {
-      const response = await fetch('http://localhost:4000/api/admin/login', {
+      const endpoint = isStudentLogin ? 'student' : 'admin';
+      const response = await fetch(`http://localhost:4000/api/${endpoint}/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -25,16 +27,20 @@ const Login = () => {
       });
 
       const data = await response.json();
-      console.log('Login response:', data); // Debug log
+      console.log('Login response:', data);
 
       if (data.success) {
-        // Store the token in localStorage
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify({ 
-          role: 'admin', 
-          name: email.split('@')[0] // Simple way to get a name from email
+          role: isStudentLogin ? 'student' : 'admin',
+          name: email.split('@')[0]
         }));
-        navigate('/admin/dashboard');
+        
+        if (isStudentLogin) {
+          navigate('/student/dashboard');
+        } else {
+          navigate('/admin/dashboard');
+        }
       } else {
         setError(data.message || 'Login failed');
       }
@@ -47,13 +53,13 @@ const Login = () => {
   };
 
   const handleStudentClick = () => {
-    localStorage.setItem('user', JSON.stringify({ role: 'student', name: 'Student' }));
-    navigate('/student/dashboard');
+    setIsStudentLogin(true);
+    setError('');
   };
 
-  const handleDirectAdminClick = () => {
-    localStorage.setItem('user', JSON.stringify({ role: 'admin', name: 'Admin' }));
-    navigate('/admin/dashboard');
+  const handleAdminClick = () => {
+    setIsStudentLogin(false);
+    setError('');
   };
 
   return (
@@ -67,14 +73,18 @@ const Login = () => {
           </div>
 
           <div className="login-right">
-            <h2 className="admin-login-title">Admin Login</h2>
+            <h2 className="login-title">
+              {isStudentLogin ? 'Student Login' : 'Admin Login'}
+            </h2>
             <form onSubmit={handleSignIn}>
               <div className="form-group">
-                <label htmlFor="email">Email</label>
+                <label htmlFor="email">
+                  {isStudentLogin ? 'User ID' : 'Email'}
+                </label>
                 <input
-                  type="email"
+                  type={isStudentLogin ? 'text' : 'email'}
                   id="email"
-                  placeholder="Username or Email ID"
+                  placeholder={isStudentLogin ? 'Enter User ID' : 'Enter Email'}
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
@@ -116,30 +126,32 @@ const Login = () => {
               <div className="role-buttons">
                 <button
                   type="button"
-                  className="role-btn admin"
-                  onClick={handleDirectAdminClick}
+                  className={`role-btn admin ${!isStudentLogin ? 'active' : ''}`}
+                  onClick={handleAdminClick}
                 >
                   Admin Login
                 </button>
                 <button
                   type="button"
-                  className="role-btn student"
+                  className={`role-btn student ${isStudentLogin ? 'active' : ''}`}
                   onClick={handleStudentClick}
                 >
                   Student Login
                 </button>
               </div>
 
-              <div className="signup-link">
-                Don't have an account?{' '}
-                <button 
-                  type="button" 
-                  className="link-btn"
-                  onClick={() => navigate('/signup')}
-                >
-                  Sign Up
-                </button>
-              </div>
+              {!isStudentLogin && (
+                <div className="signup-link">
+                  Don't have an account?{' '}
+                  <button 
+                    type="button" 
+                    className="link-btn"
+                    onClick={() => navigate('/signup')}
+                  >
+                    Sign Up
+                  </button>
+                </div>
+              )}
             </form>
           </div>
         </div>
