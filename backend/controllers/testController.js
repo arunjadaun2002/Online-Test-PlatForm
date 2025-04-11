@@ -163,4 +163,91 @@ const getAllTests = async (req, res) => {
   }
 }
 
-module.exports = { createTestWithFile, addTypedQuestion, uplaodTypedTest, getAllTests };
+const getAllQuizzes = async (req, res) => {
+  try {
+    const admin = await User.findById(req.user.id);
+    if (!admin || admin.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    const quizzes = await Test.find({}).select('-excelUrl');
+    res.status(200).json({
+      success: true,
+      data: quizzes
+    });
+  } catch (err) {
+    console.log("Error fetching quizzes: ", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
+const deleteQuiz = async (req, res) => {
+  try {
+    const admin = await User.findById(req.user.id);
+    if (!admin || admin.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    const quiz = await Test.findByIdAndDelete(req.params.id);
+    if (!quiz) {
+      return res.status(404).json({
+        success: false,
+        message: 'Quiz not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Quiz deleted successfully'
+    });
+  } catch (err) {
+    console.log("Error deleting quiz: ", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
+const deleteAllQuizzes = async (req, res) => {
+  try {
+    const admin = await User.findById(req.user.id);
+    if (!admin || admin.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    await Test.deleteMany({});
+    res.status(200).json({
+      success: true,
+      message: 'All quizzes deleted successfully'
+    });
+  } catch (err) {
+    console.log("Error deleting all quizzes: ", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
+module.exports = { 
+  createTestWithFile, 
+  addTypedQuestion, 
+  uplaodTypedTest, 
+  getAllTests,
+  getAllQuizzes,
+  deleteQuiz,
+  deleteAllQuizzes
+};

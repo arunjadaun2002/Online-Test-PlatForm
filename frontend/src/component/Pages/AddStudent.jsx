@@ -7,7 +7,8 @@ const AddStudent = () => {
   const [formData, setFormData] = useState({
     name: '',
     email: '',
-    section: '',
+    class: '',
+    userId: '',
     password: '',
     confirmPassword: ''
   });
@@ -34,8 +35,26 @@ const AddStudent = () => {
       return;
     }
 
+    // Validate password length
+    if (formData.password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      setLoading(false);
+      return;
+    }
+
+    // Validate required fields
+    if (!formData.name || !formData.email || !formData.class || !formData.userId || !formData.password) {
+      setError('All fields are required');
+      setLoading(false);
+      return;
+    }
+
     try {
       const token = localStorage.getItem('token');
+      if (!token) {
+        throw new Error('Authentication token not found');
+      }
+
       const response = await fetch('http://localhost:4000/api/admin/register-student', {
         method: 'POST',
         headers: {
@@ -45,7 +64,8 @@ const AddStudent = () => {
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
-          section: formData.section,
+          class: formData.class,
+          userId: formData.userId,
           password: formData.password
         })
       });
@@ -58,9 +78,10 @@ const AddStudent = () => {
 
       // Show success message and redirect
       alert('Student registered successfully!');
-      navigate('/admin/student-info');
+      navigate('/admin/students');
     } catch (err) {
-      setError(err.message);
+      console.error('Registration error:', err);
+      setError(err.message || 'Failed to register student. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -93,14 +114,28 @@ const AddStudent = () => {
             />
           </div>
           <div className="form-group">
-            <label>Section:</label>
+            <label>User ID:</label>
             <input
               type="text"
-              name="section"
-              value={formData.section}
+              name="userId"
+              value={formData.userId}
               onChange={handleChange}
               required
             />
+          </div>
+          <div className="form-group">
+            <label>Class:</label>
+            <select
+              name="class"
+              value={formData.class}
+              onChange={handleChange}
+              required
+            >
+              <option value="">Select Class</option>
+              {['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].map(cls => (
+                <option key={`add-class-${cls}`} value={cls}>Class {cls}</option>
+              ))}
+            </select>
           </div>
           <div className="form-group">
             <label>Password:</label>
@@ -110,6 +145,7 @@ const AddStudent = () => {
               value={formData.password}
               onChange={handleChange}
               required
+              minLength={6}
             />
           </div>
           <div className="form-group">
@@ -120,6 +156,7 @@ const AddStudent = () => {
               value={formData.confirmPassword}
               onChange={handleChange}
               required
+              minLength={6}
             />
           </div>
           <div className="form-actions">

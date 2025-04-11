@@ -2,6 +2,7 @@ const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../utils/mailer');
+const Student = require('../models/studentModel');
 
 exports.adminSignup = async (req, res) => {
     try{
@@ -105,41 +106,77 @@ exports.adminForgotPassword = async (req, res) =>{
 }
 
 exports.registerStudent = async (req, res) => {
-    try {
-        const { name, email, section, password } = req.body;
-        const admin = await User.findById(req.user.id)
-        if(!admin || admin.role != 'admin'){
-            return res.status(403).json({
-                message: 'Unauthorized'
-            })
-        }
+  try {
+    const { name, email, class: studentClass, password, userId } = req.body;
 
-        const existingStudent = await User.findOne({email});
-
-        if(existingStudent){
-            return res.status(400).json({
-                success: false,
-                message: 'Student alrady register'
-            })
-        }
-
-        const hashedPassword = await bcrypt.hash(password, 10);
-        const student = await User.create({name, email, section, password: hashedPassword, role: 'student'});
-        res.status(201).json({
-            success: true,
-            message: 'Student register successfully',
-            student: student
-        })
-    }catch(err){
-        console.log('Error: registerStudent');
-        console.log(err);
-        res.status(500).json({
-            success: false,
-            message:'Internal Server Error',
-            error: err.message
-        })
+    // Validate required fields
+    if (!name || !email || !studentClass || !password || !userId) {
+      return res.status(400).json({
+        success: false,
+        message: 'All fields are required'
+      });
     }
-}
+
+    // Validate class
+    if (!['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].includes(studentClass)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid class value'
+      });
+    }
+
+    // Check if student already exists
+    const existingStudent = await Student.findOne({ $or: [{ email }, { userId }] });
+    if (existingStudent) {
+      return res.status(400).json({
+        success: false,
+        message: 'Student with this email or user ID already exists'
+      });
+    }
+
+    // Hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
+
+    // Create new student
+    const student = new Student({
+      name,
+      email,
+      class: studentClass,
+      userId,
+      password: hashedPassword,
+      verified: true
+    });
+
+    // Save the student
+    await student.save({ validateBeforeSave: true });
+
+    console.log('Student registered successfully:', {
+      email,
+      hashedPassword
+    });
+
+    res.status(201).json({
+      success: true,
+      message: 'Student registered successfully',
+      data: {
+        id: student._id,
+        name: student.name,
+        email: student.email,
+        class: student.class,
+        userId: student.userId,
+        verified: student.verified
+      }
+    });
+  } catch (error) {
+    console.error('Error registering student:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Error registering student',
+      error: error.message
+    });
+  }
+};
 
 exports.verifyAdmin = async (req, res) => {
     try {
@@ -199,7 +236,7 @@ exports.getAllStudents = async (req, res) => {
             });
         }
 
-        const students = await User.find({ role: 'student' }).select('-password');
+        const students = await Student.find({}).select('-password');
         
         res.status(200).json({
             success: true,

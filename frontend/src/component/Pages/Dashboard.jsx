@@ -4,16 +4,54 @@ import './Dashboard.css';
 function Dashboard() {
   const [quizCount, setQuizCount] = useState(0);
   const [studentCount, setStudentCount] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
-    // Get quiz count from localStorage
-    const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-    setQuizCount(quizzes.length);
-
-    // Get student count from localStorage
-    const students = JSON.parse(localStorage.getItem('students') || '[]');
-    setStudentCount(students.length);
+    fetchCounts();
   }, []);
+
+  const fetchCounts = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      
+      // Fetch quiz count
+      const quizResponse = await fetch('http://localhost:4000/api/admin/quizzes', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!quizResponse.ok) {
+        throw new Error('Failed to fetch quiz count');
+      }
+
+      const quizData = await quizResponse.json();
+      setQuizCount(quizData.data.length);
+
+      // Fetch student count
+      const studentResponse = await fetch('http://localhost:4000/api/admin/students', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!studentResponse.ok) {
+        throw new Error('Failed to fetch student count');
+      }
+
+      const studentData = await studentResponse.json();
+      setStudentCount(studentData.data.length);
+
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
+
+  if (loading) return <div className="loading">Loading...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   return (
     <div className="dashboard-container">

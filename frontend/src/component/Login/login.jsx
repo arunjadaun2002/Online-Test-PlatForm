@@ -17,26 +17,26 @@ const Login = () => {
     setError('');
 
     try {
-      const endpoint = isStudentLogin ? 'student' : 'admin';
-      const response = await fetch(`http://localhost:4000/api/${endpoint}/login`, {
+      const response = await fetch('http://localhost:4000/api/auth/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ 
+          email, 
+          password,
+          role: isStudentLogin ? 'student' : 'admin'
+        }),
       });
 
       const data = await response.json();
       console.log('Login response:', data);
 
-      if (data.success) {
+      if (response.ok) {
         localStorage.setItem('token', data.token);
-        localStorage.setItem('user', JSON.stringify({ 
-          role: isStudentLogin ? 'student' : 'admin',
-          name: email.split('@')[0]
-        }));
+        localStorage.setItem('user', JSON.stringify(data.user));
         
-        if (isStudentLogin) {
+        if (data.user.role === 'student') {
           navigate('/student/dashboard');
         } else {
           navigate('/admin/dashboard');

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './Quiz.css';
 
@@ -6,23 +6,88 @@ function Quiz() {
   const navigate = useNavigate();
   const [selectedQuiz, setSelectedQuiz] = useState(null);
   const [showQuestionsModal, setShowQuestionsModal] = useState(false);
+  const [quizzes, setQuizzes] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Get quizzes from localStorage
-  const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+  useEffect(() => {
+    fetchQuizzes();
+  }, []);
+
+  const fetchQuizzes = async () => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:4000/api/admin/quizzes', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch quizzes');
+      }
+
+      const data = await response.json();
+      setQuizzes(data.data);
+      setLoading(false);
+    } catch (err) {
+      setError(err.message);
+      setLoading(false);
+    }
+  };
 
   const handleAddQuiz = () => {
     navigate('/admin/create-test');
   };
 
-  const handleDelete = (id) => {
-    const updatedQuizzes = quizzes.filter(quiz => quiz.id !== id);
-    localStorage.setItem('quizzes', JSON.stringify(updatedQuizzes));
-    window.location.reload(); // Refresh to update the list
+  const handleDelete = async (id) => {
+    if (!window.confirm('Are you sure you want to delete this quiz?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:4000/api/admin/quizzes/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete quiz');
+      }
+
+      // Refresh the quiz list
+      fetchQuizzes();
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
-  const handleDeleteAll = () => {
-    localStorage.removeItem('quizzes');
-    window.location.reload(); // Refresh to update the list
+  const handleDeleteAll = async () => {
+    if (!window.confirm('Are you sure you want to delete all quizzes?')) {
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch('http://localhost:4000/api/admin/quizzes', {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete all quizzes');
+      }
+
+      // Refresh the quiz list
+      fetchQuizzes();
+    } catch (err) {
+      setError(err.message);
+    }
   };
 
   const handleEdit = (id) => {
@@ -39,6 +104,9 @@ function Quiz() {
     setShowQuestionsModal(false);
     setSelectedQuiz(null);
   };
+
+  if (loading) return <div className="loading">Loading...</div>;
+  if (error) return <div className="error">Error: {error}</div>;
 
   return (
     <div className="quiz-container">
@@ -70,12 +138,12 @@ function Quiz() {
           </thead>
           <tbody>
             {quizzes.map((quiz, index) => (
-              <tr key={quiz.id}>
+              <tr key={quiz._id}>
                 <td>{index + 1}</td>
                 <td>{quiz.title}</td>
                 <td>{quiz.description}</td>
                 <td>{quiz.perQuestionMark}</td>
-                <td>{quiz.time}</td>
+                <td>{quiz.timeInMinutes} minutes</td>
                 <td className="action-buttons">
                   <button 
                     className="view-questions-btn"
@@ -85,13 +153,13 @@ function Quiz() {
                   </button>
                   <button 
                     className="edit-btn"
-                    onClick={() => handleEdit(quiz.id)}
+                    onClick={() => handleEdit(quiz._id)}
                   >
                     Edit
                   </button>
                   <button 
                     className="delete-btn"
-                    onClick={() => handleDelete(quiz.id)}
+                    onClick={() => handleDelete(quiz._id)}
                   >
                     Delete
                   </button>

@@ -1,35 +1,52 @@
-const User = require('../models/userModel');
+const Student = require('../models/studentModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../utils/mailer');
 
 exports.studentLogin = async (req, res) => {
-    try{
-        const {email, password} = req.body;
-        const user = await User.findOne({email, role: 'student'});
-        if(!user || !await bcrypt.compare(password, user.password)){
+    try {
+        const { email, password } = req.body;
+        const student = await Student.findOne({ email });
+        
+        if (!student || !await bcrypt.compare(password, student.password)) {
             return res.status(401).json({
                 success: false,
                 message: 'Invalid Credentials'
-            })
+            });
         }
-        const token = jwt.sign({id:user._id}, process.env.JWT_SECRET);
+
+        const token = jwt.sign(
+            { 
+                id: student._id,
+                email: student.email,
+                role: 'student'
+            },
+            process.env.JWT_SECRET,
+            { expiresIn: '1d' }
+        );
+
         res.status(200).json({
             success: true,
-            message:'User singned in',
-            token: token
-        })
-
-    }catch(err){
+            message: 'Student signed in',
+            token,
+            user: {
+                id: student._id,
+                name: student.name,
+                email: student.email,
+                role: 'student',
+                class: student.class
+            }
+        });
+    } catch (err) {
         console.log("Error: studentLogin");
         console.log(err);
         res.status(500).json({
             success: false,
             message: 'Internal Server error',
             error: err.message
-        })
+        });
     }
-}
+};
 
 exports.forgotPassword = async (req, res) => {
     try{

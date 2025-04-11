@@ -7,13 +7,14 @@ const Students = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedClass, setSelectedClass] = useState(null);
   const [editingStudent, setEditingStudent] = useState(null);
   const [emailingStudent, setEmailingStudent] = useState(null);
   const [editForm, setEditForm] = useState({
     name: '',
     email: '',
-    section: '',
-    verified: false
+    class: '',
+    userId: ''
   });
   const [emailForm, setEmailForm] = useState({
     subject: '',
@@ -39,6 +40,7 @@ const Students = () => {
       }
       
       const data = await response.json();
+      console.log('Fetched students:', data.data);
       setStudents(data.data);
       setLoading(false);
     } catch (err) {
@@ -65,7 +67,6 @@ const Students = () => {
         throw new Error('Failed to delete student');
       }
 
-      // Refresh the student list
       fetchStudents();
     } catch (err) {
       setError(err.message);
@@ -77,8 +78,8 @@ const Students = () => {
     setEditForm({
       name: student.name,
       email: student.email,
-      section: student.section || '',
-      verified: student.verified
+      class: student.class,
+      userId: student.userId
     });
   };
 
@@ -99,7 +100,6 @@ const Students = () => {
         throw new Error('Failed to update student');
       }
 
-      // Refresh the student list and close the edit form
       fetchStudents();
       setEditingStudent(null);
     } catch (err) {
@@ -136,7 +136,6 @@ const Students = () => {
         throw new Error('Failed to send email');
       }
 
-      // Close the email modal
       setEmailingStudent(null);
       alert('Email sent successfully!');
     } catch (err) {
@@ -144,11 +143,41 @@ const Students = () => {
     }
   };
 
-  const filteredStudents = students.filter(student => 
-    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    student.userId.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  // Get unique classes and group students by class
+  const uniqueClasses = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'];
+  
+  // Group students by their class
+  const studentsByClass = students.reduce((acc, student) => {
+    const studentClass = String(student.class).trim();
+    if (!acc[studentClass]) {
+      acc[studentClass] = [];
+    }
+    acc[studentClass].push(student);
+    return acc;
+  }, {});
+
+  console.log('Students by class:', studentsByClass);
+
+  const handleClassClick = (cls) => {
+    console.log('Clicked class:', cls);
+    console.log('Students in class:', studentsByClass[cls]);
+    setSelectedClass(cls);
+  };
+
+  const handleCloseClassModal = () => {
+    setSelectedClass(null);
+  };
+
+  const filteredStudents = students.filter(student => {
+    const matchesSearch = 
+      student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      student.userId.toLowerCase().includes(searchTerm.toLowerCase());
+    
+    const matchesClass = selectedClass === null || student.class === selectedClass;
+    
+    return matchesSearch && matchesClass;
+  });
 
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">Error: {error}</div>;
@@ -164,58 +193,88 @@ const Students = () => {
           >
             Add Student
           </button>
-          <div className="search-bar">
-            <input
-              type="text"
-              placeholder="Search students..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-            />
+          <div className="filters">
+            <div className="search-bar">
+              <input
+                type="text"
+                placeholder="Search students..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+              />
+            </div>
           </div>
         </div>
       </div>
 
-      <div className="students-table-container">
-        <table className="students-table">
-          <thead>
-            <tr>
-              <th>Name</th>
-              <th>Email</th>
-              <th>User ID</th>
-              <th>Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            {filteredStudents.map((student) => (
-              <tr key={student._id}>
-                <td>{student.name}</td>
-                <td>{student.email}</td>
-                <td>{student.userId}</td>
-                <td>
-                  <button 
-                    className="action-btn mail"
-                    onClick={() => handleMail(student)}
-                  >
-                    Mail
-                  </button>
-                  <button 
-                    className="action-btn edit"
-                    onClick={() => handleEdit(student)}
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    className="action-btn delete"
-                    onClick={() => handleDelete(student._id)}
-                  >
-                    Delete
-                  </button>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      <div className="class-sections">
+        {uniqueClasses.map(cls => {
+          const classStudents = studentsByClass[cls] || [];
+          return (
+            <div 
+              key={`class-${cls}`}
+              className={`class-section ${selectedClass === cls ? 'active' : ''}`}
+              onClick={() => handleClassClick(cls)}
+            >
+              <h3>Class {cls}</h3>
+              <span className="student-count">{classStudents.length} Students</span>
+            </div>
+          );
+        })}
       </div>
+
+      {selectedClass && (
+        <div className="class-modal">
+          <div className="class-modal-content">
+            <div className="class-modal-header">
+              <h3>Class {selectedClass} Students</h3>
+              <button className="close-btn" onClick={handleCloseClassModal}>×</button>
+            </div>
+            <div className="class-students-table-container">
+              <table className="students-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>User ID</th>
+                    <th>Class</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {studentsByClass[selectedClass]?.map((student) => (
+                    <tr key={student._id}>
+                      <td>{student.name}</td>
+                      <td>{student.email}</td>
+                      <td>{student.userId}</td>
+                      <td>{student.class}</td>
+                      <td>
+                        <button 
+                          className="action-btn mail"
+                          onClick={() => handleMail(student)}
+                        >
+                          Mail
+                        </button>
+                        <button 
+                          className="action-btn edit"
+                          onClick={() => handleEdit(student)}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          className="action-btn delete"
+                          onClick={() => handleDelete(student._id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
 
       {editingStudent && (
         <div className="edit-modal">
@@ -241,22 +300,26 @@ const Students = () => {
                 />
               </div>
               <div className="form-group">
-                <label>Section:</label>
+                <label>User ID:</label>
                 <input
                   type="text"
-                  value={editForm.section}
-                  onChange={(e) => setEditForm({...editForm, section: e.target.value})}
+                  value={editForm.userId}
+                  onChange={(e) => setEditForm({...editForm, userId: e.target.value})}
+                  required
                 />
               </div>
               <div className="form-group">
-                <label>
-                  <input
-                    type="checkbox"
-                    checked={editForm.verified}
-                    onChange={(e) => setEditForm({...editForm, verified: e.target.checked})}
-                  />
-                  Verified
-                </label>
+                <label>Class:</label>
+                <select
+                  value={editForm.class}
+                  onChange={(e) => setEditForm({...editForm, class: e.target.value})}
+                  required
+                >
+                  <option value="">Select Class</option>
+                  {uniqueClasses.map(cls => (
+                    <option key={`edit-class-${cls}`} value={cls}>Class {cls}</option>
+                  ))}
+                </select>
               </div>
               <div className="form-actions">
                 <button type="submit" className="save-btn">Save</button>

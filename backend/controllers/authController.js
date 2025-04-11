@@ -2,6 +2,7 @@ const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 const User = require('../models/userModel');
 const sendEmail = require('../utils/mailer');
+const Student = require('../models/studentModel');
 
 exports.resetPassword = async (req, res) =>{
     try{
@@ -80,4 +81,109 @@ exports.forgotPassword = async (req, res) => {
             error: err.message
         });
     }
+};
+
+exports.login = async (req, res) => {
+  try {
+    const { email, password, role } = req.body;
+    console.log('Login attempt for:', { email, role });
+
+    let user;
+    if (role === 'student') {
+      // Try to find student by email
+      user = await Student.findOne({ email: email?.toLowerCase() });
+      console.log('Student found:', user ? 'Yes' : 'No');
+      
+      if (!user) {
+        return res.status(401).json({ 
+          success: false,
+          message: 'Student not found. Please check your email.' 
+        });
+      }
+
+      // Log the details for debugging
+      console.log('Attempting login with:', {
+        providedPassword: password,
+        storedHash: user.password
+      });
+
+      try {
+        // Use bcrypt.compare with await
+        const isMatch = await bcrypt.compare(password, user.password);
+        console.log('Password match result:', isMatch);
+
+        if (!isMatch) {
+          return res.status(401).json({ 
+            success: false,
+            message: 'Invalid password' 
+          });
+        }
+      } catch (bcryptError) {
+        console.error('Bcrypt error:', bcryptError);
+        return res.status(500).json({
+          success: false,
+          message: 'Error verifying password'
+        });
+      }
+    } else if (role === 'admin') {
+      user = await User.findOne({ email, role: 'admin' });
+      if (!user) {
+        return res.status(401).json({ 
+          success: false,
+          message: 'Admin not found. Please check your email.' 
+        });
+      }
+
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ 
+          success: false,
+          message: 'Invalid password' 
+        });
+      }
+
+      if (!user.verified) {
+        return res.status(401).json({
+          success: false,
+          message: 'Email is not verified'
+        });
+      }
+    } else {
+      return res.status(400).json({
+        success: false,
+        message: 'Please select a valid role'
+      });
+    }
+
+    // Generate JWT token
+    const token = jwt.sign(
+      { 
+        id: user._id,
+        email: user.email,
+        role: user.role || 'student'
+      },
+      process.env.JWT_SECRET,
+      { expiresIn: '1d' }
+    );
+
+    // Return user data and token
+    res.json({
+      success: true,
+      token,
+      user: {
+        id: user._id,
+        name: user.name,
+        email: user.email,
+        userId: user.userId,
+        role: user.role || 'student',
+        class: user.class
+      }
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Server error. Please try again later.' 
+    });
+  }
 };
