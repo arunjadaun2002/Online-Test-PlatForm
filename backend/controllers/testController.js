@@ -63,7 +63,7 @@ const addTypedQuestion = async (req, res) => {
       await workbook.xlsx.readFile(filePath);
     }
 
-    // Attempt to get existing sheet, or create it if it doesn’t exist
+    // Attempt to get existing sheet, or create it if it doesn't exist
     let worksheet = workbook.getWorksheet(SHEET_NAME);
     if (!worksheet) {
       worksheet = workbook.addWorksheet(SHEET_NAME, {
@@ -117,46 +117,32 @@ const uplaodTypedTest = async (req, res) => {
             message: 'Unauthorized'
         })
     }
-    const filePath = "./tempTypedtest.xlsx";
 
-    // if there is no file is there
-    if (!fs.existsSync(filePath)) {
-      return res.status(400).json({
-        success: false,
-        message: "No typed test file found . Please add questions first",
-      });
-    }
-    // Read the file into the buffer
-    const fileBuffer = fs.readFileSync(filePath);
-    // uploading the file to azure
-    const fileUrl = await uploadFileToBlob(fileBuffer);
-
-    // create DB entry
+    // Create DB entry directly from request body
     const testData = {
       title: req.body.title,
       description: req.body.description,
-      totalQuestions: req.body.totalQuestions,
-      totalTime: req.body.totalTime,
+      totalQuestion: req.body.totalQuestion,
       rightMarks: req.body.rightMarks,
       wrongMarks: req.body.wrongMarks,
       sectionId: req.body.sectionId,
       subject: req.body.subject,
-      excelUrl: fileUrl,
+      questions: req.body.questions // Store questions directly
     };
 
     const newTest = await Test.create(testData);
-    // remove from the local storage after uploading the file
-    fs.unlinkSync(filePath);
 
     return res.status(201).json({
       success: true,
-      message: " typed test uploaded in Azure ",
+      message: "Test created successfully",
+      data: newTest
     });
   } catch (err) {
-    console.log("error when uploading the excel file", err);
+    console.log("error when creating test:", err);
     res.status(500).json({
-      sucess: false,
+      success: false,
       message: "Internal server error",
+      error: err.message
     });
   }
 };

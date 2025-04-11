@@ -112,7 +112,7 @@ function CreateTest() {
     });
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (questions.length === 0) {
@@ -120,21 +120,51 @@ function CreateTest() {
       return;
     }
 
-    const newQuiz = {
-      id: Date.now(), // Generate unique ID
-      title: testData.title,
-      description: testData.description,
-      time: parseInt(testData.timeInMinutes),
-      perQuestionMark: parseInt(testData.perQuestionMark),
-      totalQuestions: parseInt(testData.totalQuestions),
-      questions: questions
-    };
+    try {
+      const newQuiz = {
+        title: testData.title,
+        description: testData.description,
+        totalQuestion: parseInt(testData.totalQuestions),
+        rightMarks: parseInt(testData.perQuestionMark),
+        wrongMarks: 0,
+        subject: 'General',
+        sectionId: Date.now().toString(),
+        questions: questions.map(q => ({
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer
+        }))
+      };
 
-    // Save to localStorage
-    const existingQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-    localStorage.setItem('quizzes', JSON.stringify([...existingQuizzes, newQuiz]));
-    
-    navigate('/quiz');
+      const response = await fetch('http://localhost:4000/api/test/typedtest/upload', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${localStorage.getItem('token')}`
+        },
+        body: JSON.stringify(newQuiz)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to create quiz');
+      }
+
+      const data = await response.json();
+
+      const existingQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
+      localStorage.setItem('quizzes', JSON.stringify([...existingQuizzes, { 
+        ...newQuiz, 
+        id: Date.now(),
+        time: testData.timeInMinutes,
+        perQuestionMark: testData.perQuestionMark
+      }]));
+      
+      navigate('/admin/quiz');
+    } catch (error) {
+      console.error('Error creating quiz:', error);
+      alert('Failed to create quiz. Please try again.');
+    }
   };
 
   return (

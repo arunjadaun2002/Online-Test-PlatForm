@@ -11,7 +11,7 @@ function Quiz() {
   const quizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
 
   const handleAddQuiz = () => {
-    navigate('/create-test');
+    navigate('/admin/create-test');
   };
 
   const handleDelete = (id) => {

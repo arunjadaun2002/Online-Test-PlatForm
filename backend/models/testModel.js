@@ -7,7 +7,7 @@ const testSchema = new mongoose.Schema(
       required: true,
     },
     description: String,
-    totalQuestion:Number,
+    totalQuestion: Number,
     rightMarks: {
       type: Number,
       required: true,
@@ -19,6 +19,11 @@ const testSchema = new mongoose.Schema(
     },
     subject: String,
     excelUrl: String,
+    questions: [{
+      question: String,
+      options: [String],
+      correctAnswer: String
+    }]
   },
   { timestamps: true }
 );

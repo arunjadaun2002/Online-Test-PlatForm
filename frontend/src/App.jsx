@@ -1,7 +1,9 @@
 import React from "react";
 import { Navigate, Route, Routes } from "react-router-dom";
 import AdminLayout from "./component/AdminPanel/AdminLayout";
+import ForgotPassword from "./component/Login/ForgotPassword";
 import Login from "./component/Login/login";
+import ResetPassword from "./component/Login/ResetPassword";
 import Signup from "./component/Login/Signup";
 import VerifyEmail from "./component/Login/VerifyEmail";
 import { QuizProvider } from './component/Pages/QuizContext';
@@ -20,6 +22,8 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/verify/:token" element={<VerifyEmail />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route path="/reset-password/:token" element={<ResetPassword />} />
           <Route path="/" element={<Navigate to="/login" replace />} />
 
           {/* Admin Routes */}
