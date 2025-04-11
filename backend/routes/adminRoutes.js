@@ -1,5 +1,5 @@
 const express = require('express');
-const { adminSignup, adminLogin, adminForgotPassword, registerStudent, verifyAdmin, getAllStudents, deleteStudent, updateStudent, sendEmail } = require('../controllers/adminController');
+const { adminSignup, adminLogin, adminForgotPassword, registerStudent, verifyAdmin, getAllStudents, deleteStudent, updateStudent, sendEmail, changeStudentPassword } = require('../controllers/adminController');
 const { getAllQuizzes, deleteQuiz, deleteAllQuizzes } = require('../controllers/testController');
 const authentication = require('../middlewares/authMiddleware');
 
@@ -15,6 +15,7 @@ router.get('/students', authentication, getAllStudents);
 router.delete('/students/:id', authentication, deleteStudent);
 router.put('/students/:id', authentication, updateStudent);
 router.post('/send-email', authentication, sendEmail);
+router.put('/student/password', authentication, changeStudentPassword);
 
 // Quiz routes
 router.get('/quizzes', authentication, getAllQuizzes);

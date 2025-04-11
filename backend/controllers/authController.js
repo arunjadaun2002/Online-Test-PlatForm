@@ -101,32 +101,15 @@ exports.login = async (req, res) => {
         });
       }
 
-      // Log the details for debugging
-      console.log('Attempting login with:', {
-        providedPassword: password,
-        storedHash: user.password
-      });
-
-      try {
-        // Use bcrypt.compare with await
-        const isMatch = await bcrypt.compare(password, user.password);
-        console.log('Password match result:', isMatch);
-
-        if (!isMatch) {
-          return res.status(401).json({ 
-            success: false,
-            message: 'Invalid password' 
-          });
-        }
-      } catch (bcryptError) {
-        console.error('Bcrypt error:', bcryptError);
-        return res.status(500).json({
+      const isMatch = await bcrypt.compare(password, user.password);
+      if (!isMatch) {
+        return res.status(401).json({ 
           success: false,
-          message: 'Error verifying password'
+          message: 'Invalid password' 
         });
       }
     } else if (role === 'admin') {
-      user = await User.findOne({ email, role: 'admin' });
+      user = await User.findOne({ email: email?.toLowerCase(), role: 'admin' });
       if (!user) {
         return res.status(401).json({ 
           success: false,

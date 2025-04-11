@@ -14,7 +14,8 @@ const Students = () => {
     name: '',
     email: '',
     class: '',
-    userId: ''
+    userId: '',
+    password: ''
   });
   const [emailForm, setEmailForm] = useState({
     subject: '',
@@ -79,7 +80,8 @@ const Students = () => {
       name: student.name,
       email: student.email,
       class: student.class,
-      userId: student.userId
+      userId: student.userId,
+      password: ''
     });
   };
 
@@ -87,17 +89,46 @@ const Students = () => {
     e.preventDefault();
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:4000/api/admin/students/${editingStudent._id}`, {
+      
+      // First update the student's basic info
+      const response = await fetch('http://localhost:4000/api/admin/update-student', {
         method: 'PUT',
         headers: {
           'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(editForm)
+        body: JSON.stringify({
+          studentId: editingStudent._id,
+          name: editForm.name,
+          email: editForm.email,
+          class: editForm.class,
+          userId: editForm.userId
+        })
       });
 
       if (!response.ok) {
-        throw new Error('Failed to update student');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to update student');
+      }
+
+      // If password is provided, update it separately
+      if (editForm.password) {
+        const passwordResponse = await fetch('http://localhost:4000/api/admin/student/password', {
+          method: 'PUT',
+          headers: {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            studentId: editingStudent._id,
+            newPassword: editForm.password
+          })
+        });
+
+        if (!passwordResponse.ok) {
+          const errorData = await passwordResponse.json();
+          throw new Error(errorData.message || 'Failed to update password');
+        }
       }
 
       fetchStudents();
@@ -320,6 +351,14 @@ const Students = () => {
                     <option key={`edit-class-${cls}`} value={cls}>Class {cls}</option>
                   ))}
                 </select>
+              </div>
+              <div className="form-group">
+                <label>Password:</label>
+                <input
+                  type="password"
+                  value={editForm.password}
+                  onChange={(e) => setEditForm({...editForm, password: e.target.value})}
+                />
               </div>
               <div className="form-actions">
                 <button type="submit" className="save-btn">Save</button>

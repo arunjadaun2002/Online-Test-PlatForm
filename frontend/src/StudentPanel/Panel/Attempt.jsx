@@ -1,39 +1,84 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './Attempt.css';
 
 const Attempt = () => {
-    // Mock data for available tests
-    const availableTests = [
-        {
-            id: 1,
-            name: "Test On 66 KV",
-            course: "Science",
-            startTime: "Mar 28 2025 9:00AM",
-            endTime: "Mar 28 2025 5:00PM",
-            duration: "60 minutes"
-        },
-        {
-            id: 2,
-            name: "Test On DSA",
-            course: "Computer Science",
-            startTime: "Mar 29 2025 10:00AM",
-            endTime: "Mar 29 2025 6:00PM",
-            duration: "45 minutes"
-        },
-        {
-            id: 3,
-            name: "Test On JavaScript",
-            course: "Web Development",
-            startTime: "Mar 30 2025 9:00AM",
-            endTime: "Mar 30 2025 5:00PM",
-            duration: "90 minutes"
+    const navigate = useNavigate();
+    const [tests, setTests] = useState([]);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
+    const [studentClass, setStudentClass] = useState(null);
+
+    useEffect(() => {
+        fetchStudentData();
+    }, []);
+
+    const fetchStudentData = async () => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:4000/api/student/profile', {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch student data');
+            }
+
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to fetch student data');
+            }
+
+            const studentClass = data.data.class;
+            setStudentClass(studentClass);
+            fetchTests(studentClass);
+        } catch (err) {
+            console.error('Error fetching student data:', err);
+            setError(err.message);
+            setLoading(false);
         }
-    ];
+    };
+
+    const fetchTests = async (studentClass) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:4000/api/student/tests`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch tests');
+            }
+
+            const data = await response.json();
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to fetch tests');
+            }
+
+            setTests(data.data);
+            setLoading(false);
+        } catch (err) {
+            console.error('Error fetching tests:', err);
+            setError(err.message);
+            setLoading(false);
+        }
+    };
+
+    const handleStartTest = (testId) => {
+        navigate(`/student/test/${testId}`);
+    };
+
+    if (loading) return <div className="loading">Loading...</div>;
+    if (error) return <div className="error">Error: {error}</div>;
 
     return (
         <div className="attempt-page">
             <div className="attempt-header">
-                <h1>Available Test:</h1>
+                <h1>Available Tests for Class {studentClass}</h1>
                 <div className="search-container">
                     <h2>Search Test :</h2>
                     <div className="search-box">
@@ -50,22 +95,33 @@ const Attempt = () => {
             <div className="test-list">
                 <h2>Select Test :</h2>
                 <div className="test-cards">
-                    {availableTests.map((test) => (
-                        <div key={test.id} className="test-card">
-                            <div className="test-info">
-                                <h3>{test.name}</h3>
-                                <div className="test-details">
-                                    <p>Start: {test.startTime}</p>
-                                    <p>End: {test.endTime}</p>
-                                    <p>Duration: {test.duration}</p>
+                    {tests.length === 0 ? (
+                        <div className="no-tests">
+                            <p>No tests available for your class at the moment.</p>
+                        </div>
+                    ) : (
+                        tests.map((test) => (
+                            <div key={test._id} className="test-card">
+                                <div className="test-info">
+                                    <h3>{test.title}</h3>
+                                    <div className="test-details">
+                                        <p>Total Questions: {test.totalQuestion}</p>
+                                        <p>Marks per Question: {test.rightMarks}</p>
+                                        <p>Class: {test.class}</p>
+                                    </div>
+                                </div>
+                                <div className="test-meta">
+                                    <span className="course-tag">Subject: {test.subject || 'General'}</span>
+                                    <button 
+                                        className="start-test-btn"
+                                        onClick={() => handleStartTest(test._id)}
+                                    >
+                                        Start Test
+                                    </button>
                                 </div>
                             </div>
-                            <div className="test-meta">
-                                <span className="course-tag">Course: {test.course}</span>
-                                <button className="start-test-btn">Start Test</button>
-                            </div>
-                        </div>
-                    ))}
+                        ))
+                    )}
                 </div>
             </div>
         </div>
