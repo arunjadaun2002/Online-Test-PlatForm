@@ -89,8 +89,23 @@
     font-size: 0.9rem;
 }
 
+.success-message {
+    color: #28a745;
+    text-align: center;
+    margin-bottom: 15px;
+    padding: 10px;
+    background-color: #e6ffe6;
+    border-radius: 5px;
+    font-size: 0.9rem;
+}
+
 .button-group {
     margin: 25px 0;
+}
+
+.back-to-login {
+    text-align: center;
+    margin-top: 20px;
 }
 
 .Log-in-btn {
@@ -124,8 +139,9 @@
     text-align: center;
     color: #dc3545;
     text-decoration: none;
-    margin: 20px 0;
+    margin: 20px 0 20px 40%; /* added 60% left margin */
 }
+
 
 .role-buttons {
     display: flex;

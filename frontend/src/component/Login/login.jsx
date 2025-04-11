@@ -119,9 +119,13 @@ const Login = () => {
                 </button>
               </div>
 
-              <a href="#" className="forget-password">
+              <button 
+                type="button" 
+                className="forget-password"
+                onClick={() => navigate('/forgot-password')}
+              >
                 Forget Password
-              </a>
+              </button>
 
               <div className="role-buttons">
                 <button

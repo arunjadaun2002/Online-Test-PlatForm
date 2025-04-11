@@ -17,7 +17,7 @@ const ForgotPassword = () => {
     setSuccess('');
 
     try {
-      const response = await fetch('http://localhost:4000/api/auth/forgot-password', {
+      const response = await fetch('http://localhost:4000/api/admin/forgot-password', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -45,7 +45,7 @@ const ForgotPassword = () => {
   return (
     <div className="login-page">
       <div className="container">
-        <h1 className="heading">Forgot Password</h1>
+        <h1 className="heading">Online Test</h1>
 
         <div className="login-container">
           <div className="login-left">
@@ -53,10 +53,10 @@ const ForgotPassword = () => {
           </div>
 
           <div className="login-right">
-            <h2 className="login-title">Reset Your Password</h2>
+            <h2 className="login-title">Reset Password</h2>
             <form onSubmit={handleSubmit}>
               <div className="form-group">
-                <label>Email</label>
+                <label htmlFor="email">Email</label>
                 <input
                   type="email"
                   id="email"

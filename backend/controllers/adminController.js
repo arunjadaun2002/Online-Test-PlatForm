@@ -188,3 +188,161 @@ exports.verifyAdmin = async (req, res) => {
         });
     }
 }
+
+exports.getAllStudents = async (req, res) => {
+    try {
+        const admin = await User.findById(req.user.id);
+        if (!admin || admin.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized'
+            });
+        }
+
+        const students = await User.find({ role: 'student' }).select('-password');
+        
+        res.status(200).json({
+            success: true,
+            data: students
+        });
+    } catch (err) {
+        console.log('Error: getAllStudents');
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error',
+            error: err.message
+        });
+    }
+}
+
+exports.deleteStudent = async (req, res) => {
+    try {
+        const admin = await User.findById(req.user.id);
+        if (!admin || admin.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized'
+            });
+        }
+
+        const studentId = req.params.id;
+        const student = await User.findById(studentId);
+        
+        if (!student || student.role !== 'student') {
+            return res.status(404).json({
+                success: false,
+                message: 'Student not found'
+            });
+        }
+
+        await User.findByIdAndDelete(studentId);
+        
+        res.status(200).json({
+            success: true,
+            message: 'Student deleted successfully'
+        });
+    } catch (err) {
+        console.log('Error: deleteStudent');
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error',
+            error: err.message
+        });
+    }
+}
+
+exports.updateStudent = async (req, res) => {
+    try {
+        const admin = await User.findById(req.user.id);
+        if (!admin || admin.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized'
+            });
+        }
+
+        const studentId = req.params.id;
+        const { name, email, section, verified } = req.body;
+
+        const student = await User.findById(studentId);
+        if (!student || student.role !== 'student') {
+            return res.status(404).json({
+                success: false,
+                message: 'Student not found'
+            });
+        }
+
+        // Check if email is being changed and if it's already taken
+        if (email && email !== student.email) {
+            const existingStudent = await User.findOne({ email });
+            if (existingStudent) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'Email already in use'
+                });
+            }
+        }
+
+        // Update student fields
+        const updateData = {};
+        if (name) updateData.name = name;
+        if (email) updateData.email = email;
+        if (section) updateData.section = section;
+        if (typeof verified === 'boolean') updateData.verified = verified;
+
+        const updatedStudent = await User.findByIdAndUpdate(
+            studentId,
+            updateData,
+            { new: true }
+        ).select('-password');
+
+        res.status(200).json({
+            success: true,
+            message: 'Student updated successfully',
+            data: updatedStudent
+        });
+    } catch (err) {
+        console.log('Error: updateStudent');
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error',
+            error: err.message
+        });
+    }
+}
+
+exports.sendEmail = async (req, res) => {
+    try {
+        const admin = await User.findById(req.user.id);
+        if (!admin || admin.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized'
+            });
+        }
+
+        const { to, subject, message } = req.body;
+
+        await sendEmail(
+            to,
+            subject,
+            message
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Email sent successfully'
+        });
+    } catch (err) {
+        console.log('Error: sendEmail');
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to send email',
+            error: err.message
+        });
+    }
+}
