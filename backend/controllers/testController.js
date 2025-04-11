@@ -3,6 +3,7 @@ const fs = require("fs");
 const Test = require("../models/testModel");
 const User = require("../models/userModel");
 const { uploadFileToBlob } = require("../services/azureBlobService");
+const Student = require("../models/studentModel");
 
 const createTestWithFile = async (req, res) => {
   try {
@@ -126,6 +127,12 @@ const uplaodTypedTest = async (req, res) => {
       });
     }
 
+    // Standardize class format to "Class X"
+    let standardizedClass = req.body.class;
+    if (!standardizedClass.startsWith('Class ')) {
+      standardizedClass = `Class ${standardizedClass}`;
+    }
+
     // Create DB entry directly from request body
     const testData = {
       title: req.body.title,
@@ -135,7 +142,7 @@ const uplaodTypedTest = async (req, res) => {
       wrongMarks: req.body.wrongMarks,
       sectionId: req.body.sectionId,
       subject: req.body.subject,
-      class: req.body.class,
+      class: standardizedClass,
       questions: req.body.questions // Store questions directly
     };
 
@@ -252,6 +259,75 @@ const deleteAllQuizzes = async (req, res) => {
   }
 };
 
+const getTestsByClass = async (req, res) => {
+  try {
+    const student = await Student.findById(req.user.id);
+    if (!student) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    console.log('Student class:', student.class);
+    
+    // Convert student's class to standardized format
+    const studentClass = `Class ${student.class}`;
+    
+    // Find tests with matching class
+    const tests = await Test.find({
+      class: studentClass
+    }).select('-excelUrl');
+    
+    console.log('Found tests:', tests);
+
+    res.status(200).json({
+      success: true,
+      data: tests
+    });
+  } catch (err) {
+    console.log("Error fetching tests by class: ", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
+const updateTestClasses = async (req, res) => {
+  try {
+    const admin = await User.findById(req.user.id);
+    if (!admin || admin.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    // Get all tests
+    const tests = await Test.find({});
+    
+    // Update each test's class format
+    for (const test of tests) {
+      if (test.class && !test.class.startsWith('Class ')) {
+        test.class = `Class ${test.class}`;
+        await test.save();
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Test classes updated successfully'
+    });
+  } catch (err) {
+    console.log("Error updating test classes: ", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
 module.exports = { 
   createTestWithFile, 
   addTypedQuestion, 
@@ -259,5 +335,7 @@ module.exports = {
   getAllTests,
   getAllQuizzes,
   deleteQuiz,
-  deleteAllQuizzes
+  deleteAllQuizzes,
+  getTestsByClass,
+  updateTestClasses
 };

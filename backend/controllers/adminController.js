@@ -264,16 +264,16 @@ exports.deleteStudent = async (req, res) => {
         }
 
         const studentId = req.params.id;
-        const student = await User.findById(studentId);
+        const student = await Student.findById(studentId);
         
-        if (!student || student.role !== 'student') {
+        if (!student) {
             return res.status(404).json({
                 success: false,
                 message: 'Student not found'
             });
         }
 
-        await User.findByIdAndDelete(studentId);
+        await Student.findByIdAndDelete(studentId);
         
         res.status(200).json({
             success: true,

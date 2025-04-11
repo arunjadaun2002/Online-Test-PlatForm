@@ -1,0 +1,92 @@
+.student-tests-container {
+  padding: 20px;
+  margin-left: 270px;
+  max-width: calc(100% - 290px);
+  min-height: 100vh;
+  background: #f5f5f5;
+}
+
+.student-tests-container h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.tests-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
+  padding: 20px 0;
+}
+
+.test-card {
+  background: white;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.test-card:hover {
+  transform: translateY(-5px);
+}
+
+.test-card h3 {
+  color: #333;
+  margin-bottom: 10px;
+  font-size: 1.2rem;
+}
+
+.description {
+  color: #666;
+  margin-bottom: 15px;
+  font-size: 0.9rem;
+}
+
+.test-details {
+  margin-bottom: 15px;
+}
+
+.test-details p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 0.9rem;
+}
+
+.attempt-btn {
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: background-color 0.3s;
+}
+
+.attempt-btn:hover {
+  background-color: #45a049;
+}
+
+.loading {
+  text-align: center;
+  padding: 20px;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: 20px;
+  color: #f44336;
+}
+
+@media (max-width: 768px) {
+  .student-tests-container {
+    margin-left: 0;
+    max-width: 100%;
+    padding: 10px;
+  }
+
+  .tests-grid {
+    grid-template-columns: 1fr;
+  }
+} 

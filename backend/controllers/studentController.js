@@ -19,7 +19,8 @@ exports.studentLogin = async (req, res) => {
             { 
                 id: student._id,
                 email: student.email,
-                role: 'student'
+                role: 'student',
+                class: student.class
             },
             process.env.JWT_SECRET,
             { expiresIn: '1d' }
