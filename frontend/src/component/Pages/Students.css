@@ -65,23 +65,6 @@
   background-color: #f8f9fa;
 }
 
-.status-badge {
-  padding: 4px 8px;
-  border-radius: 4px;
-  font-size: 12px;
-  font-weight: 500;
-}
-
-.status-badge.verified {
-  background-color: #d4edda;
-  color: #155724;
-}
-
-.status-badge.pending {
-  background-color: #fff3cd;
-  color: #856404;
-}
-
 .action-btn {
   padding: 6px 12px;
   margin-right: 8px;
@@ -284,5 +267,28 @@
 
 .send-btn:hover {
   opacity: 0.9;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.add-student-btn {
+  padding: 8px 16px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.add-student-btn:hover {
+  background-color: #45a049;
+  transform: translateY(-1px);
 }
 

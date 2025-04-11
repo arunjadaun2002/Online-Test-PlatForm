@@ -1,5 +1,6 @@
 import React from 'react';
 import { Route, Routes } from 'react-router-dom';
+import AddStudent from '../Pages/AddStudent';
 import CreateTest from '../Pages/CreateTest';
 import Quiz from '../Pages/Quiz';
 import Reports from '../Pages/Reports';
@@ -20,6 +21,7 @@ const AdminLayout = () => {
                 <Routes>
                     <Route path="dashboard" element={<Dashboard />} />
                     <Route path="students" element={<Students />} />
+                    <Route path="add-student" element={<AddStudent />} />
                     <Route path="quiz" element={<Quiz />} />
                     <Route path="create-test" element={<CreateTest />} />
                     <Route path="reports" element={<Reports />} />

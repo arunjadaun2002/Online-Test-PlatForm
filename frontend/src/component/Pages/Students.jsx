@@ -157,13 +157,21 @@ const Students = () => {
     <div className="students-container">
       <div className="students-header">
         <h2>Students</h2>
-        <div className="search-bar">
-          <input
-            type="text"
-            placeholder="Search students..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-          />
+        <div className="header-actions">
+          <button 
+            className="add-student-btn"
+            onClick={() => navigate('/admin/add-student')}
+          >
+            Add Student
+          </button>
+          <div className="search-bar">
+            <input
+              type="text"
+              placeholder="Search students..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+            />
+          </div>
         </div>
       </div>
 
@@ -174,7 +182,6 @@ const Students = () => {
               <th>Name</th>
               <th>Email</th>
               <th>User ID</th>
-              <th>Status</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -184,11 +191,6 @@ const Students = () => {
                 <td>{student.name}</td>
                 <td>{student.email}</td>
                 <td>{student.userId}</td>
-                <td>
-                  <span className={`status-badge ${student.verified ? 'verified' : 'pending'}`}>
-                    {student.verified ? 'Verified' : 'Pending'}
-                  </span>
-                </td>
                 <td>
                   <button 
                     className="action-btn mail"

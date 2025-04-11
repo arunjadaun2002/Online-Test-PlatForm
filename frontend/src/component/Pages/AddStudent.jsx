@@ -1,20 +1,22 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import './AddStudent.css';
 
-function AddStudent({ onClose, onAddStudent }) {
-  const [studentData, setStudentData] = useState({
+const AddStudent = () => {
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
     name: '',
-    userId: '',
-    password: '',
     email: '',
-    section: ''
+    section: '',
+    password: '',
+    confirmPassword: ''
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setStudentData(prev => ({
+    setFormData(prev => ({
       ...prev,
       [name]: value
     }));
@@ -22,127 +24,124 @@ function AddStudent({ onClose, onAddStudent }) {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setLoading(true);
     setError('');
+    setLoading(true);
+
+    // Validate passwords match
+    if (formData.password !== formData.confirmPassword) {
+      setError('Passwords do not match');
+      setLoading(false);
+      return;
+    }
 
     try {
       const token = localStorage.getItem('token');
       const response = await fetch('http://localhost:4000/api/admin/register-student', {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         },
-        body: JSON.stringify(studentData)
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          section: formData.section,
+          password: formData.password
+        })
       });
 
       const data = await response.json();
-      
-      if (data.success) {
-        onAddStudent(data.student);
-        onClose();
-      } else {
-        setError(data.message || 'Failed to add student');
+
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to register student');
       }
+
+      // Show success message and redirect
+      alert('Student registered successfully!');
+      navigate('/admin/student-info');
     } catch (err) {
-      setError('An error occurred while adding student');
-      console.error('Add student error:', err);
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="add-student-modal">
-      <div className="modal-content">
-        <div className="modal-header">
-          <h2>Add Student</h2>
-          <button className="back-btn" onClick={onClose}>
-            ×
-          </button>
-        </div>
+    <div className="add-student-container">
+      <div className="add-student-form">
+        <h2>Add New Student</h2>
+        {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>
-          <div className="form-grid">
-            <div className="form-group">
-              <label>Student Name</label>
-              <input
-                type="text"
-                name="name"
-                value={studentData.name}
-                onChange={handleChange}
-                placeholder="Enter name"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>User ID</label>
-              <input
-                type="text"
-                name="userId"
-                value={studentData.userId}
-                onChange={handleChange}
-                placeholder="Enter user ID"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Email</label>
-              <input
-                type="email"
-                name="email"
-                value={studentData.email}
-                onChange={handleChange}
-                placeholder="Enter email"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Password</label>
-              <input
-                type="password"
-                name="password"
-                value={studentData.password}
-                onChange={handleChange}
-                placeholder="Enter password"
-                required
-              />
-            </div>
-
-            <div className="form-group">
-              <label>Section</label>
-              <input
-                type="text"
-                name="section"
-                value={studentData.section}
-                onChange={handleChange}
-                placeholder="Enter section"
-                required
-              />
-            </div>
+          <div className="form-group">
+            <label>Name:</label>
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+            />
           </div>
-
-          {error && (
-            <div className="error-message">
-              {error}
-            </div>
-          )}
-
-          <div className="modal-footer">
+          <div className="form-group">
+            <label>Email:</label>
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Section:</label>
+            <input
+              type="text"
+              name="section"
+              value={formData.section}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Password:</label>
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-group">
+            <label>Confirm Password:</label>
+            <input
+              type="password"
+              name="confirmPassword"
+              value={formData.confirmPassword}
+              onChange={handleChange}
+              required
+            />
+          </div>
+          <div className="form-actions">
             <button 
               type="submit" 
               className="submit-btn"
               disabled={loading}
             >
-              {loading ? 'Adding...' : 'Add Student'}
+              {loading ? 'Registering...' : 'Register Student'}
+            </button>
+            <button 
+              type="button" 
+              className="cancel-btn"
+              onClick={() => navigate('/admin/students')}
+            >
+              Cancel
             </button>
           </div>
         </form>
       </div>
     </div>
   );
-}
+};
 
 export default AddStudent;
