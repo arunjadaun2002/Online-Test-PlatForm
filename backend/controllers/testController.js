@@ -118,6 +118,14 @@ const uplaodTypedTest = async (req, res) => {
         })
     }
 
+    // Validate required fields
+    if (!req.body.class) {
+      return res.status(400).json({
+        success: false,
+        message: "Class field is required"
+      });
+    }
+
     // Create DB entry directly from request body
     const testData = {
       title: req.body.title,
@@ -127,6 +135,7 @@ const uplaodTypedTest = async (req, res) => {
       wrongMarks: req.body.wrongMarks,
       sectionId: req.body.sectionId,
       subject: req.body.subject,
+      class: req.body.class,
       questions: req.body.questions // Store questions directly
     };
 
@@ -142,7 +151,8 @@ const uplaodTypedTest = async (req, res) => {
     res.status(500).json({
       success: false,
       message: "Internal server error",
-      error: err.message
+      error: err.message,
+      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
     });
   }
 };

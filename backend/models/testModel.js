@@ -19,6 +19,10 @@ const testSchema = new mongoose.Schema(
     },
     subject: String,
     excelUrl: String,
+    class: {
+      type: String,
+      required: true
+    },
     questions: [{
       question: String,
       options: [String],

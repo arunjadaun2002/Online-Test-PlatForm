@@ -131,6 +131,7 @@ function Quiz() {
               <th>#</th>
               <th>Quiz Title</th>
               <th>Description</th>
+              <th>Class</th>
               <th>Per Question Mark</th>
               <th>Time</th>
               <th>Action</th>
@@ -142,6 +143,7 @@ function Quiz() {
                 <td>{index + 1}</td>
                 <td>{quiz.title}</td>
                 <td>{quiz.description}</td>
+                <td>{quiz.class}</td>
                 <td>{quiz.perQuestionMark}</td>
                 <td>{quiz.timeInMinutes} minutes</td>
                 <td className="action-buttons">
