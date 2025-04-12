@@ -131,12 +131,15 @@ function CreateTest() {
         subject: 'General',
         sectionId: Date.now().toString(),
         class: testData.class,
+        timeInMinutes: parseInt(testData.timeInMinutes),
         questions: questions.map(q => ({
           question: q.question,
           options: q.options,
           correctAnswer: q.correctAnswer
         }))
       };
+
+      console.log('Sending quiz data:', newQuiz); // Debug log
 
       const response = await fetch('http://localhost:4000/api/test/typedtest/upload', {
         method: 'POST',
@@ -153,14 +156,7 @@ function CreateTest() {
       }
 
       const data = await response.json();
-
-      const existingQuizzes = JSON.parse(localStorage.getItem('quizzes') || '[]');
-      localStorage.setItem('quizzes', JSON.stringify([...existingQuizzes, { 
-        ...newQuiz, 
-        id: Date.now(),
-        time: testData.timeInMinutes,
-        perQuestionMark: testData.perQuestionMark
-      }]));
+      console.log('Response from server:', data); // Debug log
       
       navigate('/admin/quiz');
     } catch (error) {

@@ -23,6 +23,11 @@ const testSchema = new mongoose.Schema(
       type: String,
       required: true
     },
+    timeInMinutes: {
+      type: Number,
+      required: true,
+      default: 0
+    },
     questions: [{
       question: String,
       options: [String],

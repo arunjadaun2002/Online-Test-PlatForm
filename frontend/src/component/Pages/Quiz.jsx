@@ -17,7 +17,7 @@ function Quiz() {
   const fetchQuizzes = async () => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/admin/quizzes', {
+      const response = await fetch('http://localhost:4000/api/test/tests', {
         headers: {
           'Authorization': `Bearer ${token}`
         }
@@ -28,9 +28,24 @@ function Quiz() {
       }
 
       const data = await response.json();
-      setQuizzes(data.data);
+      console.log('Fetched quizzes data:', data); // Debug log
+
+      if (data.success && data.data) {
+        const formattedQuizzes = data.data.map(quiz => ({
+          ...quiz,
+          rightMarks: quiz.rightMarks || 0,
+          timeInMinutes: quiz.timeInMinutes || 0,
+          class: quiz.class || 'Not specified',
+          description: quiz.description || 'No description'
+        }));
+        console.log('Formatted quizzes:', formattedQuizzes); // Debug log
+        setQuizzes(formattedQuizzes);
+      } else {
+        throw new Error('Invalid response format');
+      }
       setLoading(false);
     } catch (err) {
+      console.error('Error fetching quizzes:', err);
       setError(err.message);
       setLoading(false);
     }
@@ -142,10 +157,10 @@ function Quiz() {
               <tr key={quiz._id}>
                 <td>{index + 1}</td>
                 <td>{quiz.title}</td>
-                <td>{quiz.description}</td>
-                <td>{quiz.class}</td>
-                <td>{quiz.perQuestionMark}</td>
-                <td>{quiz.timeInMinutes} minutes</td>
+                <td>{quiz.description || 'No description'}</td>
+                <td>{quiz.class || 'Not specified'}</td>
+                <td>{quiz.rightMarks || 0}</td>
+                <td>{quiz.timeInMinutes > 0 ? `${quiz.timeInMinutes} minutes` : 'Not specified'}</td>
                 <td className="action-buttons">
                   <button 
                     className="view-questions-btn"

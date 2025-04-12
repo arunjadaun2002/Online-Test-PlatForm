@@ -127,6 +127,13 @@ const uplaodTypedTest = async (req, res) => {
       });
     }
 
+    if (!req.body.timeInMinutes) {
+      return res.status(400).json({
+        success: false,
+        message: "Time duration is required"
+      });
+    }
+
     // Standardize class format to "Class X"
     let standardizedClass = req.body.class;
     if (!standardizedClass.startsWith('Class ')) {
@@ -143,8 +150,11 @@ const uplaodTypedTest = async (req, res) => {
       sectionId: req.body.sectionId,
       subject: req.body.subject,
       class: standardizedClass,
-      questions: req.body.questions // Store questions directly
+      timeInMinutes: parseInt(req.body.timeInMinutes),
+      questions: req.body.questions
     };
+
+    console.log('Creating test with data:', testData); // Debug log
 
     const newTest = await Test.create(testData);
 
@@ -166,19 +176,19 @@ const uplaodTypedTest = async (req, res) => {
 
 const getAllTests = async (req, res) => {
   try {
-    const tests = await Test.find({}, 'title subject sectionId');
+    const tests = await Test.find({}).select('title description totalQuestion rightMarks wrongMarks sectionId subject class timeInMinutes questions createdAt updatedAt');
     return res.status(200).json({
       success: true,
       data: tests
-    })
-  }catch (err) {
+    });
+  } catch (err) {
     console.log("Error fetching tests: ", err);
     return res.status(500).json({
       success: false,
       message: 'Internal Server Error'
-    })
+    });
   }
-}
+};
 
 const getAllQuizzes = async (req, res) => {
   try {
