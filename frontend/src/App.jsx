@@ -10,6 +10,8 @@ import { QuizProvider } from './component/Pages/QuizContext';
 import { StudentProvider } from './component/Pages/StudentContext';
 import Attempt from './StudentPanel/Panel/Attempt';
 import Attempted from './StudentPanel/Panel/Result';
+import TakeTest from './StudentPanel/Panel/TakeTest';
+import TestInstructions from './StudentPanel/Panel/TestInstructions';
 import StudentDashboard from "./StudentPanel/StudentDashboard";
 import StudentLayout from "./StudentPanel/StudentLayout";
 
@@ -34,6 +36,8 @@ function App() {
             <Route path="dashboard" element={<StudentDashboard />} />
             <Route path="attempt" element={<Attempt />} />
             <Route path="attempted" element={<Attempted />} />
+            <Route path="test-instructions/:testId" element={<TestInstructions />} />
+            <Route path="take-test/:testId" element={<TakeTest />} />
             <Route index element={<Navigate to="dashboard" replace />} />
           </Route>
         </Routes>

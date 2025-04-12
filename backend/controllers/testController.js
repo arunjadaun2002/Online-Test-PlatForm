@@ -328,6 +328,69 @@ const updateTestClasses = async (req, res) => {
   }
 };
 
+const getTestById = async (req, res) => {
+  try {
+    const test = await Test.findById(req.params.id);
+    if (!test) {
+      return res.status(404).json({
+        success: false,
+        message: 'Test not found'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: test
+    });
+  } catch (err) {
+    console.log("Error fetching test by ID: ", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
+const getTestByIdForStudent = async (req, res) => {
+  try {
+    const student = await Student.findById(req.user.id);
+    if (!student) {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    const test = await Test.findById(req.params.id);
+    if (!test) {
+      return res.status(404).json({
+        success: false,
+        message: 'Test not found'
+      });
+    }
+
+    // Check if the test is for the student's class
+    const studentClass = `Class ${student.class}`;
+    if (test.class !== studentClass) {
+      return res.status(403).json({
+        success: false,
+        message: 'You are not authorized to take this test'
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      data: test
+    });
+  } catch (err) {
+    console.log("Error fetching test by ID for student: ", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
 module.exports = { 
   createTestWithFile, 
   addTypedQuestion, 
@@ -337,5 +400,7 @@ module.exports = {
   deleteQuiz,
   deleteAllQuizzes,
   getTestsByClass,
-  updateTestClasses
+  updateTestClasses,
+  getTestById,
+  getTestByIdForStudent
 };

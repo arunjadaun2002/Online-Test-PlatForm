@@ -69,7 +69,8 @@ const Attempt = () => {
     };
 
     const handleStartTest = (testId) => {
-        navigate(`/student/test/${testId}`);
+        console.log('Navigating to instructions with test ID:', testId);
+        navigate(`/student/test-instructions/${testId}`);
     };
 
     if (loading) return <div className="loading">Loading...</div>;

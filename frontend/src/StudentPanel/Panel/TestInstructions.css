@@ -1,0 +1,166 @@
+.instructions-page {
+    padding: 20px;
+    max-width: 1800px;
+    margin: 0 auto;
+    margin-left: 300px;
+    margin-right: 50px;
+    width: calc(100% - 350px);
+}
+
+.instructions-container {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 30px;
+}
+
+.instructions-container h1 {
+    color: #63579C;
+    font-size: 28px;
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+.instruction-content h2 {
+    color: #FF4A11;
+    font-size: 20px;
+    margin-bottom: 30px;
+    text-align: center;
+}
+
+.instruction-list {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.instruction-item {
+    background-color: #f8f9fa;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #63579C;
+}
+
+.instruction-item p {
+    margin: 0;
+    color: #333;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.status-indicators {
+    margin-top: 15px;
+    padding-left: 20px;
+}
+
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 10px;
+}
+
+.status-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+}
+
+.status-dot.not-visited {
+    background-color: #ccc;
+}
+
+.status-dot.not-answered {
+    background-color: #FF4A11;
+}
+
+.status-dot.answered {
+    background-color: #28a745;
+}
+
+.status-dot.marked-review {
+    background-color: #ffc107;
+}
+
+.status-dot.answered-marked {
+    background-color: #17a2b8;
+}
+
+.confirmation-section {
+    margin-top: 30px;
+    padding: 20px;
+    background-color: #f8f9fa;
+    border-radius: 8px;
+}
+
+.checkbox-container {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.checkbox-container input[type="checkbox"] {
+    width: 20px;
+    height: 20px;
+    margin-top: 3px;
+}
+
+.checkbox-container label {
+    color: #333;
+    font-size: 16px;
+    line-height: 1.5;
+}
+
+.start-test-btn {
+    display: block;
+    width: 200px;
+    margin: 0 auto;
+    padding: 12px 24px;
+    background-color: #28a745;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 18px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.start-test-btn:hover {
+    background-color: #218838;
+    transform: translateY(-2px);
+}
+
+@media (max-width: 1200px) {
+    .instructions-page {
+        margin-left: 100px;
+        margin-right: 30px;
+        width: calc(100% - 130px);
+    }
+}
+
+@media (max-width: 768px) {
+    .instructions-page {
+        margin-left: 15px;
+        margin-right: 15px;
+        padding: 15px;
+        width: calc(100% - 30px);
+    }
+
+    .instructions-container {
+        padding: 15px;
+    }
+
+    .instruction-item {
+        padding: 10px;
+    }
+
+    .status-indicators {
+        padding-left: 10px;
+    }
+
+    .start-test-btn {
+        width: 100%;
+    }
+} 
