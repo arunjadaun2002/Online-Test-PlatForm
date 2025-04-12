@@ -1,0 +1,815 @@
+/* Global CSS Variables */
+:root {
+  --bg-color: #ffffff;
+  --text-color: #333333;
+  --border-color: #e0e0e0;
+  --hover-bg: #f5f5f5;
+  --section-bg: #ffffff;
+  --title-color: #333333;
+  --section-border: #6c5ce7;
+  --card-bg: #ffffff;
+  /* Constant colors for navbar and sidebar */
+  --nav-bg: #1a1b2e;
+  --nav-text: #ffffff;
+  --nav-hover: #262942;
+  --nav-active: #2d325a;
+  --nav-border: #2d325a;
+  /* Constant button colors */
+  --add-button-bg: #4CAF50;      /* Green */
+  --view-button-bg: #2196F3;     /* Blue */
+  --edit-button-bg: #FFC107;     /* Yellow */
+  --delete-button-bg: #F44336;   /* Red */
+  --button-text: #ffffff;        /* White text */
+}
+
+[data-theme="dark"] {
+  /* Core dark theme colors */
+  --bg-color: #0a0a0a;
+  --text-color: #ffffff;
+  --border-color: #2c2c2c;
+  --hover-bg: #1e1e1e;
+  --section-bg: #121212;
+  --title-color: #ffffff;
+  --section-border: #6c5ce7;
+  --card-bg: #121212;
+  
+  /* Enhanced shadow and interaction colors */
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --card-hover-bg: #1a1a1a;
+  --input-bg: #0f0f0f;
+  --input-border: #2c2c2c;
+  --input-focus-border: #404040;
+  
+  /* Table colors */
+  --table-header-bg: #1a1b2e;
+  --table-row-hover: #1a1a1a;
+  
+  /* Quiz and card colors */
+  --quiz-card-bg: #121212;
+  --quiz-border: #2c2c2c;
+  --quiz-hover: #1a1a1a;
+  
+  /* Accent colors */
+  --accent-purple: #6c5ce7;
+  --accent-purple-hover: #5a4bd1;
+  --success-color: #2ea043;
+  --warning-color: #d29922;
+  --error-color: #da3633;
+  
+  /* Text hierarchy */
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
+  --text-tertiary: #b0b0b0;
+  
+  /* Button colors - New consistent scheme */
+  --button-primary-bg: #6c5ce7;
+  --button-primary-hover: #5a4bd1;
+  --button-secondary-bg: #2d2d3d;
+  --button-secondary-hover: #363648;
+  --button-danger-bg: #da3633;
+  --button-danger-hover: #b22c29;
+  --button-success-bg: #2ea043;
+  --button-success-hover: #2c974b;
+  
+  /* Navbar colors - Keep constant */
+  --nav-bg: #1a1b2e;
+  --nav-text: #ffffff;
+  --nav-hover: #262942;
+  --nav-active: #2d325a;
+  --nav-border: #2d325a;
+}
+
+/* Apply dark mode to entire app */
+body {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  transition: background-color 0.3s, color 0.3s;
+  margin: 0;
+  padding: 0;
+}
+
+/* Apply dark mode to all basic elements */
+h1, h2, h3, h4, h5, h6, p, span, div {
+  color: var(--text-color);
+}
+
+/* Card styles */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] .card {
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Sidebar styles - dark blue theme */
+.sidebar {
+  background-color: var(--nav-bg) !important;
+  border-right: 1px solid var(--nav-border) !important;
+  color: var(--nav-text) !important;
+}
+
+.sidebar * {
+  color: var(--nav-text) !important;
+}
+
+.sidebar a, .sidebar button, .sidebar .nav-link {
+  color: var(--nav-text) !important;
+}
+
+.sidebar a:hover, .sidebar button:hover, .sidebar .nav-link:hover {
+  background-color: var(--nav-hover) !important;
+}
+
+.sidebar .active {
+  background-color: var(--nav-active) !important;
+}
+
+/* Header/Navbar styles - dark blue theme */
+.header, .navbar {
+  background-color: var(--nav-bg) !important;
+  border-bottom: 1px solid var(--nav-border) !important;
+}
+
+.header *, .navbar * {
+  color: var(--nav-text) !important;
+}
+
+/* Input styles */
+input, select, textarea {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] input,
+[data-theme="dark"] select,
+[data-theme="dark"] textarea {
+  background-color: #1a1a1a;
+  border-color: #2c2c2c;
+}
+
+/* Button styles */
+button {
+  background-color: var(--section-bg);
+  color: var(--text-color);
+  border: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] button:not(.sidebar button) {
+  background-color: #1d1d1d;
+  border-color: #2c2c2c;
+}
+
+/* Table styles */
+table {
+  background-color: var(--card-bg);
+  color: var(--text-color);
+}
+
+[data-theme="dark"] table {
+  background-color: #1d1d1d;
+}
+
+th, td {
+  border-color: var(--border-color);
+}
+
+[data-theme="dark"] th,
+[data-theme="dark"] td {
+  border-color: #2c2c2c;
+}
+
+/* Link styles */
+a:not(.sidebar a) {
+  color: #8b7ff8;
+}
+
+[data-theme="dark"] a:not(.sidebar a) {
+  color: #9d93ff;
+}
+
+a:hover:not(.sidebar a) {
+  color: #6c5ce7;
+}
+
+/* Main content area styles */
+.main-content {
+  background-color: var(--bg-color);
+  color: var(--text-color);
+}
+
+/* Settings specific styles */
+.settings-container {
+  background-color: var(--bg-color) !important;
+}
+
+[data-theme="dark"] .settings-container {
+  background-color: #121212 !important;
+}
+
+/* Student Information Page Enhanced Styles */
+[data-theme="dark"] .student-info-container {
+  background-color: #0a0a0a;
+  min-height: 100vh;
+  padding: 25px;
+}
+
+[data-theme="dark"] .student-actions {
+  background-color: var(--quiz-card-bg);
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid var(--quiz-border);
+}
+
+[data-theme="dark"] .student-actions button {
+  background-color: var(--button-primary-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--quiz-border);
+  padding: 10px 20px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  margin-right: 10px;
+}
+
+[data-theme="dark"] .student-actions button:hover {
+  background-color: var(--button-primary-hover);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .student-actions .delete-btn {
+  background-color: var(--button-danger-bg);
+}
+
+[data-theme="dark"] .student-actions .delete-btn:hover {
+  background-color: var(--button-danger-hover);
+}
+
+/* Quiz Page Enhanced Styles */
+[data-theme="dark"] .quiz-container {
+  background-color: #0a0a0a;
+  min-height: 100vh;
+  padding: 25px;
+}
+
+[data-theme="dark"] .quiz-actions {
+  background-color: var(--quiz-card-bg);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  border: 1px solid var(--quiz-border);
+}
+
+[data-theme="dark"] .quiz-card {
+  background-color: var(--quiz-card-bg);
+  border: 1px solid var(--quiz-border);
+  border-radius: 10px;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+[data-theme="dark"] .quiz-card .action-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  padding-top: 15px;
+  border-top: 1px solid var(--quiz-border);
+}
+
+[data-theme="dark"] .quiz-card .action-buttons button {
+  background-color: var(--button-secondary-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--quiz-border);
+  padding: 8px 16px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+[data-theme="dark"] .quiz-card .action-buttons button:hover {
+  background-color: var(--button-secondary-hover);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .quiz-card .start-btn {
+  background-color: var(--button-success-bg) !important;
+}
+
+[data-theme="dark"] .quiz-card .start-btn:hover {
+  background-color: var(--button-success-hover) !important;
+}
+
+/* Create Test Page Enhanced Styles */
+[data-theme="dark"] .create-test-container {
+  background-color: #0a0a0a;
+  min-height: 100vh;
+  padding: 25px;
+}
+
+[data-theme="dark"] .test-form {
+  background-color: #121212;
+  border: 1px solid #2c2c2c;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .test-form .form-actions {
+  display: flex;
+  gap: 15px;
+  margin-top: 25px;
+  padding-top: 20px;
+  border-top: 1px solid #2c2c2c;
+}
+
+[data-theme="dark"] .test-form .form-actions button {
+  background-color: var(--button-primary-bg);
+  color: var(--text-primary);
+  border: 1px solid var(--quiz-border);
+  padding: 12px 24px;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+  min-width: 120px;
+}
+
+[data-theme="dark"] .test-form .form-actions button:hover {
+  background-color: var(--button-primary-hover);
+  transform: translateY(-1px);
+}
+
+[data-theme="dark"] .test-form .form-actions .save-btn {
+  background-color: var(--button-success-bg);
+}
+
+[data-theme="dark"] .test-form .form-actions .save-btn:hover {
+  background-color: var(--button-success-hover);
+}
+
+[data-theme="dark"] .test-form .form-actions .cancel-btn {
+  background-color: var(--button-danger-bg);
+}
+
+[data-theme="dark"] .test-form .form-actions .cancel-btn:hover {
+  background-color: var(--button-danger-hover);
+}
+
+/* Enhanced Input Styles for Dark Mode */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background-color: #0f0f0f !important;
+  border: 1px solid #2c2c2c !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus {
+  border-color: #404040 !important;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+  outline: none;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #666666;
+}
+
+/* Create Test Form Specific Styles */
+[data-theme="dark"] .test-form {
+  background-color: #121212;
+  border: 1px solid #2c2c2c;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] .test-form input,
+[data-theme="dark"] .test-form textarea,
+[data-theme="dark"] .test-form select {
+  background-color: #0f0f0f !important;
+  border: 1px solid #2c2c2c !important;
+  color: #ffffff !important;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+[data-theme="dark"] .test-form label {
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: block;
+  font-weight: 500;
+}
+
+[data-theme="dark"] .test-form .form-group {
+  margin-bottom: 24px;
+}
+
+/* Question Card Styles */
+[data-theme="dark"] .question-card {
+  background-color: #121212;
+  border: 1px solid #2c2c2c;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .question-card input,
+[data-theme="dark"] .question-card textarea {
+  background-color: #0f0f0f !important;
+  border: 1px solid #2c2c2c !important;
+}
+
+[data-theme="dark"] .option-input {
+  background-color: #0f0f0f !important;
+  border: 1px solid #2c2c2c !important;
+  color: var(--text-primary) !important;
+  padding: 10px;
+  margin: 8px 0;
+  border-radius: 4px;
+  width: 100%;
+}
+
+/* Form Field Containers */
+[data-theme="dark"] .form-field {
+  margin-bottom: 20px;
+}
+
+[data-theme="dark"] .form-field label {
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: block;
+}
+
+/* Number Input Specific Styles */
+[data-theme="dark"] input[type="number"] {
+  background-color: #0f0f0f !important;
+  padding: 12px;
+}
+
+/* Textarea Specific Styles */
+[data-theme="dark"] textarea {
+  background-color: #0f0f0f !important;
+  min-height: 120px;
+  resize: vertical;
+  line-height: 1.5;
+  padding: 12px;
+}
+
+/* Select Specific Styles */
+[data-theme="dark"] select {
+  background-color: #0f0f0f !important;
+  background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+  background-position: right 12px center;
+  padding-right: 40px;
+}
+
+/* Enhanced body styles for dark mode */
+[data-theme="dark"] body {
+  background-color: #0a0a0a;
+  color: var(--text-primary);
+}
+
+/* Enhanced container styles */
+[data-theme="dark"] .create-test-container,
+[data-theme="dark"] .quiz-container,
+[data-theme="dark"] .student-info-container {
+  background-color: #0a0a0a;
+  min-height: 100vh;
+  padding: 25px;
+}
+
+/* Enhanced form styles */
+[data-theme="dark"] .test-form {
+  background-color: #121212;
+  border: 1px solid #2c2c2c;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Enhanced input styles */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background-color: #0f0f0f !important;
+  border: 1px solid #2c2c2c !important;
+  color: #ffffff !important;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus {
+  border-color: #404040 !important;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+  outline: none;
+}
+
+[data-theme="dark"] input::placeholder,
+[data-theme="dark"] textarea::placeholder {
+  color: #666666;
+}
+
+/* Enhanced card styles */
+[data-theme="dark"] .question-card {
+  background-color: #121212;
+  border: 1px solid #2c2c2c;
+  padding: 20px;
+  margin: 15px 0;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] .question-card:hover {
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+/* Enhanced label styles */
+[data-theme="dark"] label {
+  color: #e0e0e0;
+  font-weight: 500;
+}
+
+/* Title styles */
+[data-theme="dark"] h1,
+[data-theme="dark"] h2,
+[data-theme="dark"] h3,
+[data-theme="dark"] h4,
+[data-theme="dark"] h5,
+[data-theme="dark"] h6 {
+  color: #ffffff;
+}
+
+/* Enhanced button styles */
+[data-theme="dark"] .primary-button,
+[data-theme="dark"] button.primary {
+  background-color: var(--button-primary-bg);
+  color: #ffffff;
+  border: none;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+  font-weight: 500;
+  padding: 10px 20px;
+  border-radius: 6px;
+}
+
+[data-theme="dark"] .primary-button:hover,
+[data-theme="dark"] button.primary:hover {
+  background-color: var(--button-primary-hover);
+  transform: translateY(-1px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] .secondary-button,
+[data-theme="dark"] button.secondary {
+  background-color: var(--button-secondary-bg);
+  color: #ffffff;
+  border: 1px solid var(--button-secondary-hover);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .secondary-button:hover,
+[data-theme="dark"] button.secondary:hover {
+  background-color: var(--button-secondary-hover);
+  transform: translateY(-1px);
+}
+
+/* Success button */
+[data-theme="dark"] .success-button,
+[data-theme="dark"] .save-btn,
+[data-theme="dark"] button.success {
+  background-color: var(--button-success-bg) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+[data-theme="dark"] .success-button:hover,
+[data-theme="dark"] .save-btn:hover,
+[data-theme="dark"] button.success:hover {
+  background-color: var(--button-success-hover) !important;
+}
+
+/* Danger button */
+[data-theme="dark"] .danger-button,
+[data-theme="dark"] .cancel-btn,
+[data-theme="dark"] button.danger {
+  background-color: var(--button-danger-bg) !important;
+  color: #ffffff !important;
+  border: none !important;
+}
+
+[data-theme="dark"] .danger-button:hover,
+[data-theme="dark"] .cancel-btn:hover,
+[data-theme="dark"] button.danger:hover {
+  background-color: var(--button-danger-hover) !important;
+}
+
+/* Quiz card styles */
+[data-theme="dark"] .quiz-card {
+  background-color: var(--quiz-card-bg);
+  border: 1px solid var(--quiz-border);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .quiz-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+/* Form container styles */
+[data-theme="dark"] .form-container,
+[data-theme="dark"] .test-form,
+[data-theme="dark"] .settings-form {
+  background-color: var(--section-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 25px;
+  box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+/* Input field styles */
+[data-theme="dark"] input,
+[data-theme="dark"] textarea,
+[data-theme="dark"] select {
+  background-color: var(--input-bg) !important;
+  border: 1px solid var(--input-border) !important;
+  color: var(--text-primary) !important;
+  border-radius: 6px;
+  padding: 12px;
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] input:focus,
+[data-theme="dark"] textarea:focus,
+[data-theme="dark"] select:focus {
+  border-color: var(--accent-purple) !important;
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+/* Table styles */
+[data-theme="dark"] table {
+  background-color: var(--section-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+[data-theme="dark"] th {
+  background-color: var(--table-header-bg);
+  color: var(--text-primary);
+  font-weight: 500;
+  padding: 12px 16px;
+}
+
+[data-theme="dark"] td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+[data-theme="dark"] tr:hover {
+  background-color: var(--table-row-hover);
+}
+
+/* Card styles */
+[data-theme="dark"] .card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 20px;
+  margin: 15px 0;
+  box-shadow: 0 2px 4px var(--shadow-color);
+  transition: all 0.2s ease;
+}
+
+[data-theme="dark"] .card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow-color);
+}
+
+/* Navigation elements - keeping constant */
+[data-theme="dark"] .sidebar,
+[data-theme="dark"] .navbar {
+  background-color: var(--nav-bg) !important;
+  color: var(--nav-text) !important;
+}
+
+[data-theme="dark"] .sidebar a,
+[data-theme="dark"] .navbar a {
+  color: var(--nav-text) !important;
+}
+
+[data-theme="dark"] .sidebar a:hover,
+[data-theme="dark"] .navbar a:hover {
+  background-color: var(--nav-hover) !important;
+}
+
+/* Status indicators */
+[data-theme="dark"] .status-success {
+  color: var(--success-color);
+}
+
+[data-theme="dark"] .status-warning {
+  color: var(--warning-color);
+}
+
+[data-theme="dark"] .status-error {
+  color: var(--error-color);
+}
+
+/* Add Student/Quiz button */
+.add-button,
+button[class*="add"],
+.student-actions button:not(.delete-btn),
+.quiz-actions button:not(.delete-btn) {
+  background-color: var(--add-button-bg) !important;
+  color: var(--button-text) !important;
+  border: none !important;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.add-button:hover,
+button[class*="add"]:hover {
+  opacity: 0.9;
+}
+
+/* View Questions button */
+.view-button,
+button[class*="view"],
+.quiz-card .action-buttons button:first-child {
+  background-color: var(--view-button-bg) !important;
+  color: var(--button-text) !important;
+  border: none !important;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.view-button:hover,
+button[class*="view"]:hover {
+  opacity: 0.9;
+}
+
+/* Edit button */
+.edit-button,
+button[class*="edit"],
+.quiz-card .action-buttons button:nth-child(2) {
+  background-color: var(--edit-button-bg) !important;
+  color: #000000 !important;  /* Black text for yellow button */
+  border: none !important;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.edit-button:hover,
+button[class*="edit"]:hover {
+  opacity: 0.9;
+}
+
+/* Delete button */
+.delete-button,
+button[class*="delete"],
+.delete-btn,
+.quiz-card .action-buttons button:last-child {
+  background-color: var(--delete-button-bg) !important;
+  color: var(--button-text) !important;
+  border: none !important;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+
+.delete-button:hover,
+button[class*="delete"]:hover,
+.delete-btn:hover {
+  opacity: 0.9;
+}
+
+/* Search input styles */
+input[type="search"],
+input[placeholder*="Search"] {
+  border: 1px solid #ddd;
+  padding: 8px 12px;
+  border-radius: 4px;
+  width: 100%;
+  max-width: 400px;
+}
+
+/* Remove any hover color changes, only adjust opacity */
+[data-theme="dark"] button:hover {
+  opacity: 0.9;
+  transform: none !important;
+  box-shadow: none !important;
+}
