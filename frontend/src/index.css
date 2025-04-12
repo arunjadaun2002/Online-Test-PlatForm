@@ -20,6 +20,10 @@
   --edit-button-bg: #FFC107;     /* Yellow */
   --delete-button-bg: #F44336;   /* Red */
   --button-text: #ffffff;        /* White text */
+  --background-light: #f5f5f5;
+  --background-dark: #000000;
+  --text-primary: #ffffff;
+  --text-secondary: #e0e0e0;
 }
 
 [data-theme="dark"] {
@@ -81,11 +85,16 @@
 
 /* Apply dark mode to entire app */
 body {
-  background-color: var(--bg-color);
+  background-color: var(--background-light);
   color: var(--text-color);
   transition: background-color 0.3s, color 0.3s;
   margin: 0;
   padding: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 /* Apply dark mode to all basic elements */
@@ -468,7 +477,7 @@ a:hover:not(.sidebar a) {
 
 /* Enhanced body styles for dark mode */
 [data-theme="dark"] body {
-  background-color: #0a0a0a;
+  background-color: var(--background-dark);
   color: var(--text-primary);
 }
 
@@ -476,7 +485,7 @@ a:hover:not(.sidebar a) {
 [data-theme="dark"] .create-test-container,
 [data-theme="dark"] .quiz-container,
 [data-theme="dark"] .student-info-container {
-  background-color: #0a0a0a;
+  background-color: var(--background-dark);
   min-height: 100vh;
   padding: 25px;
 }
@@ -812,4 +821,53 @@ input[placeholder*="Search"] {
   opacity: 0.9;
   transform: none !important;
   box-shadow: none !important;
+}
+
+/* Make sure all pages inherit the dark background */
+[data-theme="dark"] #root {
+  background-color: var(--background-dark);
+  min-height: 100vh;
+}
+
+[data-theme="dark"] * {
+  background-color: initial;
+}
+
+/* Dark mode styles for login pages only */
+[data-theme="dark"] .login-container,
+[data-theme="dark"] .login-card {
+  background-color: #000000;
+}
+
+[data-theme="dark"] .login-container input {
+  background-color: #1a1a1a !important;
+  border-color: #333;
+  color: #ffffff;
+}
+
+[data-theme="dark"] .login-container label,
+[data-theme="dark"] .login-container p,
+[data-theme="dark"] .login-container h1,
+[data-theme="dark"] .login-container h2,
+[data-theme="dark"] .login-container h3,
+[data-theme="dark"] .login-container div:not(.login-card) {
+  background-color: transparent;
+  color: #ffffff;
+}
+
+/* Restore original admin component dark mode styles */
+[data-theme="dark"] .create-test-container,
+[data-theme="dark"] .quiz-container,
+[data-theme="dark"] .student-info-container {
+  background-color: var(--bg-color);
+}
+
+[data-theme="dark"] .test-form {
+  background-color: var(--section-bg);
+}
+
+[data-theme="dark"] input:not(.login-container input),
+[data-theme="dark"] textarea:not(.login-container textarea),
+[data-theme="dark"] select:not(.login-container select) {
+  background-color: var(--input-bg) !important;
 }

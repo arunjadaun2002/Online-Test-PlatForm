@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import examIcon from "../../assets/images/exam-icon.jpeg";
+import examIcon from "../../assets/images/exam-icon.png";
 import "./Signup.css";
 
 const Signup = () => {
@@ -11,7 +11,7 @@ const Signup = () => {
     password: "",
   });
   const [error, setError] = useState("");
-``
+
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData((prev) => ({

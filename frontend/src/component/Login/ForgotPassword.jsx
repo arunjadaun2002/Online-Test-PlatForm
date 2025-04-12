@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import examIcon from '../../assets/images/exam-icon.jpeg';
+import examIcon from '../../assets/images/exam-icon.png';
 import './Login.css';
 
 const ForgotPassword = () => {
