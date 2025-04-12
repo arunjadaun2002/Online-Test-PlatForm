@@ -7,13 +7,32 @@ const TestInstructions = () => {
     const { testId } = useParams();
     const [isChecked, setIsChecked] = useState(false);
 
-    const handleStartTest = () => {
+    const handleStartTest = async () => {
         if (!isChecked) {
             alert('Please read and accept the instructions before starting the test.');
             return;
         }
-        console.log('Starting test with ID:', testId); // Debug log
-        navigate(`/student/take-test/${testId}`);
+
+        try {
+            // Request fullscreen mode
+            if (document.documentElement.requestFullscreen) {
+                await document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                await document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                await document.documentElement.msRequestFullscreen();
+            }
+
+            // Store test start time in localStorage
+            localStorage.setItem('testStartTime', Date.now());
+            localStorage.setItem('tabSwitchCount', '0');
+
+            // Navigate to test page
+            navigate(`/student/take-test/${testId}`);
+        } catch (err) {
+            console.error('Error entering fullscreen:', err);
+            alert('Please allow fullscreen mode to start the test.');
+        }
     };
 
     return (
@@ -25,50 +44,40 @@ const TestInstructions = () => {
                     
                     <div className="instruction-list">
                         <div className="instruction-item">
-                            <p>1. Click Start Test On Bottom Of Your Screen To Begin The Test.</p>
+                            <p>1. The test will open in fullscreen mode. Do not switch tabs or windows.</p>
                         </div>
                         <div className="instruction-item">
-                            <p>2. The Clock Has Been Set At Server And Count Down Timer At The Top Right Side Of The Screen Will Display Left Out Time To Closure From Where You Can Monitor.</p>
+                            <p>2. Switching tabs more than 3 times will result in automatic test submission.</p>
                         </div>
                         <div className="instruction-item">
-                            <p>3. Click One Of The Answer Simply Click The Desired Option Button.</p>
+                            <p>3. The test will be automatically submitted when the time is up.</p>
                         </div>
                         <div className="instruction-item">
-                            <p>4. Candidate Can Change Their Response Of Attempted Answer Anytime During Examination Slot Time By Clicking Another Answer Which Candidates Want To Change An Answer. Click To Remove Incorrect Answer, Click The Desired Option Button.</p>
+                            <p>4. Do not use any external resources or applications during the test.</p>
                         </div>
                         <div className="instruction-item">
-                            <p>5. Click On Next To Save The Answer And Move To The Next Question. The Next Question Will Automatically Be Displayed.</p>
+                            <p>5. Your screen will be monitored for any suspicious activity.</p>
                         </div>
                         <div className="instruction-item">
-                            <p>6. Click On Mark For Review To Review You Answer At Later Stage.</p>
+                            <p>6. Click Start Test On Bottom Of Your Screen To Begin The Test.</p>
                         </div>
                         <div className="instruction-item">
-                            <p>7. To Select A Question, Click On The Question Number On The Right Side Of The Screen.</p>
+                            <p>7. The Clock Has Been Set At Server And Count Down Timer At The Top Right Side Of The Screen Will Display Left Out Time To Closure From Where You Can Monitor.</p>
                         </div>
                         <div className="instruction-item">
-                            <p>8. The Colour Coded Diagram On The Left Side Of The Screen Shows The Status Of The Question:</p>
-                            <div className="status-indicators">
-                                <div className="status-item">
-                                    <span className="status-dot not-visited"></span>
-                                    <p>You Have Not Visited The Question Yet.</p>
-                                </div>
-                                <div className="status-item">
-                                    <span className="status-dot not-answered"></span>
-                                    <p>You Have Not Answered The Question.</p>
-                                </div>
-                                <div className="status-item">
-                                    <span className="status-dot answered"></span>
-                                    <p>You Have Answered The Question.</p>
-                                </div>
-                                <div className="status-item">
-                                    <span className="status-dot marked-review"></span>
-                                    <p>You Have NOT Answered The Question, But Have Marked The Question For Review.</p>
-                                </div>
-                                <div className="status-item">
-                                    <span className="status-dot answered-marked"></span>
-                                    <p>You Have Answered The Question, But Marked It For Review.</p>
-                                </div>
-                            </div>
+                            <p>8. Click One Of The Answer Simply Click The Desired Option Button.</p>
+                        </div>
+                        <div className="instruction-item">
+                            <p>9. Candidate Can Change Their Response Of Attempted Answer Anytime During Examination Slot Time By Clicking Another Answer Which Candidates Want To Change An Answer. Click To Remove Incorrect Answer, Click The Desired Option Button.</p>
+                        </div>
+                        <div className="instruction-item">
+                            <p>10. Click On Next To Save The Answer And Move To The Next Question. The Next Question Will Automatically Be Displayed.</p>
+                        </div>
+                        <div className="instruction-item">
+                            <p>11. Click On Mark For Review To Review You Answer At Later Stage.</p>
+                        </div>
+                        <div className="instruction-item">
+                            <p>12. To Select A Question, Click On The Question Number On The Right Side Of The Screen.</p>
                         </div>
                     </div>
 
@@ -81,8 +90,7 @@ const TestInstructions = () => {
                                 onChange={(e) => setIsChecked(e.target.checked)}
                             />
                             <label htmlFor="instructions-checkbox">
-                                The Computer Provided To Me Is In Proper Working Condition.
-                                I Have Read And Understood The Instructions Given Above.
+                                I have read and understood all the instructions. I agree to take the test in fullscreen mode and understand that switching tabs more than 3 times will result in automatic submission.
                             </label>
                         </div>
                         <button 

@@ -73,6 +73,15 @@ const Attempt = () => {
         navigate(`/student/test-instructions/${testId}`);
     };
 
+    const formatTime = (minutes) => {
+        const hours = Math.floor(minutes / 60);
+        const mins = minutes % 60;
+        if (hours > 0) {
+            return `${hours} hour${hours > 1 ? 's' : ''} ${mins} minute${mins !== 1 ? 's' : ''}`;
+        }
+        return `${mins} minute${mins !== 1 ? 's' : ''}`;
+    };
+
     if (loading) return <div className="loading">Loading...</div>;
     if (error) return <div className="error">Error: {error}</div>;
 
@@ -109,6 +118,7 @@ const Attempt = () => {
                                         <p>Total Questions: {test.totalQuestion}</p>
                                         <p>Marks per Question: {test.rightMarks}</p>
                                         <p>Class: {test.class}</p>
+                                        <p>Duration: {formatTime(test.timeInMinutes)}</p>
                                     </div>
                                 </div>
                                 <div className="test-meta">
