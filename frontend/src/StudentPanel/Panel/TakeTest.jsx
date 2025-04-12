@@ -22,6 +22,8 @@ const TakeTest = () => {
     const [showInstructions, setShowInstructions] = useState(true);
     const [currentSection, setCurrentSection] = useState(0);
     const [sections, setSections] = useState([]);
+    const [showFullscreenWarning, setShowFullscreenWarning] = useState(false);
+    const [warningCount, setWarningCount] = useState(0);
 
     useEffect(() => {
         fetchTestData();
@@ -76,16 +78,22 @@ const TakeTest = () => {
     };
 
     const handleFullscreenChange = () => {
-        const isFullscreenNow = !!(document.fullscreenElement || 
-            document.webkitFullscreenElement || 
-            document.mozFullScreenElement || 
-            document.msFullscreenElement);
+        const isInFullscreen = document.fullscreenElement || 
+                             document.webkitFullscreenElement || 
+                             document.mozFullScreenElement || 
+                             document.msFullscreenElement;
         
-        setIsFullscreen(isFullscreenNow);
+        setIsFullscreen(!!isInFullscreen);
         
-        if (!isFullscreenNow && !isTestSubmitted) {
-            setWarningMessage('Please return to fullscreen mode to continue the test.');
-            setShowWarning(true);
+        if (!isInFullscreen) {
+            setShowFullscreenWarning(true);
+            setWarningCount(prev => {
+                const newCount = prev + 1;
+                if (newCount >= 3) {
+                    handleSubmitTest();
+                }
+                return newCount;
+            });
         }
     };
 
@@ -101,23 +109,23 @@ const TakeTest = () => {
 
     const handleWindowFocus = () => {
         if (!isFullscreen) {
-            requestFullscreen();
+            enterFullscreen();
         }
     };
 
-    const requestFullscreen = () => {
-        const element = document.documentElement;
-        if (element.requestFullscreen) {
-            element.requestFullscreen();
-        } else if (element.webkitRequestFullscreen) {
-            element.webkitRequestFullscreen();
-        } else if (element.mozRequestFullScreen) {
-            element.mozRequestFullScreen();
-        } else if (element.msRequestFullscreen) {
-            element.msRequestFullscreen();
+    const enterFullscreen = async () => {
+        try {
+            setShowFullscreenWarning(false);
+            if (document.documentElement.requestFullscreen) {
+                await document.documentElement.requestFullscreen();
+            } else if (document.documentElement.webkitRequestFullscreen) {
+                await document.documentElement.webkitRequestFullscreen();
+            } else if (document.documentElement.msRequestFullscreen) {
+                await document.documentElement.msRequestFullscreen();
+            }
+        } catch (err) {
+            console.error('Error entering fullscreen:', err);
         }
-        document.body.classList.add('fullscreen-test');
-        setIsFullscreen(true);
     };
 
     const incrementTabSwitchCount = () => {
@@ -140,7 +148,7 @@ const TakeTest = () => {
 
     const handleWarningConfirm = () => {
         setShowWarning(false);
-        requestFullscreen();
+        enterFullscreen();
     };
 
     const handleWarningCancel = () => {
@@ -399,6 +407,15 @@ const TakeTest = () => {
                     </div>
                 </div>
             )}
+            {showFullscreenWarning && (
+                <div className="fullscreen-warning">
+                    <p>Please return to fullscreen mode to continue the test.</p>
+                    <p>Warning {warningCount}/3</p>
+                    <button onClick={enterFullscreen}>
+                        Return to Fullscreen
+                    </button>
+                </div>
+            )}
             <div className="test-header">
                 <h1>{test.title}</h1>
                 <div className="test-info">
@@ -414,13 +431,13 @@ const TakeTest = () => {
                             {answeredQuestions}/{test.questions.length} Questions Answered
                         </span>
                     </div>
-                    <div className="security-warning">
-                        {!isFullscreen && (
-                            <div className="warning-message">
-                                Please return to fullscreen mode
-                            </div>
-                        )}
-                    </div>
+                    {!isFullscreen && (
+                        <div className="security-warning">
+                            <span className="warning-message">
+                                Warning: Exit fullscreen detected!
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
 

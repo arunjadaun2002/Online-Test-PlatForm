@@ -1,12 +1,17 @@
 {
+  "name": "online-test-platform",
+  "version": "1.0.0",
+  "description": "Online Test Platform",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js"
+  },
   "dependencies": {
-<<<<<<< HEAD
+    "express": "^5.1.0",
     "react-icons": "^5.5.0"
-=======
-    "express": "^5.1.0"
   },
   "devDependencies": {
     "nodemon": "^3.1.9"
->>>>>>> eff11bf31505d73b09e0b7c1afe18f4746727cce
   }
 }
