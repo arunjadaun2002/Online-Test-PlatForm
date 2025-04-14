@@ -3,15 +3,16 @@ const fs = require("fs");
 const Test = require("../models/testModel");
 const User = require("../models/userModel");
 const { uploadFileToBlob } = require("../services/azureBlobService");
-const Student = require("../models/studentModel");
+const Student = require("../models/studentModel");// Correct spelling
+const Submission = require("../models/submitionModel")
 
 const createTestWithFile = async (req, res) => {
   try {
-    const admin = await User.findById(req.user.id)
-    if(!admin || admin.role != 'admin'){
-        return res.status(403).json({
-            message: 'Unauthorized'
-        })
+    const admin = await User.findById(req.user.id);
+    if (!admin || admin.role != "admin") {
+      return res.status(403).json({
+        message: "Unauthorized",
+      });
     }
     const fileUrl = await uploadFileToBlob(req.file);
 
@@ -45,11 +46,11 @@ const createTestWithFile = async (req, res) => {
 const SHEET_NAME = "TypedTest"; // Use one consistent name
 
 const addTypedQuestion = async (req, res) => {
-  const admin = await User.findById(req.user.id)
-  if(!admin || admin.role != 'admin'){
-      return res.status(403).json({
-          message: 'Unauthorized'
-      })
+  const admin = await User.findById(req.user.id);
+  if (!admin || admin.role != "admin") {
+    return res.status(403).json({
+      message: "Unauthorized",
+    });
   }
   const filePath = "./tempTypedTest.xlsx";
   let workbook;
@@ -112,31 +113,31 @@ const addTypedQuestion = async (req, res) => {
 
 const uplaodTypedTest = async (req, res) => {
   try {
-    const admin = await User.findById(req.user.id)
-    if(!admin || admin.role != 'admin'){
-        return res.status(403).json({
-            message: 'Unauthorized'
-        })
+    const admin = await User.findById(req.user.id);
+    if (!admin || admin.role != "admin") {
+      return res.status(403).json({
+        message: "Unauthorized",
+      });
     }
 
     // Validate required fields
     if (!req.body.class) {
       return res.status(400).json({
         success: false,
-        message: "Class field is required"
+        message: "Class field is required",
       });
     }
 
     if (!req.body.timeInMinutes) {
       return res.status(400).json({
         success: false,
-        message: "Time duration is required"
+        message: "Time duration is required",
       });
     }
 
     // Standardize class format to "Class X"
     let standardizedClass = req.body.class;
-    if (!standardizedClass.startsWith('Class ')) {
+    if (!standardizedClass.startsWith("Class ")) {
       standardizedClass = `Class ${standardizedClass}`;
     }
 
@@ -151,17 +152,17 @@ const uplaodTypedTest = async (req, res) => {
       subject: req.body.subject,
       class: standardizedClass,
       timeInMinutes: parseInt(req.body.timeInMinutes),
-      questions: req.body.questions
+      questions: req.body.questions,
     };
 
-    console.log('Creating test with data:', testData); // Debug log
+    console.log("Creating test with data:", testData); // Debug log
 
     const newTest = await Test.create(testData);
 
     return res.status(201).json({
       success: true,
       message: "Test created successfully",
-      data: newTest
+      data: newTest,
     });
   } catch (err) {
     console.log("error when creating test:", err);
@@ -169,23 +170,25 @@ const uplaodTypedTest = async (req, res) => {
       success: false,
       message: "Internal server error",
       error: err.message,
-      stack: process.env.NODE_ENV === 'development' ? err.stack : undefined
+      stack: process.env.NODE_ENV === "development" ? err.stack : undefined,
     });
   }
 };
 
 const getAllTests = async (req, res) => {
   try {
-    const tests = await Test.find({}).select('title description totalQuestion rightMarks wrongMarks sectionId subject class timeInMinutes questions createdAt updatedAt');
+    const tests = await Test.find({}).select(
+      "title description totalQuestion rightMarks wrongMarks sectionId subject class timeInMinutes questions createdAt updatedAt"
+    );
     return res.status(200).json({
       success: true,
-      data: tests
+      data: tests,
     });
   } catch (err) {
     console.log("Error fetching tests: ", err);
     return res.status(500).json({
       success: false,
-      message: 'Internal Server Error'
+      message: "Internal Server Error",
     });
   }
 };
@@ -193,23 +196,23 @@ const getAllTests = async (req, res) => {
 const getAllQuizzes = async (req, res) => {
   try {
     const admin = await User.findById(req.user.id);
-    if (!admin || admin.role !== 'admin') {
+    if (!admin || admin.role !== "admin") {
       return res.status(403).json({
         success: false,
-        message: 'Unauthorized'
+        message: "Unauthorized",
       });
     }
 
-    const quizzes = await Test.find({}).select('-excelUrl');
+    const quizzes = await Test.find({}).select("-excelUrl");
     res.status(200).json({
       success: true,
-      data: quizzes
+      data: quizzes,
     });
   } catch (err) {
     console.log("Error fetching quizzes: ", err);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error"
+      message: "Internal Server Error",
     });
   }
 };
@@ -217,10 +220,10 @@ const getAllQuizzes = async (req, res) => {
 const deleteQuiz = async (req, res) => {
   try {
     const admin = await User.findById(req.user.id);
-    if (!admin || admin.role !== 'admin') {
+    if (!admin || admin.role !== "admin") {
       return res.status(403).json({
         success: false,
-        message: 'Unauthorized'
+        message: "Unauthorized",
       });
     }
 
@@ -228,19 +231,19 @@ const deleteQuiz = async (req, res) => {
     if (!quiz) {
       return res.status(404).json({
         success: false,
-        message: 'Quiz not found'
+        message: "Quiz not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      message: 'Quiz deleted successfully'
+      message: "Quiz deleted successfully",
     });
   } catch (err) {
     console.log("Error deleting quiz: ", err);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error"
+      message: "Internal Server Error",
     });
   }
 };
@@ -248,23 +251,23 @@ const deleteQuiz = async (req, res) => {
 const deleteAllQuizzes = async (req, res) => {
   try {
     const admin = await User.findById(req.user.id);
-    if (!admin || admin.role !== 'admin') {
+    if (!admin || admin.role !== "admin") {
       return res.status(403).json({
         success: false,
-        message: 'Unauthorized'
+        message: "Unauthorized",
       });
     }
 
     await Test.deleteMany({});
     res.status(200).json({
       success: true,
-      message: 'All quizzes deleted successfully'
+      message: "All quizzes deleted successfully",
     });
   } catch (err) {
     console.log("Error deleting all quizzes: ", err);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error"
+      message: "Internal Server Error",
     });
   }
 };
@@ -275,31 +278,31 @@ const getTestsByClass = async (req, res) => {
     if (!student) {
       return res.status(403).json({
         success: false,
-        message: 'Unauthorized'
+        message: "Unauthorized",
       });
     }
 
-    console.log('Student class:', student.class);
-    
+    console.log("Student class:", student.class);
+
     // Convert student's class to standardized format
     const studentClass = `Class ${student.class}`;
-    
+
     // Find tests with matching class
     const tests = await Test.find({
-      class: studentClass
-    }).select('-excelUrl');
-    
-    console.log('Found tests:', tests);
+      class: studentClass,
+    }).select("-excelUrl");
+
+    console.log("Found tests:", tests);
 
     res.status(200).json({
       success: true,
-      data: tests
+      data: tests,
     });
   } catch (err) {
     console.log("Error fetching tests by class: ", err);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error"
+      message: "Internal Server Error",
     });
   }
 };
@@ -307,19 +310,19 @@ const getTestsByClass = async (req, res) => {
 const updateTestClasses = async (req, res) => {
   try {
     const admin = await User.findById(req.user.id);
-    if (!admin || admin.role !== 'admin') {
+    if (!admin || admin.role !== "admin") {
       return res.status(403).json({
         success: false,
-        message: 'Unauthorized'
+        message: "Unauthorized",
       });
     }
 
     // Get all tests
     const tests = await Test.find({});
-    
+
     // Update each test's class format
     for (const test of tests) {
-      if (test.class && !test.class.startsWith('Class ')) {
+      if (test.class && !test.class.startsWith("Class ")) {
         test.class = `Class ${test.class}`;
         await test.save();
       }
@@ -327,13 +330,13 @@ const updateTestClasses = async (req, res) => {
 
     res.status(200).json({
       success: true,
-      message: 'Test classes updated successfully'
+      message: "Test classes updated successfully",
     });
   } catch (err) {
     console.log("Error updating test classes: ", err);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error"
+      message: "Internal Server Error",
     });
   }
 };
@@ -344,19 +347,19 @@ const getTestById = async (req, res) => {
     if (!test) {
       return res.status(404).json({
         success: false,
-        message: 'Test not found'
+        message: "Test not found",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: test
+      data: test,
     });
   } catch (err) {
     console.log("Error fetching test by ID: ", err);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error"
+      message: "Internal Server Error",
     });
   }
 };
@@ -367,7 +370,7 @@ const getTestByIdForStudent = async (req, res) => {
     if (!student) {
       return res.status(403).json({
         success: false,
-        message: 'Unauthorized'
+        message: "Unauthorized",
       });
     }
 
@@ -375,7 +378,7 @@ const getTestByIdForStudent = async (req, res) => {
     if (!test) {
       return res.status(404).json({
         success: false,
-        message: 'Test not found'
+        message: "Test not found",
       });
     }
 
@@ -384,27 +387,65 @@ const getTestByIdForStudent = async (req, res) => {
     if (test.class !== studentClass) {
       return res.status(403).json({
         success: false,
-        message: 'You are not authorized to take this test'
+        message: "You are not authorized to take this test",
       });
     }
 
     res.status(200).json({
       success: true,
-      data: test
+      data: test,
     });
   } catch (err) {
     console.log("Error fetching test by ID for student: ", err);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error"
+      message: "Internal Server Error",
     });
   }
 };
 
-module.exports = { 
-  createTestWithFile, 
-  addTypedQuestion, 
-  uplaodTypedTest, 
+const submitTest = async (req, res) => {
+  try {
+    const { testId } = req.params;
+    const { answers, tabSwitchCount, testDuration } = req.body;
+    const userId = req.user?.id; // Assuming authentication middleware
+
+    // Optional: retrieve the test data
+    const test = await Test.findById(testId);
+    if (!test) {
+      return res
+        .status(404)
+        .json({ success: false, message: "Test not found" });
+    }
+
+    // Optional: compute score or other logic here
+
+    // Create a new submission record
+    const submission = new Submission({
+      testId,
+      userId,
+      answers,
+      tabSwitchCount,
+      testDuration,
+      submittedAt: new Date(),
+    });
+    await submission.save();
+
+    return res.status(200).json({
+      success: true,
+      message: "Test submitted successfully",
+      data: submission,
+    });
+  } catch (error) {
+    console.error("Submit test error:", error);
+    return res.status(500).json({ success: false, message: error.message });
+  }
+};
+
+module.exports = {
+  createTestWithFile,
+  addTypedQuestion,
+  uplaodTypedTest,
   getAllTests,
   getAllQuizzes,
   deleteQuiz,
@@ -412,5 +453,6 @@ module.exports = {
   getTestsByClass,
   updateTestClasses,
   getTestById,
-  getTestByIdForStudent
+  getTestByIdForStudent,
+  submitTest,
 };
