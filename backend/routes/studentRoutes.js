@@ -10,6 +10,6 @@ router.post('/forget-password', forgotPassword);
 router.get('/tests', authentication, getTestsByClass);
 router.get('/tests/:id', authentication, getTestByIdForStudent);
 router.get('/profile', authentication, getProfile);
-router.post('/tests/:id/submit', submitTest);
+router.post('/tests/:id/submit', authentication, submitTest);
 
 module.exports = router;

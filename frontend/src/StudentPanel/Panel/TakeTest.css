@@ -109,46 +109,60 @@
 .options-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
+    gap: 10px;
+    margin-top: 20px;
 }
 
 .option {
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 12px;
+    padding: 15px;
     border: 1px solid #ddd;
-    border-radius: 6px;
+    border-radius: 8px;
     cursor: pointer;
-    transition: all 0.2s;
-    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    background-color: white;
 }
 
 .option:hover {
     background-color: #f8f9fa;
+    border-color: #63579C;
 }
 
 .option.selected {
+    background-color: #63579C;
+    color: white;
+    border-color: #63579C;
+}
+
+.option.correct-option {
     background-color: #4CAF50;
     color: white;
     border-color: #388E3C;
 }
 
+.option.selected.correct-option {
+    background-color: #4CAF50;
+    border-color: #388E3C;
+}
+
 .option input[type="radio"] {
-    width: 20px;
-    height: 20px;
-    cursor: pointer;
+    margin: 0;
+    width: 18px;
+    height: 18px;
+    accent-color: #63579C;
+}
+
+.option.selected input[type="radio"] {
+    accent-color: white;
 }
 
 .option label {
-    font-size: 16px;
-    color: #333;
-    cursor: pointer;
     flex: 1;
+    margin-left: 10px;
+    font-size: 16px;
+    cursor: pointer;
 }
 
 .option.selected label {

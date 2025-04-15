@@ -1,0 +1,61 @@
+{
+  "testId": "67fde180536f6607aab1a303",
+  "userId": "67fa136678c4a47f18d95fd2",
+  "testTitle": "Yaman Test",
+  "totalQuestions": 3,
+  "rightMarks": 1,
+  "negativeMarks": 0,
+  "answers": {
+    "0": "Place",
+    "1": "Animal",
+    "2": "Mercury "
+  },
+  "tabSwitchCount": 0,
+  "testDuration": 12,
+  "totalMarks": 1,
+  "correctAnswers": 1,
+  "wrongAnswers": 2,
+  "questionResults": [
+    {
+      "question": "what is school?",
+      "options": [
+        "Place",
+        "Animal",
+        "Transport",
+        "Classroom"
+      ],
+      "correctAnswer": "Place",
+      "studentAnswer": "Place",
+      "isCorrect": true,
+      "marksObtained": 1
+    },
+    {
+      "question": "What is name?",
+      "options": [
+        "Mammale",
+        "Animal",
+        "Name",
+        "Nothing"
+      ],
+      "correctAnswer": "Name",
+      "studentAnswer": "Animal",
+      "isCorrect": false,
+      "marksObtained": 0
+    },
+    {
+      "question": "What is light?",
+      "options": [
+        "Mercury ",
+        "Venus",
+        "Earth",
+        "Sun"
+      ],
+      "correctAnswer": "Sun",
+      "studentAnswer": "Mercury ",
+      "isCorrect": false,
+      "marksObtained": 0
+    }
+  ],
+  "percentage": "33.33",
+  "submittedAt": "2025-04-15T04:46:36.796Z"
+}

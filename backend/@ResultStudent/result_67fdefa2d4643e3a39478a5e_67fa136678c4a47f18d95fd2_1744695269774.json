@@ -1,0 +1,47 @@
+{
+  "testId": "67fdefa2d4643e3a39478a5e",
+  "userId": "67fa136678c4a47f18d95fd2",
+  "testTitle": "Maths",
+  "totalQuestions": 2,
+  "rightMarks": 1,
+  "negativeMarks": 0,
+  "answers": {
+    "0": "11",
+    "1": "24"
+  },
+  "tabSwitchCount": 0,
+  "testDuration": 7,
+  "totalMarks": 1,
+  "correctAnswers": 1,
+  "wrongAnswers": 1,
+  "questionResults": [
+    {
+      "question": "10+1",
+      "options": [
+        "11",
+        "12",
+        "14",
+        "15"
+      ],
+      "correctAnswer": "11",
+      "studentAnswer": "11",
+      "isCorrect": true,
+      "marksObtained": 1
+    },
+    {
+      "question": "19+1",
+      "options": [
+        "22",
+        "23",
+        "24",
+        "20"
+      ],
+      "correctAnswer": "20",
+      "studentAnswer": "24",
+      "isCorrect": false,
+      "marksObtained": 0
+    }
+  ],
+  "percentage": "50.00",
+  "submittedAt": "2025-04-15T05:34:29.774Z"
+}

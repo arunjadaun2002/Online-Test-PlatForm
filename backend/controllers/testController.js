@@ -1,10 +1,30 @@
 const ExcelJS = require("exceljs");
 const fs = require("fs");
+const path = require("path");
 const Test = require("../models/testModel");
 const User = require("../models/userModel");
 const { uploadFileToBlob } = require("../services/azureBlobService");
 const Student = require("../models/studentModel");// Correct spelling
 const Submission = require("../models/submitionModel")
+
+// Function to ensure ResultStudent directory exists and is writable
+const ensureResultDirectory = () => {
+  const resultDir = path.join(__dirname, '..', '@ResultStudent');
+  try {
+    if (!fs.existsSync(resultDir)) {
+      fs.mkdirSync(resultDir, { recursive: true });
+      console.log('Created @ResultStudent directory');
+    }
+    // Test write permissions
+    const testFile = path.join(resultDir, 'test.txt');
+    fs.writeFileSync(testFile, 'test');
+    fs.unlinkSync(testFile);
+    return resultDir;
+  } catch (error) {
+    console.error('Error setting up @ResultStudent directory:', error);
+    throw new Error('Failed to setup result directory');
+  }
+};
 
 const createTestWithFile = async (req, res) => {
   try {
@@ -406,19 +426,62 @@ const getTestByIdForStudent = async (req, res) => {
 
 const submitTest = async (req, res) => {
   try {
-    const { testId } = req.params;
-    const { answers, tabSwitchCount, testDuration } = req.body;
-    const userId = req.user?.id; // Assuming authentication middleware
+    console.log('Submit test request received:', {
+      params: req.params,
+      body: req.body,
+      user: req.user
+    });
 
-    // Optional: retrieve the test data
-    const test = await Test.findById(testId);
-    if (!test) {
-      return res
-        .status(404)
-        .json({ success: false, message: "Test not found" });
+    const { id: testId } = req.params;
+    const { answers, tabSwitchCount, testDuration, testTitle, totalQuestions, rightMarks, negativeMarks, questions } = req.body;
+    const userId = req.user?.id;
+
+    if (!userId) {
+      console.error('No user ID found in request');
+      return res.status(401).json({ success: false, message: "User not authenticated" });
     }
 
-    // Optional: compute score or other logic here
+    if (!testId) {
+      console.error('No test ID provided');
+      return res.status(400).json({ success: false, message: "Test ID is required" });
+    }
+
+    // Retrieve the test data
+    console.log('Looking for test with ID:', testId);
+    const test = await Test.findById(testId);
+    
+    if (!test) {
+      console.error('Test not found in database:', testId);
+      return res.status(404).json({ success: false, message: "Test not found" });
+    }
+
+    // Calculate marks and prepare detailed results
+    let totalMarks = 0;
+    let correctAnswers = 0;
+    let wrongAnswers = 0;
+    const questionResults = [];
+
+    test.questions.forEach((question, index) => {
+      const studentAnswer = answers[index];
+      const isCorrect = studentAnswer === question.correctAnswer;
+      
+      if (isCorrect) {
+        totalMarks += rightMarks;
+        correctAnswers++;
+      } else if (studentAnswer) {
+        totalMarks -= negativeMarks;
+        wrongAnswers++;
+      }
+
+      questionResults.push({
+        question: question.question,
+        options: question.options,
+        correctAnswer: question.correctAnswer,
+        studentAnswer: studentAnswer || null,
+        isCorrect: isCorrect,
+        marksObtained: isCorrect ? rightMarks : (studentAnswer ? -negativeMarks : 0)
+      });
+    });
 
     // Create a new submission record
     const submission = new Submission({
@@ -427,18 +490,77 @@ const submitTest = async (req, res) => {
       answers,
       tabSwitchCount,
       testDuration,
+      totalMarks,
+      correctAnswers,
+      wrongAnswers,
       submittedAt: new Date(),
     });
     await submission.save();
+    console.log('Submission saved to database');
+
+    // Ensure ResultStudent directory exists and is writable
+    const resultDir = path.join(process.cwd(), '@ResultStudent');
+    console.log('Result directory path:', resultDir);
+
+    try {
+      if (!fs.existsSync(resultDir)) {
+        fs.mkdirSync(resultDir, { recursive: true });
+        console.log('Created @ResultStudent directory');
+      }
+    } catch (dirError) {
+      console.error('Error creating directory:', dirError);
+      throw new Error('Failed to create result directory');
+    }
+
+    // Prepare result data
+    const resultData = {
+      testId,
+      userId,
+      testTitle,
+      totalQuestions,
+      rightMarks,
+      negativeMarks,
+      answers,
+      tabSwitchCount,
+      testDuration,
+      totalMarks,
+      correctAnswers,
+      wrongAnswers,
+      questionResults,
+      percentage: ((totalMarks / (totalQuestions * rightMarks)) * 100).toFixed(2),
+      submittedAt: new Date(),
+    };
+
+    // Save result to JSON file
+    const fileName = `result_${testId}_${userId}_${Date.now()}.json`;
+    const filePath = path.join(resultDir, fileName);
+    
+    try {
+      fs.writeFileSync(filePath, JSON.stringify(resultData, null, 2));
+      console.log('Result saved to:', filePath);
+    } catch (fileError) {
+      console.error('Error writing result file:', fileError);
+      throw new Error('Failed to write result file');
+    }
 
     return res.status(200).json({
       success: true,
       message: "Test submitted successfully",
-      data: submission,
+      data: {
+        submission,
+        totalMarks,
+        correctAnswers,
+        wrongAnswers,
+        percentage: resultData.percentage
+      },
     });
   } catch (error) {
     console.error("Submit test error:", error);
-    return res.status(500).json({ success: false, message: error.message });
+    return res.status(500).json({ 
+      success: false, 
+      message: error.message,
+      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+    });
   }
 };
 

@@ -186,17 +186,26 @@ tr:hover {
 }
 
 .option {
-  padding: 6px;
+  padding: 6px 12px;
   border: 1px solid #ddd;
   border-radius: 4px;
   background: white;
   font-size: 13px;
+  position: relative;
 }
 
 .option.correct {
   background-color: #dff0d8;
   border-color: #d6e9c6;
   color: #3c763d;
+}
+
+.option.correct::after {
+  content: '✓';
+  position: absolute;
+  right: 15px;
+  color: #3c763d;
+  font-weight: bold;
 }
 
 @media (max-width: 768px) {

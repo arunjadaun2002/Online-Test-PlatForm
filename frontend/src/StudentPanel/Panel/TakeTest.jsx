@@ -324,33 +324,88 @@ const TakeTest = () => {
     try {
       setIsTestSubmitted(true);
 
+      // Convert answer indices to actual answer text
+      const answerTexts = {};
+      Object.keys(answers).forEach(questionIndex => {
+        const selectedOptionIndex = answers[questionIndex];
+        answerTexts[questionIndex] = test.questions[questionIndex].options[selectedOptionIndex];
+      });
+
       // Prepare result data
       const resultData = {
-        answers,
+        testId: testId,
+        answers: answerTexts,
         tabSwitchCount: parseInt(localStorage.getItem("tabSwitchCount") || "0"),
         testDuration: test.timeInMinutes * 60 - remainingTime,
         testTitle: test.title,
         totalQuestions: test.questions.length,
         rightMarks: test.rightMarks,
         negativeMarks: test.negativeMarks || 0,
+        questions: test.questions.map((q, index) => ({
+          question: q.question,
+          options: q.options,
+          correctAnswer: q.correctAnswer,
+          selectedAnswer: answerTexts[index] || null,
+          isCorrect: answerTexts[index] === q.correctAnswer
+        }))
       };
-      console.log("Result data:", resultData);
 
-      // Convert to JSON, prompt download
-      const fileData = JSON.stringify(resultData, null, 2);
-      const blob = new Blob([fileData], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement("a");
-      link.href = url;
-      link.download = `testResult_${testId}.json`;
-      link.click();
-      URL.revokeObjectURL(url);
+      console.log('Submitting test with data:', {
+        testId,
+        resultData
+      });
 
-      // Navigate to completed screen
-      navigate("/student/completed");
+      // Send result data to backend
+      const token = localStorage.getItem("token");
+      if (!token) {
+        throw new Error('No authentication token found');
+      }
+
+      const response = await fetch(`http://localhost:4000/api/student/tests/${testId}/submit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(resultData)
+      });
+
+      const responseData = await response.json();
+      
+      if (!response.ok) {
+        console.error('Submit test error response:', responseData);
+        throw new Error(responseData.message || 'Failed to submit test');
+      }
+
+      console.log('Test submitted successfully:', responseData);
+      
+      // Navigate to result page with test ID and result data
+      navigate("/student/attempted", {
+        state: { 
+          testId: testId,
+          testTitle: test.title,
+          totalQuestions: test.questions.length,
+          rightMarks: test.rightMarks,
+          negativeMarks: test.negativeMarks || 0,
+          result: {
+            testTitle: test.title,
+            totalQuestions: test.questions.length,
+            rightMarks: test.rightMarks,
+            negativeMarks: test.negativeMarks || 0,
+            questions: test.questions.map((q, index) => ({
+              questionText: q.question,
+              options: q.options,
+              correctAnswer: q.correctAnswer,
+              selectedAnswer: answerTexts[index] || null,
+              isCorrect: answerTexts[index] === q.correctAnswer
+            }))
+          }
+        }
+      });
     } catch (err) {
       console.error("Error submitting test:", err);
-      setError(err.message);
+      setError(err.message || 'Failed to submit test');
+      setIsTestSubmitted(false); // Allow retry if submission fails
     }
   };
 
@@ -485,57 +540,6 @@ const TakeTest = () => {
               Submit Test
             </button>
           </div>
-        </div>
-
-        <div
-          className={`question-palette ${showQuestionPalette ? "active" : ""}`}
-        >
-          <button
-            className="toggle-palette"
-            onClick={() => setShowQuestionPalette(!showQuestionPalette)}
-          >
-            {showQuestionPalette ? "Hide Questions" : "Show Questions"}
-          </button>
-          {showQuestionPalette && (
-            <>
-              <div className="palette-header">
-                <h3>Question Palette</h3>
-              </div>
-              <div className="question-grid">
-                {test.questions.map((_, index) => (
-                  <button
-                    key={index}
-                    className={`question-number ${getQuestionStatus(index)}`}
-                    onClick={() => setCurrentQuestion(index)}
-                  >
-                    {index + 1}
-                  </button>
-                ))}
-              </div>
-              <div className="legend">
-                <div className="legend-item">
-                  <span className="status-dot not-visited"></span>
-                  <p>Not Visited</p>
-                </div>
-                <div className="legend-item">
-                  <span className="status-dot not-answered"></span>
-                  <p>Not Answered</p>
-                </div>
-                <div className="legend-item">
-                  <span className="status-dot answered"></span>
-                  <p>Answered</p>
-                </div>
-                <div className="legend-item">
-                  <span className="status-dot marked-review"></span>
-                  <p>Marked for Review</p>
-                </div>
-                <div className="legend-item">
-                  <span className="status-dot answered-marked"></span>
-                  <p>Answered & Marked</p>
-                </div>
-              </div>
-            </>
-          )}
         </div>
       </div>
     </div>

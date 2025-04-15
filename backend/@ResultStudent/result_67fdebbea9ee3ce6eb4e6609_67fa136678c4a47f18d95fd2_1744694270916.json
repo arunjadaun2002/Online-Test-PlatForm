@@ -1,0 +1,47 @@
+{
+  "testId": "67fdebbea9ee3ce6eb4e6609",
+  "userId": "67fa136678c4a47f18d95fd2",
+  "testTitle": "Math Test",
+  "totalQuestions": 2,
+  "rightMarks": 1,
+  "negativeMarks": 0,
+  "answers": {
+    "0": "11",
+    "1": "12"
+  },
+  "tabSwitchCount": 0,
+  "testDuration": 9,
+  "totalMarks": 1,
+  "correctAnswers": 1,
+  "wrongAnswers": 1,
+  "questionResults": [
+    {
+      "question": "9+2",
+      "options": [
+        "21",
+        "10",
+        "11",
+        "12"
+      ],
+      "correctAnswer": "11",
+      "studentAnswer": "11",
+      "isCorrect": true,
+      "marksObtained": 1
+    },
+    {
+      "question": "10+1",
+      "options": [
+        "11",
+        "44",
+        "12",
+        "13"
+      ],
+      "correctAnswer": "11",
+      "studentAnswer": "12",
+      "isCorrect": false,
+      "marksObtained": 0
+    }
+  ],
+  "percentage": "50.00",
+  "submittedAt": "2025-04-15T05:17:50.916Z"
+}

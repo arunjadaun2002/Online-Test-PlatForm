@@ -22,17 +22,48 @@ const Result = () => {
                 throw new Error('No test data found');
             }
 
-            const response = await fetch(`http://localhost:4000/api/student/results/${testId}`, {
+            // First try to get the result from the state if available
+            if (location.state?.result) {
+                setResult(location.state.result);
+                setLoading(false);
+                return;
+            }
+
+            // Try to fetch from the server
+            const response = await fetch(`http://localhost:4000/api/student/test-results/${testId}`, {
                 headers: {
-                    'Authorization': `Bearer ${token}`
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
                 }
             });
 
             if (!response.ok) {
+                if (response.status === 404) {
+                    // If result is not found, use the state data as fallback
+                    if (location.state?.testTitle) {
+                        setResult({
+                            testTitle: location.state.testTitle,
+                            totalQuestions: location.state.totalQuestions,
+                            rightMarks: location.state.rightMarks,
+                            negativeMarks: location.state.negativeMarks,
+                            questions: []
+                        });
+                        setLoading(false);
+                        return;
+                    }
+                }
+                const errorData = await response.text();
+                console.error('Server response:', errorData);
                 throw new Error('Failed to fetch result data');
             }
 
             const data = await response.json();
+            console.log('Received result data:', data);
+            
+            if (!data.success) {
+                throw new Error(data.message || 'Failed to fetch result data');
+            }
+
             setResult(data.data);
             setLoading(false);
         } catch (err) {
@@ -56,6 +87,7 @@ const Result = () => {
     const totalQuestions = result.questions.length;
     const correctAnswers = result.questions.filter(q => q.isCorrect).length;
     const wrongAnswers = totalQuestions - correctAnswers;
+    const percentage = ((totalMarks / (totalQuestions * result.rightMarks)) * 100).toFixed(2);
 
     return (
         <div className="result-page">
@@ -90,6 +122,10 @@ const Result = () => {
                             <span className="label">Total Marks:</span>
                             <span className="value marks">{totalMarks}</span>
                         </div>
+                        <div className="summary-item">
+                            <span className="label">Percentage:</span>
+                            <span className="value percentage">{percentage}%</span>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -106,21 +142,37 @@ const Result = () => {
                                 </span>
                             </div>
                             <div className="question-content">
-                                <p>{question.questionText}</p>
+                                <p className="question-text">{question.questionText}</p>
                                 <div className="options">
                                     {question.options.map((option, optIndex) => (
                                         <div 
                                             key={optIndex} 
-                                            className={`option ${optIndex === question.correctAnswer ? 'correct-answer' : ''} 
-                                                      ${optIndex === question.selectedAnswer ? 'selected-answer' : ''}`}
+                                            className={`option 
+                                                ${optIndex === question.correctAnswer ? 'correct-answer' : ''} 
+                                                ${optIndex === question.selectedAnswer ? 'selected-answer' : ''}
+                                                ${!question.isCorrect && optIndex === question.selectedAnswer ? 'wrong-answer' : ''}`}
                                         >
-                                            {option}
+                                            <span className="option-label">
+                                                {String.fromCharCode(65 + optIndex)})
+                                            </span>
+                                            <span className="option-text">{option}</span>
+                                            {optIndex === question.correctAnswer && (
+                                                <span className="answer-icon correct">✓</span>
+                                            )}
+                                            {!question.isCorrect && optIndex === question.selectedAnswer && (
+                                                <span className="answer-icon wrong">✗</span>
+                                            )}
                                         </div>
                                     ))}
                                 </div>
                             </div>
                             <div className="marks-info">
-                                <span>Marks Obtained: {question.isCorrect ? result.rightMarks : (result.negativeMarks || 0)}</span>
+                                <span className="marks-label">Marks:</span>
+                                <span className={`marks-value ${question.isCorrect ? 'positive' : 'negative'}`}>
+                                    {question.isCorrect ? 
+                                        `+${result.rightMarks}` : 
+                                        (result.negativeMarks ? `-${result.negativeMarks}` : '0')}
+                                </span>
                             </div>
                         </div>
                     ))}

@@ -105,6 +105,13 @@ function CreateTest() {
       alert('Please fill all fields');
       return;
     }
+
+    // Validate that correct answer matches one of the options
+    if (!manualQuestion.options.includes(manualQuestion.correctAnswer)) {
+      alert('Correct answer must match one of the options');
+      return;
+    }
+
     setQuestions(prev => [...prev, { ...manualQuestion }]);
     setManualQuestion({
       question: '',
@@ -116,6 +123,27 @@ function CreateTest() {
   const handleSubmit = async (e) => {
     e.preventDefault();
     
+    // Validate required fields
+    if (!testData.title) {
+      alert('Please enter a test title');
+      return;
+    }
+
+    if (!testData.class) {
+      alert('Please select a class');
+      return;
+    }
+
+    if (!testData.timeInMinutes) {
+      alert('Please enter the time duration');
+      return;
+    }
+
+    if (!testData.perQuestionMark) {
+      alert('Please enter marks per question');
+      return;
+    }
+
     if (questions.length === 0) {
       alert('Please add at least one question');
       return;
@@ -124,8 +152,8 @@ function CreateTest() {
     try {
       const newQuiz = {
         title: testData.title,
-        description: testData.description,
-        totalQuestion: parseInt(testData.totalQuestions),
+        description: testData.description || '',
+        totalQuestion: questions.length,
         rightMarks: parseInt(testData.perQuestionMark),
         wrongMarks: 0,
         subject: 'General',
@@ -139,29 +167,39 @@ function CreateTest() {
         }))
       };
 
-      console.log('Sending quiz data:', newQuiz); // Debug log
+      console.log('Sending quiz data:', newQuiz);
+
+      const token = localStorage.getItem('token');
+      if (!token) {
+        alert('You must be logged in to create a quiz');
+        return;
+      }
 
       const response = await fetch('http://localhost:4000/api/test/typedtest/upload', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${localStorage.getItem('token')}`
+          'Authorization': `Bearer ${token}`
         },
         body: JSON.stringify(newQuiz)
       });
 
+      const data = await response.json();
+      console.log('Response from server:', data);
+
       if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || 'Failed to create quiz');
+        throw new Error(data.message || 'Failed to create quiz');
       }
 
-      const data = await response.json();
-      console.log('Response from server:', data); // Debug log
-      
-      navigate('/admin/quiz');
-    } catch (error) {
-      console.error('Error creating quiz:', error);
-      alert('Failed to create quiz. Please try again.');
+      if (data.success) {
+        alert('Quiz created successfully!');
+        navigate('/admin/quiz');
+      } else {
+        throw new Error(data.message || 'Failed to create quiz');
+      }
+    } catch (err) {
+      console.error('Error creating quiz:', err);
+      alert(err.message || 'Failed to create quiz. Please try again.');
     }
   };
 
@@ -307,7 +345,7 @@ function CreateTest() {
                 name="correctAnswer"
                 value={manualQuestion.correctAnswer}
                 onChange={handleManualQuestionChange}
-                placeholder="Correct Answer (A, B, C, or D)"
+                placeholder="Enter the correct answer text (must match one of the options)"
                 className="correct-answer-input"
               />
               <button 

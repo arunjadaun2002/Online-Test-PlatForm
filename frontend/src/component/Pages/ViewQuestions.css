@@ -1,0 +1,130 @@
+.view-questions-container {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.test-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.test-header h1 {
+  margin: 0;
+  color: #333;
+}
+
+.back-btn {
+  padding: 10px 20px;
+  background-color: #63579C;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+}
+
+.test-info {
+  background-color: #f8f9fa;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 30px;
+}
+
+.test-info p {
+  margin: 10px 0;
+  color: #333;
+}
+
+.questions-list {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.question-card {
+  background-color: white;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.question-card h3 {
+  color: #333;
+  margin-top: 0;
+  margin-bottom: 15px;
+}
+
+.question-text {
+  font-size: 16px;
+  color: #333;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.option {
+  display: flex;
+  align-items: center;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  transition: all 0.3s ease;
+}
+
+.option.correct-option {
+  background-color: #dff0d8;
+  border-color: #d6e9c6;
+  color: #3c763d;
+  position: relative;
+}
+
+.option.correct-option::after {
+  content: '✓';
+  position: absolute;
+  right: 15px;
+  color: #3c763d;
+  font-weight: bold;
+}
+
+.option-label {
+  font-weight: 500;
+  margin-right: 10px;
+  min-width: 25px;
+}
+
+.option-text {
+  flex: 1;
+}
+
+.correct-answer {
+  margin-top: 15px;
+  padding: 12px;
+  background-color: #dff0d8;
+  border: 1px solid #d6e9c6;
+  border-radius: 4px;
+  color: #3c763d;
+  font-weight: 500;
+}
+
+.loading {
+  text-align: center;
+  padding: 40px;
+  font-size: 18px;
+  color: #666;
+}
+
+.error {
+  text-align: center;
+  padding: 40px;
+  color: #f44336;
+  font-size: 18px;
+} 

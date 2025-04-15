@@ -203,11 +203,14 @@ function Quiz() {
                     {question.options.map((option, optIndex) => (
                       <div 
                         key={optIndex} 
-                        className={`option ${question.correctAnswer === String.fromCharCode(65 + optIndex) ? 'correct' : ''}`}
+                        className={`option ${option === question.correctAnswer ? 'correct' : ''}`}
                       >
                         {String.fromCharCode(65 + optIndex)}) {option}
                       </div>
                     ))}
+                  </div>
+                  <div className="correct-answer">
+                    <strong>Correct Answer:</strong> {question.correctAnswer}
                   </div>
                 </div>
               ))}
