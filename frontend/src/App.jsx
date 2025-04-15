@@ -10,11 +10,12 @@ import { QuizProvider } from './component/Pages/QuizContext';
 import { StudentProvider } from './component/Pages/StudentContext';
 import { ThemeProvider } from './context/ThemeContext';
 import Attempt from './StudentPanel/Panel/Attempt';
-import Attempted from './StudentPanel/Panel/Result';
 import TakeTest from './StudentPanel/Panel/TakeTest';
 import TestInstructions from './StudentPanel/Panel/TestInstructions';
 import StudentDashboard from "./StudentPanel/StudentDashboard";
 import StudentLayout from "./StudentPanel/StudentLayout";
+import AttemptedTests from './StudentPanel/Panel/AttemptedTests';
+import Result from './StudentPanel/Panel/Result';
 import './index.css';
 
 function App() {
@@ -38,7 +39,8 @@ function App() {
             <Route path="/student" element={<StudentLayout />}>
               <Route path="dashboard" element={<StudentDashboard />} />
               <Route path="attempt" element={<Attempt />} />
-              <Route path="attempted" element={<Attempted />} />
+              <Route path="attempted" element={<AttemptedTests />} />
+              <Route path="result/:testId" element={<Result />} />
               <Route path="test-instructions/:testId" element={<TestInstructions />} />
               <Route path="take-test/:testId" element={<TakeTest />} />
               <Route index element={<Navigate to="dashboard" replace />} />

@@ -1,67 +1,35 @@
 import React, { useEffect, useState } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import './Result.css';
 
 const Result = () => {
-    const location = useLocation();
+    const { testId } = useParams();
     const navigate = useNavigate();
     const [result, setResult] = useState(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
     useEffect(() => {
-        fetchResultData();
-    }, []);
+        fetchResult();
+    }, [testId]);
 
-    const fetchResultData = async () => {
+    const fetchResult = async () => {
         try {
             const token = localStorage.getItem('token');
-            const testId = location.state?.testId;
-
-            if (!testId) {
-                throw new Error('No test data found');
+            if (!token) {
+                throw new Error('No authentication token found');
             }
 
-            // First try to get the result from the state if available
-            if (location.state?.result) {
-                setResult(location.state.result);
-                setLoading(false);
-                return;
-            }
-
-            // Try to fetch from the server
-            const response = await fetch(`http://localhost:4000/api/student/test-results/${testId}`, {
+            const response = await fetch(`http://localhost:4000/api/student/result/${testId}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
 
-            if (!response.ok) {
-                if (response.status === 404) {
-                    // If result is not found, use the state data as fallback
-                    if (location.state?.testTitle) {
-                        setResult({
-                            testTitle: location.state.testTitle,
-                            totalQuestions: location.state.totalQuestions,
-                            rightMarks: location.state.rightMarks,
-                            negativeMarks: location.state.negativeMarks,
-                            questions: []
-                        });
-                        setLoading(false);
-                        return;
-                    }
-                }
-                const errorData = await response.text();
-                console.error('Server response:', errorData);
-                throw new Error('Failed to fetch result data');
-            }
-
             const data = await response.json();
-            console.log('Received result data:', data);
-            
-            if (!data.success) {
-                throw new Error(data.message || 'Failed to fetch result data');
+            if (!response.ok || !data.success) {
+                throw new Error(data.message || 'Failed to fetch result');
             }
 
             setResult(data.data);
@@ -73,106 +41,82 @@ const Result = () => {
         }
     };
 
-    if (loading) return <div className="loading">Loading results...</div>;
-    if (error) return <div className="error">Error: {error}</div>;
-    if (!result) return <div className="error">No result data found</div>;
-
-    const calculateTotalMarks = () => {
-        return result.questions.reduce((total, q) => {
-            return total + (q.isCorrect ? result.rightMarks : (result.negativeMarks || 0));
-        }, 0);
+    const handleBackToTests = () => {
+        navigate('/student/attempted');
     };
 
-    const totalMarks = calculateTotalMarks();
-    const totalQuestions = result.questions.length;
-    const correctAnswers = result.questions.filter(q => q.isCorrect).length;
-    const wrongAnswers = totalQuestions - correctAnswers;
-    const percentage = ((totalMarks / (totalQuestions * result.rightMarks)) * 100).toFixed(2);
+    if (loading) return <div className="loading">Loading...</div>;
+    if (error) return <div className="error">Error: {error}</div>;
+    if (!result) return <div className="error">No result found</div>;
 
     return (
         <div className="result-page">
             <div className="result-header">
                 <h1>Test Results</h1>
-                <button className="back-btn" onClick={() => navigate('/student/attempt')}>
+                <button className="back-button" onClick={handleBackToTests}>
                     Back to Tests
                 </button>
             </div>
 
-            <div className="result-summary">
-                <div className="summary-card">
-                    <h3>Test Summary</h3>
-                    <div className="summary-details">
-                        <div className="summary-item">
-                            <span className="label">Test Title:</span>
-                            <span className="value">{result.testTitle}</span>
-                        </div>
-                        <div className="summary-item">
-                            <span className="label">Total Questions:</span>
-                            <span className="value">{totalQuestions}</span>
-                        </div>
-                        <div className="summary-item">
-                            <span className="label">Correct Answers:</span>
-                            <span className="value correct">{correctAnswers}</span>
-                        </div>
-                        <div className="summary-item">
-                            <span className="label">Wrong Answers:</span>
-                            <span className="value wrong">{wrongAnswers}</span>
-                        </div>
-                        <div className="summary-item">
-                            <span className="label">Total Marks:</span>
-                            <span className="value marks">{totalMarks}</span>
-                        </div>
-                        <div className="summary-item">
-                            <span className="label">Percentage:</span>
-                            <span className="value percentage">{percentage}%</span>
-                        </div>
+            <div className="result-container">
+                <div className="test-summary">
+                    <h2>Test Summary</h2>
+                    <div className="summary-item">
+                        <label>Test Title:</label>
+                        <span>{result.testTitle}</span>
+                    </div>
+                    <div className="summary-item">
+                        <label>Total Questions:</label>
+                        <span>{result.totalQuestions}</span>
+                    </div>
+                    <div className="summary-item">
+                        <label>Correct Answers:</label>
+                        <span className="correct">{result.correctAnswers}</span>
+                    </div>
+                    <div className="summary-item">
+                        <label>Wrong Answers:</label>
+                        <span className="wrong">{result.wrongAnswers}</span>
+                    </div>
+                    <div className="summary-item">
+                        <label>Total Marks:</label>
+                        <span>{result.totalMarks}</span>
+                    </div>
+                    <div className="summary-item">
+                        <label>Percentage:</label>
+                        <span className="percentage">{result.percentage}%</span>
                     </div>
                 </div>
-            </div>
 
-            <div className="detailed-results">
-                <h2>Detailed Results</h2>
-                <div className="questions-list">
-                    {result.questions.map((question, index) => (
-                        <div key={index} className={`question-result ${question.isCorrect ? 'correct' : 'wrong'}`}>
+                <div className="detailed-results">
+                    <h2>Detailed Results</h2>
+                    {result.questionResults.map((question, index) => (
+                        <div key={index} className={`question-card ${question.isCorrect ? 'correct' : 'incorrect'}`}>
                             <div className="question-header">
                                 <h3>Question {index + 1}</h3>
-                                <span className={`status ${question.isCorrect ? 'correct' : 'wrong'}`}>
-                                    {question.isCorrect ? 'Correct' : 'Wrong'}
+                                <span className={`status ${question.isCorrect ? 'correct' : 'incorrect'}`}>
+                                    {question.isCorrect ? 'Correct' : 'Incorrect'}
                                 </span>
                             </div>
-                            <div className="question-content">
-                                <p className="question-text">{question.questionText}</p>
-                                <div className="options">
-                                    {question.options.map((option, optIndex) => (
-                                        <div 
-                                            key={optIndex} 
-                                            className={`option 
-                                                ${optIndex === question.correctAnswer ? 'correct-answer' : ''} 
-                                                ${optIndex === question.selectedAnswer ? 'selected-answer' : ''}
-                                                ${!question.isCorrect && optIndex === question.selectedAnswer ? 'wrong-answer' : ''}`}
-                                        >
-                                            <span className="option-label">
-                                                {String.fromCharCode(65 + optIndex)})
-                                            </span>
-                                            <span className="option-text">{option}</span>
-                                            {optIndex === question.correctAnswer && (
-                                                <span className="answer-icon correct">✓</span>
-                                            )}
-                                            {!question.isCorrect && optIndex === question.selectedAnswer && (
-                                                <span className="answer-icon wrong">✗</span>
-                                            )}
-                                        </div>
-                                    ))}
-                                </div>
+                            <p className="question-text">{question.question}</p>
+                            <div className="options">
+                                {question.options.map((option, optIndex) => (
+                                    <div 
+                                        key={optIndex} 
+                                        className={`option ${
+                                            option === question.correctAnswer ? 'correct-answer' : ''
+                                        } ${
+                                            option === question.studentAnswer && !question.isCorrect ? 'wrong-answer' : ''
+                                        }`}
+                                    >
+                                        <span className="option-label">
+                                            {String.fromCharCode(65 + optIndex)})
+                                        </span>
+                                        <span className="option-text">{option}</span>
+                                    </div>
+                                ))}
                             </div>
                             <div className="marks-info">
-                                <span className="marks-label">Marks:</span>
-                                <span className={`marks-value ${question.isCorrect ? 'positive' : 'negative'}`}>
-                                    {question.isCorrect ? 
-                                        `+${result.rightMarks}` : 
-                                        (result.negativeMarks ? `-${result.negativeMarks}` : '0')}
-                                </span>
+                                <span>Marks obtained: {question.marksObtained}</span>
                             </div>
                         </div>
                     ))}

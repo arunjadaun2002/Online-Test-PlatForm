@@ -379,29 +379,9 @@ const TakeTest = () => {
 
       console.log('Test submitted successfully:', responseData);
       
-      // Navigate to result page with test ID and result data
-      navigate("/student/attempted", {
-        state: { 
-          testId: testId,
-          testTitle: test.title,
-          totalQuestions: test.questions.length,
-          rightMarks: test.rightMarks,
-          negativeMarks: test.negativeMarks || 0,
-          result: {
-            testTitle: test.title,
-            totalQuestions: test.questions.length,
-            rightMarks: test.rightMarks,
-            negativeMarks: test.negativeMarks || 0,
-            questions: test.questions.map((q, index) => ({
-              questionText: q.question,
-              options: q.options,
-              correctAnswer: q.correctAnswer,
-              selectedAnswer: answerTexts[index] || null,
-              isCorrect: answerTexts[index] === q.correctAnswer
-            }))
-          }
-        }
-      });
+      // Show success message and navigate to attempted tests page
+      alert('Test submitted successfully!');
+      navigate("/student/attempted");
     } catch (err) {
       console.error("Error submitting test:", err);
       setError(err.message || 'Failed to submit test');

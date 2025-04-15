@@ -4,8 +4,8 @@ const path = require("path");
 const Test = require("../models/testModel");
 const User = require("../models/userModel");
 const { uploadFileToBlob } = require("../services/azureBlobService");
-const Student = require("../models/studentModel");// Correct spelling
-const Submission = require("../models/submitionModel")
+const Student = require("../models/studentModel");
+const Submission = require("../models/submitionModel");
 
 // Function to ensure ResultStudent directory exists and is writable
 const ensureResultDirectory = () => {
@@ -564,6 +564,130 @@ const submitTest = async (req, res) => {
   }
 };
 
+const getAttemptedTests = async (req, res) => {
+  try {
+    console.log('getAttemptedTests called with user:', req.user);
+
+    const student = await Student.findById(req.user.id);
+    if (!student) {
+      console.log('Student not found with ID:', req.user.id);
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized - Student not found"
+      });
+    }
+
+    console.log('Found student:', student);
+    console.log('Fetching attempted tests for student:', student._id);
+
+    // Find all submissions for this student
+    const submissions = await Submission.find({ userId: student._id })
+      .populate({
+        path: 'testId',
+        select: 'title totalQuestion rightMarks class',
+        model: 'Test'
+      })
+      .sort({ submittedAt: -1 });
+
+    console.log('Raw submissions found:', submissions);
+
+    if (!submissions || submissions.length === 0) {
+      console.log('No submissions found for student:', student._id);
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "No attempted tests found"
+      });
+    }
+
+    // Format the response
+    const attemptedTests = submissions.map(submission => {
+      if (!submission.testId) {
+        console.log('Submission without testId:', submission);
+        return null;
+      }
+
+      return {
+        id: submission.testId._id,
+        title: submission.testId.title,
+        totalQuestion: submission.testId.totalQuestion,
+        rightMarks: submission.testId.rightMarks,
+        class: submission.testId.class,
+        attemptedAt: submission.submittedAt,
+        score: submission.totalMarks,
+        correctAnswers: submission.correctAnswers,
+        wrongAnswers: submission.wrongAnswers
+      };
+    }).filter(test => test !== null);
+
+    console.log('Formatted attempted tests:', attemptedTests);
+
+    res.status(200).json({
+      success: true,
+      data: submissions
+    });
+  } catch (err) {
+    console.error("Error fetching attempted tests: ", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: err.message
+    });
+  }
+};
+
+const getTestResult = async (req, res) => {
+  try {
+    const { testId } = req.params;
+    const userId = req.user.id;
+
+    console.log('Getting test result for:', { testId, userId }); // Debug log
+
+    if (!testId) {
+      return res.status(400).json({
+        success: false,
+        message: "Test ID is required"
+      });
+    }
+
+    // Find the most recent result file for this test and user
+    const resultDir = path.join(process.cwd(), '@ResultStudent');
+    const files = fs.readdirSync(resultDir);
+    
+    console.log('Found result files:', files); // Debug log
+    
+    const resultFile = files
+      .filter(file => file.startsWith(`result_${testId}_${userId}_`))
+      .sort()
+      .pop();
+
+    console.log('Selected result file:', resultFile); // Debug log
+
+    if (!resultFile) {
+      return res.status(404).json({
+        success: false,
+        message: "Test result not found"
+      });
+    }
+
+    const filePath = path.join(resultDir, resultFile);
+    const resultData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+
+    console.log('Returning result data:', resultData); // Debug log
+
+    res.status(200).json({
+      success: true,
+      data: resultData
+    });
+  } catch (err) {
+    console.log("Error fetching test result: ", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
 module.exports = {
   createTestWithFile,
   addTypedQuestion,
@@ -577,4 +701,6 @@ module.exports = {
   getTestById,
   getTestByIdForStudent,
   submitTest,
+  getAttemptedTests,
+  getTestResult
 };

@@ -1,5 +1,5 @@
 .result-page {
-    padding: 20px;
+    padding: 2rem;
     max-width: 1200px;
     margin: 0 auto;
 }
@@ -8,7 +8,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 30px;
+    margin-bottom: 2rem;
 }
 
 .result-header h1 {
@@ -16,115 +16,97 @@
     color: #333;
 }
 
-.back-btn {
-    padding: 10px 20px;
-    background-color: #63579C;
+.back-button {
+    background-color: #6c5ce7;
     color: white;
     border: none;
+    padding: 0.5rem 1rem;
     border-radius: 4px;
     cursor: pointer;
-    font-weight: 500;
-    transition: background-color 0.3s;
+    font-size: 1rem;
+    transition: background-color 0.2s;
 }
 
-.back-btn:hover {
-    background-color: #524783;
+.back-button:hover {
+    background-color: #5f4dd0;
 }
 
-.result-summary {
-    margin-bottom: 40px;
-}
-
-.summary-card {
+.result-container {
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
 }
 
-.summary-card h3 {
-    margin-top: 0;
-    margin-bottom: 20px;
+.test-summary {
+    padding: 2rem;
+    border-bottom: 1px solid #eee;
+}
+
+.test-summary h2 {
+    margin: 0 0 1.5rem 0;
     color: #333;
-}
-
-.summary-details {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
 }
 
 .summary-item {
     display: flex;
-    flex-direction: column;
-    gap: 5px;
+    margin-bottom: 1rem;
+    align-items: center;
 }
 
-.summary-item .label {
+.summary-item label {
+    width: 150px;
     color: #666;
-    font-size: 14px;
+    font-weight: 500;
 }
 
-.summary-item .value {
-    font-size: 24px;
+.summary-item span {
     font-weight: 600;
-}
-
-.value.correct {
-    color: #4CAF50;
-}
-
-.value.wrong {
-    color: #f44336;
-}
-
-.value.marks {
-    color: #2196F3;
-}
-
-.value.percentage {
-    color: #FF9800;
-}
-
-.detailed-results {
-    background-color: white;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    padding: 20px;
-}
-
-.detailed-results h2 {
-    margin-top: 0;
-    margin-bottom: 20px;
     color: #333;
 }
 
-.questions-list {
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
+.summary-item .correct {
+    color: #27ae60;
 }
 
-.question-result {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 20px;
+.summary-item .wrong {
+    color: #e74c3c;
+}
+
+.summary-item .percentage {
+    color: #f39c12;
+    font-size: 1.1rem;
+}
+
+.detailed-results {
+    padding: 2rem;
+}
+
+.detailed-results h2 {
+    margin: 0 0 1.5rem 0;
+    color: #333;
+}
+
+.question-card {
     background-color: #f8f9fa;
+    border-radius: 8px;
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+    border: 1px solid #e9ecef;
 }
 
-.question-result.correct {
-    border-left: 4px solid #4CAF50;
+.question-card.correct {
+    border-left: 4px solid #27ae60;
 }
 
-.question-result.wrong {
-    border-left: 4px solid #f44336;
+.question-card.incorrect {
+    border-left: 4px solid #e74c3c;
 }
 
 .question-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
+    margin-bottom: 1rem;
 }
 
 .question-header h3 {
@@ -133,146 +115,83 @@
 }
 
 .status {
-    padding: 6px 12px;
+    padding: 0.25rem 0.75rem;
     border-radius: 4px;
+    font-size: 0.9rem;
     font-weight: 500;
-    font-size: 14px;
 }
 
 .status.correct {
-    background-color: #dff0d8;
-    color: #3c763d;
+    background-color: #27ae60;
+    color: white;
 }
 
-.status.wrong {
-    background-color: #f2dede;
-    color: #a94442;
-}
-
-.question-content {
-    margin-bottom: 15px;
+.status.incorrect {
+    background-color: #e74c3c;
+    color: white;
 }
 
 .question-text {
-    font-size: 16px;
+    font-size: 1.1rem;
     color: #333;
-    margin-bottom: 15px;
-    line-height: 1.5;
+    margin-bottom: 1rem;
 }
 
 .options {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
+    display: grid;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 .option {
     display: flex;
     align-items: center;
-    padding: 12px 15px;
-    border: 1px solid #ddd;
-    border-radius: 6px;
+    padding: 0.75rem;
     background-color: white;
-    position: relative;
+    border: 1px solid #dee2e6;
+    border-radius: 4px;
 }
 
 .option-label {
+    margin-right: 1rem;
     font-weight: 500;
-    margin-right: 10px;
     color: #666;
-    min-width: 25px;
 }
 
 .option-text {
-    flex: 1;
-}
-
-.answer-icon {
-    position: absolute;
-    right: 15px;
-    font-weight: bold;
-}
-
-.answer-icon.correct {
-    color: #4CAF50;
-}
-
-.answer-icon.wrong {
-    color: #f44336;
+    color: #333;
 }
 
 .option.correct-answer {
-    background-color: #dff0d8;
-    border-color: #d6e9c6;
-    color: #3c763d;
+    background-color: #d4edda;
+    border-color: #c3e6cb;
 }
 
 .option.wrong-answer {
-    background-color: #f2dede;
-    border-color: #ebccd1;
-    color: #a94442;
-}
-
-.option.selected-answer:not(.correct-answer) {
-    background-color: #f2dede;
-    border-color: #ebccd1;
+    background-color: #f8d7da;
+    border-color: #f5c6cb;
 }
 
 .marks-info {
-    margin-top: 15px;
-    padding-top: 15px;
-    border-top: 1px solid #ddd;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-}
-
-.marks-label {
-    font-weight: 500;
+    margin-top: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid #dee2e6;
     color: #666;
-}
-
-.marks-value {
-    font-weight: 600;
-    font-size: 16px;
-}
-
-.marks-value.positive {
-    color: #4CAF50;
-}
-
-.marks-value.negative {
-    color: #f44336;
+    font-weight: 500;
 }
 
 .loading {
     text-align: center;
-    padding: 40px;
-    font-size: 18px;
+    padding: 2rem;
+    font-size: 1.2rem;
     color: #666;
 }
 
 .error {
     text-align: center;
-    padding: 40px;
-    color: #f44336;
-    font-size: 18px;
-}
-
-.result-container {
-    background-color: #f8f9fa;
-    padding: 15px;
-    border-radius: 8px;
-    margin-top: 15px;
-    width: 100%;
-    box-sizing: border-box;
-}
-
-.result-container h2 {
-    color: #333;
-    font-size: 18px;
-    margin-bottom: 15px;
-    font-weight: 500;
+    padding: 2rem;
+    color: #e74c3c;
+    font-size: 1.2rem;
 }
 
 .result-cards {
