@@ -1,7 +1,8 @@
 import React from 'react';
+import StudentResults from '../AdminPanel/StudentResults';
 
-function Students() {
-  return <h1>Student Information Page</h1>;
-}
+const Reports = () => {
+  return <StudentResults />;
+};
 
-export default Students;
+export default Reports;

@@ -3,6 +3,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../utils/mailer');
 const Student = require('../models/studentModel');
+const TestResult = require('../models/testResultModel');
+const Submission = require('../models/submitionModel');
 
 exports.adminSignup = async (req, res) => {
     try{
@@ -436,3 +438,191 @@ const changeStudentPassword = async (req, res) => {
 };
 
 exports.changeStudentPassword = changeStudentPassword;
+
+// Get students by class
+const getStudentsByClass = async (req, res) => {
+  try {
+    const { classNumber } = req.params;
+    console.log('Searching for class:', classNumber, 'type:', typeof classNumber);
+
+    // Ensure admin is authenticated
+    const admin = await User.findById(req.user.id);
+    if (!admin || admin.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    // Convert classNumber to string and trim any whitespace
+    const classQuery = classNumber.toString().trim();
+    console.log('Class query:', classQuery);
+
+    // Find students with the exact class match
+    const students = await Student.find({ class: classQuery })
+      .select('name email userId class rollNo')
+      .sort({ name: 1 });
+
+    console.log('Found students:', students);
+
+    if (students.length === 0) {
+      // If no students found, try to find students with similar class values
+      const similarStudents = await Student.find({
+        class: { $regex: `^${classQuery}$`, $options: 'i' }
+      })
+      .select('name email userId class rollNo')
+      .sort({ name: 1 });
+
+      if (similarStudents.length > 0) {
+        console.log('Found similar students:', similarStudents);
+        return res.status(200).json({
+          success: true,
+          data: similarStudents
+        });
+      }
+    }
+
+    res.status(200).json({
+      success: true,
+      data: students
+    });
+  } catch (error) {
+    console.error('Error in getStudentsByClass:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error fetching students', 
+      error: error.message 
+    });
+  }
+};
+
+// Get student results
+const getStudentResults = async (req, res) => {
+  try {
+    const studentId = req.params.studentId || req.query.userId;
+    
+    if (!studentId) {
+      return res.status(400).json({
+        success: false,
+        message: 'Student ID is required'
+      });
+    }
+
+    // Ensure admin is authenticated
+    const admin = await User.findById(req.user.id);
+    if (!admin || admin.role !== 'admin') {
+      return res.status(403).json({
+        success: false,
+        message: 'Unauthorized'
+      });
+    }
+
+    // Find all submissions for this student
+    const submissions = await Submission.find({ userId: studentId })
+      .populate({
+        path: 'testId',
+        select: 'title totalQuestion rightMarks class',
+        model: 'Test'
+      })
+      .sort({ submittedAt: -1 });
+
+    if (!submissions || submissions.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "No attempted tests found"
+      });
+    }
+
+    // Format the response
+    const studentResults = submissions.map(submission => {
+      if (!submission.testId) {
+        return null;
+      }
+
+      return {
+        _id: submission._id,
+        testName: submission.testId.title,
+        score: submission.totalMarks,
+        percentage: ((submission.totalMarks / (submission.testId.totalQuestion * submission.testId.rightMarks)) * 100).toFixed(2),
+        date: submission.submittedAt,
+        totalQuestions: submission.testId.totalQuestion,
+        correctAnswers: submission.correctAnswers,
+        wrongAnswers: submission.wrongAnswers,
+        testDuration: submission.testDuration,
+        class: submission.testId.class
+      };
+    }).filter(result => result !== null);
+
+    res.status(200).json(studentResults);
+  } catch (error) {
+    console.error('Error in getStudentResults:', error);
+    res.status(500).json({ 
+      success: false,
+      message: 'Error fetching student results', 
+      error: error.message 
+    });
+  }
+};
+
+// Get detailed test result for a specific student
+const getTestResultDetail = async (req, res) => {
+    try {
+        const { resultId } = req.params;
+        
+        const testResult = await TestResult.findById(resultId)
+            .populate('student', 'name email')
+            .populate('test', 'title totalQuestions duration');
+
+        if (!testResult) {
+            return res.status(404).json({ message: 'Test result not found' });
+        }
+
+        // Calculate additional metrics
+        const correctAnswers = testResult.answers.filter(answer => answer.isCorrect).length;
+        const wrongAnswers = testResult.answers.filter(answer => !answer.isCorrect).length;
+        const percentage = (correctAnswers / testResult.test.totalQuestions) * 100;
+
+        const detailedResult = {
+            studentName: testResult.student.name,
+            studentEmail: testResult.student.email,
+            testTitle: testResult.test.title,
+            totalQuestions: testResult.test.totalQuestions,
+            correctAnswers,
+            wrongAnswers,
+            percentage: percentage.toFixed(2),
+            score: testResult.score,
+            duration: testResult.duration,
+            tabSwitches: testResult.tabSwitches,
+            submittedAt: testResult.submittedAt,
+            answers: testResult.answers.map((answer, index) => ({
+                questionNumber: index + 1,
+                selectedOption: answer.selectedOption,
+                correctOption: answer.correctOption,
+                isCorrect: answer.isCorrect,
+                timeTaken: answer.timeTaken
+            }))
+        };
+
+        res.json(detailedResult);
+    } catch (error) {
+        console.error('Error fetching test result detail:', error);
+        res.status(500).json({ message: 'Error fetching test result detail' });
+    }
+};
+
+module.exports = {
+  adminSignup: exports.adminSignup,
+  adminLogin: exports.adminLogin,
+  adminForgotPassword: exports.adminForgotPassword,
+  registerStudent: exports.registerStudent,
+  verifyAdmin: exports.verifyAdmin,
+  getAllStudents: exports.getAllStudents,
+  deleteStudent: exports.deleteStudent,
+  updateStudent: exports.updateStudent,
+  sendEmail: exports.sendEmail,
+  changeStudentPassword: exports.changeStudentPassword,
+  getStudentsByClass,
+  getStudentResults,
+  getTestResultDetail
+};
