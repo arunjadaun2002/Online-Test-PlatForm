@@ -107,3 +107,46 @@ exports.getProfile = async (req, res) => {
         });
     }
 };
+
+exports.updateProfile = async (req, res) => {
+    try {
+        const { name, email, class: studentClass } = req.body;
+        
+        // Find the student
+        const student = await Student.findById(req.user.id);
+        
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: 'Student not found'
+            });
+        }
+        
+        // Update fields if provided
+        if (name) student.name = name;
+        if (email) student.email = email;
+        if (studentClass) student.class = studentClass;
+        
+        // Save the updated student
+        await student.save();
+        
+        res.status(200).json({
+            success: true,
+            message: 'Profile updated successfully',
+            data: {
+                id: student._id,
+                name: student.name,
+                email: student.email,
+                class: student.class
+            }
+        });
+    } catch (err) {
+        console.log("Error: updateProfile");
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server error',
+            error: err.message
+        });
+    }
+};

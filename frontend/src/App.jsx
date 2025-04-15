@@ -16,6 +16,7 @@ import StudentDashboard from "./StudentPanel/StudentDashboard";
 import StudentLayout from "./StudentPanel/StudentLayout";
 import AttemptedTests from './StudentPanel/Panel/AttemptedTests';
 import Result from './StudentPanel/Panel/Result';
+import StudentProfile from './StudentPanel/StudentProfile';
 import './index.css';
 
 function App() {
@@ -38,6 +39,7 @@ function App() {
             {/* Student Routes */}
             <Route path="/student" element={<StudentLayout />}>
               <Route path="dashboard" element={<StudentDashboard />} />
+              <Route path="profile" element={<StudentProfile />} />
               <Route path="attempt" element={<Attempt />} />
               <Route path="attempted" element={<AttemptedTests />} />
               <Route path="result/:testId" element={<Result />} />

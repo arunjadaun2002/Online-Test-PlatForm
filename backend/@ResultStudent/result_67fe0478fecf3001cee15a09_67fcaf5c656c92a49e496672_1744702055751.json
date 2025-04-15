@@ -1,0 +1,88 @@
+{
+  "testId": "67fe0478fecf3001cee15a09",
+  "userId": "67fcaf5c656c92a49e496672",
+  "testTitle": "End test",
+  "totalQuestions": 5,
+  "rightMarks": 12,
+  "negativeMarks": 0,
+  "answers": {
+    "0": "23",
+    "1": "690",
+    "2": "6",
+    "3": "2/2"
+  },
+  "tabSwitchCount": 0,
+  "testDuration": 7,
+  "totalMarks": 0,
+  "correctAnswers": 0,
+  "wrongAnswers": 4,
+  "questionResults": [
+    {
+      "question": "What is the value of 3 × 34?",
+      "options": [
+        "23",
+        "25",
+        "102",
+        "81"
+      ],
+      "correctAnswer": "C",
+      "studentAnswer": "23",
+      "isCorrect": false,
+      "marksObtained": 0
+    },
+    {
+      "question": "What is the sum of 456 and 234?",
+      "options": [
+        "680",
+        "690",
+        "700",
+        "790"
+      ],
+      "correctAnswer": "B",
+      "studentAnswer": "690",
+      "isCorrect": false,
+      "marksObtained": 0
+    },
+    {
+      "question": "How many sides does a pentagon have?",
+      "options": [
+        "4",
+        "5",
+        "6",
+        "7"
+      ],
+      "correctAnswer": "B",
+      "studentAnswer": "6",
+      "isCorrect": false,
+      "marksObtained": 0
+    },
+    {
+      "question": "What is the fraction form of half?",
+      "options": [
+        "1/4",
+        "1/2",
+        "3/4",
+        "2/2"
+      ],
+      "correctAnswer": "B",
+      "studentAnswer": "2/2",
+      "isCorrect": false,
+      "marksObtained": 0
+    },
+    {
+      "question": "What is 100 ÷ 4?",
+      "options": [
+        "20",
+        "25",
+        "30",
+        "40"
+      ],
+      "correctAnswer": "B",
+      "studentAnswer": null,
+      "isCorrect": false,
+      "marksObtained": 0
+    }
+  ],
+  "percentage": "0.00",
+  "submittedAt": "2025-04-15T07:27:35.751Z"
+}
