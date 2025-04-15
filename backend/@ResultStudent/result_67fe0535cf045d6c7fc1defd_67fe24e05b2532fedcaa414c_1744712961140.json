@@ -1,17 +1,15 @@
 {
   "testId": "67fe0535cf045d6c7fc1defd",
-  "userId": "67fa136678c4a47f18d95fd2",
+  "userId": "67fe24e05b2532fedcaa414c",
   "testTitle": "abc",
   "totalQuestions": 1,
   "rightMarks": 1,
   "negativeMarks": 0,
-  "answers": {
-    "0": "d"
-  },
+  "answers": {},
   "tabSwitchCount": 0,
-  "testDuration": 5,
-  "totalMarks": 1,
-  "correctAnswers": 1,
+  "testDuration": 0,
+  "totalMarks": 0,
+  "correctAnswers": 0,
   "wrongAnswers": 0,
   "questionResults": [
     {
@@ -23,11 +21,11 @@
         "g"
       ],
       "correctAnswer": "d",
-      "studentAnswer": "d",
-      "isCorrect": true,
-      "marksObtained": 1
+      "studentAnswer": null,
+      "isCorrect": false,
+      "marksObtained": 0
     }
   ],
-  "percentage": "100.00",
-  "submittedAt": "2025-04-15T09:48:12.852Z"
+  "percentage": "0.00",
+  "submittedAt": "2025-04-15T10:29:21.140Z"
 }

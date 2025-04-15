@@ -1,0 +1,33 @@
+{
+  "testId": "67fdf37b003d06b74b79d08d",
+  "userId": "67fe24e05b2532fedcaa414c",
+  "testTitle": "final test ",
+  "totalQuestions": 1,
+  "rightMarks": 1,
+  "negativeMarks": 0,
+  "answers": {
+    "0": "4"
+  },
+  "tabSwitchCount": 0,
+  "testDuration": 2,
+  "totalMarks": 1,
+  "correctAnswers": 1,
+  "wrongAnswers": 0,
+  "questionResults": [
+    {
+      "question": "2 + 2",
+      "options": [
+        "12",
+        "2",
+        "2",
+        "4"
+      ],
+      "correctAnswer": "4",
+      "studentAnswer": "4",
+      "isCorrect": true,
+      "marksObtained": 1
+    }
+  ],
+  "percentage": "100.00",
+  "submittedAt": "2025-04-15T10:31:12.864Z"
+}

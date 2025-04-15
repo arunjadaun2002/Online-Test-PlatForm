@@ -1,0 +1,61 @@
+{
+  "testId": "67fe2ab0711b0c146d73d584",
+  "userId": "67f9e6f34a811c45cbe7f346",
+  "testTitle": "class 7 final test end term",
+  "totalQuestions": 3,
+  "rightMarks": 1,
+  "negativeMarks": 0,
+  "answers": {
+    "0": "hardware",
+    "1": "4",
+    "2": "121"
+  },
+  "tabSwitchCount": 0,
+  "testDuration": 4,
+  "totalMarks": 2,
+  "correctAnswers": 2,
+  "wrongAnswers": 1,
+  "questionResults": [
+    {
+      "question": "The Mouse is a ?",
+      "options": [
+        "hardware",
+        "software",
+        "both",
+        "none of these"
+      ],
+      "correctAnswer": "hardware",
+      "studentAnswer": "hardware",
+      "isCorrect": true,
+      "marksObtained": 1
+    },
+    {
+      "question": "2+2",
+      "options": [
+        "4",
+        "2",
+        "11",
+        "1"
+      ],
+      "correctAnswer": "4",
+      "studentAnswer": "4",
+      "isCorrect": true,
+      "marksObtained": 1
+    },
+    {
+      "question": "8*0",
+      "options": [
+        "8",
+        "8",
+        "121",
+        "0"
+      ],
+      "correctAnswer": "0",
+      "studentAnswer": "121",
+      "isCorrect": false,
+      "marksObtained": 0
+    }
+  ],
+  "percentage": "66.67",
+  "submittedAt": "2025-04-15T10:19:26.388Z"
+}
