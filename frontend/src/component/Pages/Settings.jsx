@@ -1,6 +1,7 @@
 import React from "react";
 import './Settings.css';
 import { useTheme } from '../../context/ThemeContext';
+import bugEmoji from '../../assets/images/bugEmoji.png';
 
 export function Settings() {
   const { darkMode, toggleDarkMode } = useTheme();
@@ -46,50 +47,7 @@ export function Settings() {
           <span>Reviews</span>
         </div>
         <div className="settings-item">
-          <svg className="icon" viewBox="0 0 24 24">
-            <defs>
-              <linearGradient id="bugGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                <stop offset="0%" stopColor="#7C66FF" />
-                <stop offset="100%" stopColor="#6C5CE7" />
-              </linearGradient>
-              <linearGradient id="bugHighlight" x1="50%" y1="0%" x2="50%" y2="100%">
-                <stop offset="0%" stopColor="#9985FF" />
-                <stop offset="100%" stopColor="#7C66FF" />
-              </linearGradient>
-              <filter id="glow">
-                <feGaussianBlur stdDeviation="0.5" result="coloredBlur"/>
-                <feMerge>
-                  <feMergeNode in="coloredBlur"/>
-                  <feMergeNode in="SourceGraphic"/>
-                </feMerge>
-              </filter>
-            </defs>
-            <g filter="url(#glow)">
-              <path
-                d="M12 4c-3 0-5 2-5 5v6c0 3 2 5 5 5s5-2 5-5V9c0-3-2-5-5-5z"
-                fill="url(#bugGradient)"
-              />
-              <path
-                d="M7 10H4v2h3m13-2h-3v2h3m-13 4H4v2h3m13-2h-3v2h3"
-                stroke="url(#bugHighlight)"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-              <rect
-                x="9"
-                y="10"
-                width="6"
-                height="5"
-                fill="url(#bugHighlight)"
-              />
-              <path
-                d="M12 4v4"
-                stroke="url(#bugHighlight)"
-                strokeWidth="1.5"
-                strokeLinecap="round"
-              />
-            </g>
-          </svg>
+          <img src={bugEmoji} alt="bug" className="icon bug-icon" />
           <span>Report Bug</span>
         </div>
       </div>
