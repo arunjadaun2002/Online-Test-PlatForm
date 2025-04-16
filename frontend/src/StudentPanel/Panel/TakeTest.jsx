@@ -243,29 +243,39 @@ const TakeTest = () => {
         throw new Error("No authentication token found");
       }
 
+      console.log('Fetching test data for testId:', testId);
+
       const response = await fetch(
         `http://localhost:4000/api/student/tests/${testId}`,
         {
           headers: {
-            Authorization: `Bearer ${token}`,
-          },
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          }
         }
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.message || "Failed to fetch test data");
-      }
-
       const data = await response.json();
 
-      if (!data.success) {
+      if (!response.ok) {
+        console.error('Error response from server:', data);
         throw new Error(data.message || "Failed to fetch test data");
       }
 
-      if (!data.data.questions || !Array.isArray(data.data.questions)) {
+      if (!data.success) {
+        console.error('Unsuccessful response:', data);
+        throw new Error(data.message || "Failed to fetch test data");
+      }
+
+      if (!data.data || !data.data.questions || !Array.isArray(data.data.questions)) {
+        console.error('Invalid data format:', data);
         throw new Error("Invalid test data format");
       }
+
+      console.log('Successfully fetched test data:', {
+        testId: data.data._id,
+        questionCount: data.data.questions.length
+      });
 
       setTest(data.data);
       const duration = data.data.timeInMinutes * 60;
@@ -273,7 +283,7 @@ const TakeTest = () => {
       setLoading(false);
     } catch (err) {
       console.error("Error fetching test:", err);
-      setError(err.message);
+      setError(err.message || "Failed to load test. Please try again later.");
       setLoading(false);
     }
   };
@@ -484,7 +494,7 @@ const TakeTest = () => {
             <div className="options-list">
               {test.questions[currentQuestion].options.map((option, index) => (
                 <div
-                  key={index}
+                  key={`${currentQuestion}-${index}`}
                   className={`option ${
                     answers[currentQuestion] === index ? "selected" : ""
                   }`}

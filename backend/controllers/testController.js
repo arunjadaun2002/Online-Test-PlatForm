@@ -357,65 +357,147 @@ const updateTestClasses = async (req, res) => {
   }
 };
 
+// Function to shuffle array using Fisher-Yates algorithm
+const shuffleArray = (array) => {
+  const shuffled = [...array];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled;
+};
+
+// Function to shuffle questions and their options
+const shuffleTest = (test) => {
+  // Create a deep copy of the test
+  const shuffledTest = JSON.parse(JSON.stringify(test));
+  
+  // Shuffle questions
+  shuffledTest.questions = shuffleArray(shuffledTest.questions);
+  
+  // Shuffle options for each question while maintaining correct answer
+  shuffledTest.questions.forEach(question => {
+    const options = question.options;
+    const correctAnswer = question.correctAnswer;
+    const correctIndex = options.indexOf(correctAnswer);
+    
+    // Shuffle options
+    const shuffledOptions = shuffleArray(options);
+    
+    // Update correct answer to match new position
+    question.correctAnswer = shuffledOptions[correctIndex];
+    question.options = shuffledOptions;
+  });
+  
+  return shuffledTest;
+};
+
 const getTestById = async (req, res) => {
   try {
-    const test = await Test.findById(req.params.id);
+    const { id } = req.params;
+    const test = await Test.findById(id);
+    
     if (!test) {
-      return res.status(404).json({
-        success: false,
-        message: "Test not found",
-      });
+      return res.status(404).json({ success: false, message: "Test not found" });
     }
 
-    res.status(200).json({
-      success: true,
-      data: test,
-    });
-  } catch (err) {
-    console.log("Error fetching test by ID: ", err);
-    res.status(500).json({
-      success: false,
-      message: "Internal Server Error",
-    });
+    // Shuffle the test for each student
+    const shuffledTest = shuffleTest(test);
+    
+    res.status(200).json({ success: true, data: shuffledTest });
+  } catch (error) {
+    console.error("Error fetching test:", error);
+    res.status(500).json({ success: false, message: "Internal server error" });
   }
 };
 
 const getTestByIdForStudent = async (req, res) => {
   try {
-    const student = await Student.findById(req.user.id);
-    if (!student) {
-      return res.status(403).json({
+    console.log('getTestByIdForStudent called with:', {
+      userId: req.user?.id,
+      testId: req.params.id
+    });
+
+    // Check if user is authenticated
+    if (!req.user || !req.user.id) {
+      console.error('No user ID found in request');
+      return res.status(401).json({
         success: false,
-        message: "Unauthorized",
+        message: "User not authenticated"
       });
     }
 
-    const test = await Test.findById(req.params.id);
-    if (!test) {
-      return res.status(404).json({
+    // Find student
+    const student = await Student.findById(req.user.id);
+    if (!student) {
+      console.error('Student not found with ID:', req.user.id);
+      return res.status(403).json({
         success: false,
-        message: "Test not found",
+        message: "Student not found"
       });
     }
+
+    console.log('Found student:', {
+      id: student._id,
+      class: student.class
+    });
+
+    // Find test
+    const test = await Test.findById(req.params.id);
+    if (!test) {
+      console.error('Test not found with ID:', req.params.id);
+      return res.status(404).json({
+        success: false,
+        message: "Test not found"
+      });
+    }
+
+    console.log('Found test:', {
+      id: test._id,
+      class: test.class,
+      questionCount: test.questions?.length
+    });
 
     // Check if the test is for the student's class
     const studentClass = `Class ${student.class}`;
     if (test.class !== studentClass) {
+      console.error('Class mismatch:', {
+        studentClass,
+        testClass: test.class
+      });
       return res.status(403).json({
         success: false,
-        message: "You are not authorized to take this test",
+        message: "You are not authorized to take this test"
       });
     }
 
+    // Shuffle the test for each student
+    const shuffledTest = shuffleTest(test);
+    
+    // Ensure each question has a unique ID
+    const testWithUniqueIds = {
+      ...shuffledTest,
+      questions: shuffledTest.questions.map((question, index) => ({
+        ...question,
+        _id: `${shuffledTest._id}-${index}` // Create unique ID for each question
+      }))
+    };
+
+    console.log('Sending test data to student:', {
+      testId: testWithUniqueIds._id,
+      questionCount: testWithUniqueIds.questions.length
+    });
+
     res.status(200).json({
       success: true,
-      data: test,
+      data: testWithUniqueIds
     });
   } catch (err) {
-    console.log("Error fetching test by ID for student: ", err);
+    console.error("Error in getTestByIdForStudent:", err);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
 };

@@ -1,4 +1,5 @@
 const Student = require('../models/studentModel');
+const User = require('../models/userModel');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const sendEmail = require('../utils/mailer');
@@ -168,4 +169,43 @@ exports.searchStudents = async (req, res) => {
       error: err.message
     });
   }
+};
+
+exports.resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword } = req.body;
+        
+        // Verify the token
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
+        
+        // Find the student
+        const student = await Student.findById(decoded.id);
+        
+        if (!student) {
+            return res.status(404).json({
+                success: false,
+                message: 'Student not found'
+            });
+        }
+        
+        // Hash the new password
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        
+        // Update the password
+        student.password = hashedPassword;
+        await student.save();
+        
+        res.status(200).json({
+            success: true,
+            message: 'Password reset successfully'
+        });
+    } catch (err) {
+        console.log("Error: resetPassword");
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server error',
+            error: err.message
+        });
+    }
 };

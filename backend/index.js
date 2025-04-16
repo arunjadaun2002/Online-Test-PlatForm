@@ -1,11 +1,11 @@
 const express = require("express");
 require("dotenv").config();
 require("./configs/database");
-const app = express();
 const cors = require("cors");
 
 // Middlewares
-app.use(cors({ origin: "http://localhost:5173" }));
+const app = express();
+app.use(cors());
 app.use(express.json());
 
 // Routes
@@ -24,8 +24,18 @@ app.use('/api/student', studentRoutes);
 app.use('/api/auth', authRoutes);
 app.use('/api/test', testRoutes);
 
-const PORT = process.env.PORT || 4000;
+// Error handling middleware
+app.use((err, req, res, next) => {
+  console.error('Global error handler:', err);
+  res.status(500).json({
+    success: false,
+    message: 'Internal Server Error',
+    error: process.env.NODE_ENV === 'development' ? err.message : undefined
+  });
+});
 
+// Start server
+const PORT = process.env.PORT || 4000;
 app.listen(PORT, () => {
     console.log(`Server is started on port ${PORT}`)
 });
