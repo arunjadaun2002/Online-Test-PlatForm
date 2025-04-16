@@ -24,7 +24,7 @@
   min-height: calc(100vh - 64px); /* Assuming header height is 64px */
   margin-left: 250px; /* Space for sidebar */
   margin-top: 64px; /* Space for header */
-  padding: 0;
+  padding: 2rem;
   background-color: var(--bg-color);
   color: var(--text-color);
   transition: background-color 0.3s, color 0.3s;
@@ -32,49 +32,60 @@
 
 .settings-title {
   color: var(--title-color);
-  font-size: 1.8rem;
-  padding: 1.5rem;
-  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 2rem;
   border-bottom: 1px solid var(--border-color);
 }
 
 .settings-section {
   padding: 1rem 0;
   background-color: var(--section-bg);
+  margin-bottom: 2rem;
 }
 
 .section-title {
   color: var(--title-color);
-  font-size: 1rem;
-  font-weight: 600;
+  font-size: 1.2rem;
+  font-weight: 500;
   padding: 0.5rem 1.5rem;
-  margin-bottom: 0.5rem;
+  margin-bottom: 1rem;
   border-left: 3px solid var(--section-border);
 }
 
 .settings-item {
   display: flex;
   align-items: center;
-  padding: 0.75rem 1.5rem;
+  padding: 0.75rem;
+  margin-bottom: 0.5rem;
+  border-radius: 0.5rem;
   cursor: pointer;
-  transition: background-color 0.2s ease;
-  border-bottom: 1px solid var(--border-color);
+  transition: background-color 0.2s;
 }
 
 .settings-item:hover {
-  background-color: var(--hover-bg);
+  background-color: rgba(0, 0, 0, 0.05);
 }
 
 .icon {
   width: 24px;
   height: 24px;
-  margin-right: 12px;
+  margin-right: 1rem;
   color: var(--text-color);
+}
+
+.bug-icon {
+  filter: brightness(0.7);
+  transition: filter 0.2s ease;
+}
+
+[data-theme='dark'] .bug-icon {
+  filter: brightness(0) invert(1);
 }
 
 .settings-item span {
   color: var(--text-color);
-  font-size: 0.95rem;
+  font-size: 1rem;
 }
 
 /* Remove unused styles */
@@ -84,33 +95,32 @@
 
 /* Toggle switch styles */
 .toggle-switch {
-  position: relative;
-  width: 50px;
-  height: 24px;
-  background-color: #ccc;
-  border-radius: 12px;
   margin-left: auto;
-  cursor: pointer;
-  transition: background-color 0.3s;
+  width: 40px;
+  height: 20px;
+  background-color: #e0e0e0;
+  border-radius: 10px;
+  position: relative;
+  transition: background-color 0.2s;
 }
 
 .toggle-slider {
+  width: 16px;
+  height: 16px;
+  background-color: white;
+  border-radius: 50%;
   position: absolute;
   top: 2px;
   left: 2px;
-  width: 20px;
-  height: 20px;
-  background-color: white;
-  border-radius: 50%;
-  transition: transform 0.3s;
+  transition: transform 0.2s;
 }
 
 .toggle-slider.active {
-  transform: translateX(26px);
-  background-color: #ffffff;
+  transform: translateX(20px);
+  background-color: #fff;
 }
 
-.toggle-switch:has(.toggle-slider.active) {
-  background-color: #6C5CE7;
+.toggle-switch.active {
+  background-color: #4CAF50;
 }
   
