@@ -3,8 +3,8 @@ const fs = require("fs");
 const path = require("path");
 const Test = require("../models/testModel");
 const User = require("../models/userModel");
-const { uploadFileToBlob } = require("../services/azureBlobService");
 const Student = require("../models/studentModel");
+const { uploadFileToBlob } = require("../services/azureBlobService");
 const Submission = require("../models/submitionModel");
 
 // Function to ensure ResultStudent directory exists and is writable
@@ -294,26 +294,22 @@ const deleteAllQuizzes = async (req, res) => {
 
 const getTestsByClass = async (req, res) => {
   try {
+    // Check if user is authenticated
+    const user = await User.findById(req.user.id);
     const student = await Student.findById(req.user.id);
-    if (!student) {
+    
+    if (!user && !student) {
       return res.status(403).json({
         success: false,
         message: "Unauthorized",
       });
     }
 
-    console.log("Student class:", student.class);
-
-    // Convert student's class to standardized format
-    const studentClass = `Class ${student.class}`;
-
-    // Find tests with matching class
-    const tests = await Test.find({
-      class: studentClass,
-    }).select("-excelUrl");
-
-    console.log("Found tests:", tests);
-
+    // Get all tests
+    const tests = await Test.find({}).select(
+      "title description totalQuestion rightMarks wrongMarks sectionId subject class timeInMinutes createdAt updatedAt"
+    );
+    
     res.status(200).json({
       success: true,
       data: tests,
@@ -688,6 +684,81 @@ const getTestResult = async (req, res) => {
   }
 };
 
+const getTestResultsByClass = async (req, res) => {
+  try {
+    const admin = await User.findById(req.user.id);
+    if (!admin || admin.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized",
+      });
+    }
+
+    const { class: classNumber, testId } = req.query;
+    if (!classNumber || !testId) {
+      return res.status(400).json({
+        success: false,
+        message: "Class and test ID are required",
+      });
+    }
+
+    // Find all submissions for this test
+    const submissions = await Submission.find({ testId })
+      .populate({
+        path: 'userId',
+        select: 'name email',
+        model: 'Student'
+      })
+      .populate({
+        path: 'testId',
+        select: 'title totalQuestion rightMarks class',
+        model: 'Test'
+      })
+      .sort({ totalMarks: -1 }); // Sort by score in descending order
+
+    if (!submissions || submissions.length === 0) {
+      return res.status(200).json({
+        success: true,
+        data: [],
+        message: "No submissions found for this test"
+      });
+    }
+
+    // Format the response
+    const results = submissions.map(submission => {
+      if (!submission.userId || !submission.testId) {
+        return null;
+      }
+
+      return {
+        _id: submission._id,
+        studentName: submission.userId.name,
+        userId: submission.userId._id,
+        testName: submission.testId.title,
+        score: submission.totalMarks,
+        percentage: ((submission.totalMarks / (submission.testId.totalQuestion * submission.testId.rightMarks)) * 100).toFixed(2),
+        date: submission.submittedAt,
+        totalQuestions: submission.testId.totalQuestion,
+        correctAnswers: submission.correctAnswers,
+        wrongAnswers: submission.wrongAnswers,
+        testDuration: submission.testDuration,
+        class: submission.testId.class
+      };
+    }).filter(result => result !== null);
+
+    res.status(200).json({
+      success: true,
+      data: results
+    });
+  } catch (err) {
+    console.log("Error fetching test results: ", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error"
+    });
+  }
+};
+
 module.exports = {
   createTestWithFile,
   addTypedQuestion,
@@ -702,5 +773,6 @@ module.exports = {
   getTestByIdForStudent,
   submitTest,
   getAttemptedTests,
-  getTestResult
+  getTestResult,
+  getTestResultsByClass
 };

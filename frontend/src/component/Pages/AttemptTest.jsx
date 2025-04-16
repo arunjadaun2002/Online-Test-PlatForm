@@ -56,14 +56,16 @@ function AttemptTest() {
   const fetchTests = async (studentClass) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:4000/api/test?class=${studentClass}`, {
+      const response = await fetch(`http://localhost:4000/api/student/tests`, {
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
         }
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch tests');
+        const errorData = await response.json();
+        throw new Error(errorData.message || 'Failed to fetch tests');
       }
 
       const data = await response.json();
@@ -71,8 +73,10 @@ function AttemptTest() {
         throw new Error(data.message || 'Failed to fetch tests');
       }
 
-      console.log('Tests for Class', studentClass, ':', data.data);
-      setTests(data.data);
+      // Filter tests for the student's class
+      const classTests = data.data.filter(test => test.class === `Class ${studentClass}`);
+      console.log('Tests for Class', studentClass, ':', classTests);
+      setTests(classTests);
       setLoading(false);
     } catch (err) {
       console.error('Error fetching tests:', err);

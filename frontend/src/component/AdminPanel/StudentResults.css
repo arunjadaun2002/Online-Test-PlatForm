@@ -153,10 +153,14 @@
 }
 
 .results-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  overflow-x: auto;
   gap: 1.5rem;
   margin-top: 1.5rem;
+  padding: 1rem;
+  -webkit-overflow-scrolling: touch;
 }
 
 .result-card {
@@ -167,6 +171,8 @@
   border: 1px solid #e0e0e0;
   transition: all 0.3s ease;
   min-height: 250px;
+  min-width: 300px;
+  flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   gap: 1rem;

@@ -1,6 +1,6 @@
 const express = require('express');
 const { adminSignup, adminLogin, adminForgotPassword, registerStudent, verifyAdmin, getAllStudents, deleteStudent, updateStudent, sendEmail, changeStudentPassword, getStudentsByClass, getStudentResults, getTestResultDetail } = require('../controllers/adminController');
-const { getAllQuizzes, deleteQuiz, deleteAllQuizzes } = require('../controllers/testController');
+const { getAllQuizzes, deleteQuiz, deleteAllQuizzes, getTestsByClass, getTestResultsByClass } = require('../controllers/testController');
 const authentication = require('../middlewares/authMiddleware');
 
 const router = express.Router();
@@ -29,5 +29,11 @@ router.get('/student/results', authentication, getStudentResults);
 
 // Get detailed test result
 router.get('/test-result/:resultId', authentication, getTestResultDetail);
+
+// Get tests by class
+router.get('/tests/class/:classNumber', authentication, getTestsByClass);
+
+// Get test results by class
+router.get('/test/results', authentication, getTestResultsByClass);
 
 module.exports = router;
