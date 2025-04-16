@@ -8,10 +8,21 @@ const Attempt = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
     const [studentClass, setStudentClass] = useState(null);
+    const [searchQuery, setSearchQuery] = useState('');
+    const [filteredTests, setFilteredTests] = useState([]);
 
     useEffect(() => {
         fetchStudentData();
     }, []);
+
+    useEffect(() => {
+        // Filter tests whenever searchQuery or tests change
+        const filtered = tests.filter(test => 
+            test.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+            test.subject?.toLowerCase().includes(searchQuery.toLowerCase())
+        );
+        setFilteredTests(filtered);
+    }, [searchQuery, tests]);
 
     const fetchStudentData = async () => {
         try {
@@ -60,12 +71,21 @@ const Attempt = () => {
             }
 
             setTests(data.data);
+            setFilteredTests(data.data);
             setLoading(false);
         } catch (err) {
             console.error('Error fetching tests:', err);
             setError(err.message);
             setLoading(false);
         }
+    };
+
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
+    const clearSearch = () => {
+        setSearchQuery('');
     };
 
     const handleStartTest = (testId) => {
@@ -94,10 +114,20 @@ const Attempt = () => {
                     <div className="search-box">
                         <input 
                             type="text" 
-                            placeholder="Search" 
+                            placeholder="Search by test title or subject..." 
                             className="search-input"
+                            value={searchQuery}
+                            onChange={handleSearch}
                         />
-                        <button className="clear-search">×</button>
+                        {searchQuery && (
+                            <button 
+                                className="clear-search"
+                                onClick={clearSearch}
+                                aria-label="Clear search"
+                            >
+                                ×
+                            </button>
+                        )}
                     </div>
                 </div>
             </div>
@@ -105,12 +135,12 @@ const Attempt = () => {
             <div className="test-list">
                 <h2>Select Test :</h2>
                 <div className="test-cards">
-                    {tests.length === 0 ? (
+                    {filteredTests.length === 0 ? (
                         <div className="no-tests">
-                            <p>No tests available for your class at the moment.</p>
+                            <p>No tests found matching your search.</p>
                         </div>
                     ) : (
-                        tests.map((test) => (
+                        filteredTests.map((test) => (
                             <div key={test._id} className="test-card">
                                 <div className="test-info">
                                     <h3>{test.title}</h3>
@@ -122,7 +152,7 @@ const Attempt = () => {
                                     </div>
                                 </div>
                                 <div className="test-meta">
-                                    <span className="course-tag">Subject: {test.subject || 'General'}</span>
+                                   
                                     <button 
                                         className="start-test-btn"
                                         onClick={() => handleStartTest(test._id)}

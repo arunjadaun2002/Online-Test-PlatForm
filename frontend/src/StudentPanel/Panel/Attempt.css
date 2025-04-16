@@ -1,7 +1,10 @@
 .attempt-page {
-    padding-left: 55px;
-    padding-right: 35px;
- }
+    padding: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+    min-height: 100vh;
+    background: var(--bg-primary);
+}
 
 /* .attempt-page {
     padding: 20px;
@@ -13,112 +16,154 @@
 } */
 
 .attempt-header {
-    background-color: #63579C;
-    padding: 25px;
-    border-radius: 8px;
-    color: white;
-    margin-bottom: 30px;
-    width: 100%;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    padding: 2rem;
+    border-radius: 1rem;
+    color: #000000;
+    margin-bottom: 2rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
 }
 
 .attempt-header h1 {
     margin: 0;
-    font-size: 28px;
-    margin-bottom: 25px;
+    font-size: 2rem;
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+    color: #000000;
 }
 
 .search-container {
-    background-color: #f8f9fa;
-    padding: 20px;
-    border-radius: 6px;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 1.5rem;
+    border-radius: 0.75rem;
+    backdrop-filter: blur(10px);
 }
 
 .search-container h2 {
-    color: #333;
-    font-size: 22px;
-    margin-bottom: 15px;
+    color: #000000;
+    font-size: 1.25rem;
+    margin-bottom: 1rem;
+    font-weight: 500;
 }
 
 .search-box {
     display: flex;
     align-items: center;
-    background-color: white;
-    border-radius: 4px;
-    padding: 8px 15px;
-    border: 1px solid #ddd;
+    background: rgba(255, 255, 255, 0.15);
+    border-radius: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.search-box:focus-within {
+    background: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.3);
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1);
 }
 
 .search-input {
     flex: 1;
     border: none;
-    padding: 12px;
-    font-size: 18px;
+    padding: 0.75rem;
+    font-size: 1rem;
     outline: none;
+    background: transparent;
+    color: #000000;
+}
+
+.search-input::placeholder {
+    color: rgba(0, 0, 0, 0.7);
 }
 
 .clear-search {
     background: none;
     border: none;
-    color: #666;
-    font-size: 24px;
+    color: rgba(0, 0, 0, 0.7);
+    font-size: 1.5rem;
     cursor: pointer;
-    padding: 0 8px;
+    padding: 0.5rem;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 2rem;
+    height: 2rem;
+    border-radius: 50%;
 }
 
 .clear-search:hover {
-    color: #333;
+    color: #000000;
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .test-list {
-    background-color: #f8f9fa;
-    padding: 25px;
-    border-radius: 8px;
-    margin-top: 30px;
+    background: var(--bg-secondary);
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
 }
 
 .test-list h2 {
-    color: #333;
-    font-size: 24px;
-    margin-bottom: 25px;
+    color: #000000;
+    font-size: 1.5rem;
+    margin-bottom: 1.5rem;
+    font-weight: 600;
 }
 
 .test-cards {
     display: flex;
     flex-direction: column;
-    gap: 20px;
+    gap: 1.5rem;
+    max-width: 800px;
+    margin: 0 auto;
 }
 
 .test-card {
-    background-color: white;
-    border-radius: 10px;
-    padding: 25px;
-    box-shadow: 0 3px 6px rgba(0, 0, 0, 0.1);
+    background: var(--bg-primary);
+    border-radius: 1rem;
+    padding: 1.5rem;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid var(--border-color);
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.test-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    border-color: var(--primary-color);
 }
 
 .test-info h3 {
-    color: #333;
+    color: #000000;
     margin: 0;
-    margin-bottom: 15px;
-    font-size: 22px;
+    margin-bottom: 1rem;
+    font-size: 1.25rem;
+    font-weight: 600;
 }
 
 .test-details {
-    color: #666;
-    font-size: 16px;
+    color: #000000;
+    font-size: 0.95rem;
+    display: grid;
+    gap: 0.5rem;
 }
 
 .test-details p {
-    margin: 8px 0;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
 }
 
 .test-meta {
+    margin-top: auto;
     display: flex;
     flex-direction: column;
-    align-items: flex-end;
-    gap: 15px;
+    gap: 1rem;
 }
 
 .course-tag {
@@ -130,50 +175,81 @@
 }
 
 .start-test-btn {
-    background-color: #28a745;
-    color: white;
+    background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+    color: #000000;
     border: none;
-    padding: 12px 30px;
-    border-radius: 6px;
+    padding: 0.75rem 1.5rem;
+    border-radius: 0.5rem;
     cursor: pointer;
-    font-weight: 600;
-    font-size: 16px;
-    transition: all 0.2s;
+    font-weight: 500;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+    text-align: center;
+    width: 100%;
 }
 
 .start-test-btn:hover {
-    background-color: #218838;
     transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(99, 87, 156, 0.3);
+}
+
+.no-tests {
+    text-align: center;
+    padding: 3rem;
+    background: var(--bg-primary);
+    border-radius: 1rem;
+    color: #000000;
+    font-size: 1.1rem;
+}
+
+.loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    color: #000000;
+    font-size: 1.1rem;
+}
+
+.error {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 50vh;
+    color: #dc3545;
+    font-size: 1.1rem;
+    text-align: center;
+    padding: 2rem;
 }
 
 @media (max-width: 1200px) {
     .attempt-page {
-        margin-left: 100px;
-        margin-right: 30px;
-        width: calc(100% - 130px);
+        padding: 1.5rem;
     }
 }
 
 @media (max-width: 768px) {
     .attempt-page {
-        margin-left: 15px;
-        margin-right: 15px;
-        padding: 15px;
-        width: calc(100% - 30px);
+        padding: 1rem;
+    }
+
+    .attempt-header {
+        padding: 1.5rem;
+    }
+
+    .attempt-header h1 {
+        font-size: 1.5rem;
+    }
+
+    .search-container {
+        padding: 1rem;
+    }
+
+    .test-list {
+        padding: 1.5rem;
     }
 
     .test-card {
-        flex-direction: column;
-        align-items: flex-start;
-    }
-
-    .test-meta {
-        margin-top: 20px;
-        align-items: flex-start;
-        width: 100%;
-    }
-
-    .start-test-btn {
-        width: 100%;
+        padding: 1.25rem;
     }
 } 
