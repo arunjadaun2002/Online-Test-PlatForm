@@ -1,11 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useStudents } from '../Pages/StudentContext';
+import { useNavigate } from 'react-router-dom';
 import './Dashboard.css';
 
 function Dashboard() {
   const [quizCount, setQuizCount] = useState(0);
   const [questionCount, setQuestionCount] = useState(0);
   const { studentCount } = useStudents();
+  const navigate = useNavigate();
 
   useEffect(() => {
     // Get quizzes from localStorage
@@ -18,6 +20,22 @@ function Dashboard() {
     }, 0);
     setQuestionCount(totalQuestions);
   }, []);
+
+  const handleMoreInfo = (type) => {
+    switch(type) {
+      case 'students':
+        navigate('/admin/students');
+        break;
+      case 'quiz':
+        navigate('/admin/quiz');
+        break;
+      case 'questions':
+        navigate('/admin/create-test');
+        break;
+      default:
+        break;
+    }
+  };
 
   return (
     <div className="dashboard">
@@ -32,7 +50,7 @@ function Dashboard() {
                 <i className="fas fa-user-plus"></i>
               </div>
             </div>
-            <div className="more-info">
+            <div className="more-info" onClick={() => handleMoreInfo('students')}>
               More Info <i className="fas fa-arrow-right"></i>
             </div>
           </div>
@@ -46,7 +64,7 @@ function Dashboard() {
                 <i className="fas fa-question"></i>
               </div>
             </div>
-            <div className="more-info">
+            <div className="more-info" onClick={() => handleMoreInfo('quiz')}>
               More Info <i className="fas fa-arrow-right"></i>
             </div>
           </div>
@@ -62,7 +80,7 @@ function Dashboard() {
                 <i className="fas fa-question-circle"></i>
               </div>
             </div>
-            <div className="more-info">
+            <div className="more-info" onClick={() => handleMoreInfo('questions')}>
               More Info <i className="fas fa-arrow-right"></i>
             </div>
           </div>

@@ -611,6 +611,31 @@ const getTestResultDetail = async (req, res) => {
     }
 };
 
+exports.getAdminInfo = async (req, res) => {
+    try {
+        const admin = await User.findById(req.user.id).select('-password');
+        if (!admin || admin.role !== 'admin') {
+            return res.status(403).json({
+                success: false,
+                message: 'Unauthorized'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: admin
+        });
+    } catch (err) {
+        console.log('Error: getAdminInfo');
+        console.log(err);
+        res.status(500).json({
+            success: false,
+            message: 'Internal Server Error',
+            error: err.message
+        });
+    }
+}
+
 module.exports = {
   adminSignup: exports.adminSignup,
   adminLogin: exports.adminLogin,
@@ -624,5 +649,6 @@ module.exports = {
   changeStudentPassword: exports.changeStudentPassword,
   getStudentsByClass,
   getStudentResults,
-  getTestResultDetail
+  getTestResultDetail,
+  getAdminInfo: exports.getAdminInfo
 };
