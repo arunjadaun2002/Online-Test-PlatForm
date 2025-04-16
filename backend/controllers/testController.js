@@ -305,8 +305,8 @@ const getTestsByClass = async (req, res) => {
       });
     }
 
-    // Get all tests
-    const tests = await Test.find({}).select(
+    // Get only Class 12 tests
+    const tests = await Test.find({ class: 'Class 12' }).select(
       "title description totalQuestion rightMarks wrongMarks sectionId subject class timeInMinutes createdAt updatedAt"
     );
     
