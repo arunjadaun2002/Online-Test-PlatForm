@@ -131,10 +131,20 @@ const StudentResults = () => {
         }
       });
       
-      console.log('Student Results Response:', response.data);
+      console.log('Raw Student Results Response:', response.data);
       
       if (response.data && Array.isArray(response.data)) {
-        setStudentResults(response.data);
+        // Map the data to ensure we have the correct structure
+        const formattedResults = response.data.map(result => {
+          console.log('Individual Result Object:', result);
+          return {
+            ...result,
+            testId: result._id, // Use the submission ID as testId
+            testName: result.testId?.title || 'Unknown Test'
+          };
+        });
+        console.log('Formatted Results:', formattedResults);
+        setStudentResults(formattedResults);
       } else {
         setStudentResults([]);
         setError('No results found for this student');
@@ -151,6 +161,51 @@ const StudentResults = () => {
   // Handle student selection
   const handleStudentClick = (student) => {
     setSelectedStudent(student);
+  };
+
+  // Add download function
+  const handleDownloadResult = async (testId, userId) => {
+    try {
+      if (!testId || !userId) {
+        console.error('Missing required parameters:', { testId, userId });
+        setError('Cannot download result: Missing test or user information');
+        return;
+      }
+
+      const token = getAuthToken();
+      if (!token) return;
+
+      console.log('Downloading result for:', { testId, userId });
+
+      const response = await axios.get(
+        `${API_BASE_URL}/api/admin/download-result/${testId}/${userId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+          responseType: 'blob', // Important for file download
+        }
+      );
+
+      // Create a blob from the response data
+      const blob = new Blob([response.data], { type: 'text/plain' });
+      const url = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.setAttribute('download', `result_${testId}_${userId}.txt`);
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('Error downloading result:', error);
+      if (error.response) {
+        console.error('Server error:', error.response.data);
+        setError(`Failed to download result: ${error.response.data.message || 'Server error'}`);
+      } else {
+        setError('Failed to download result: Network error');
+      }
+    }
   };
 
   return (
@@ -250,23 +305,31 @@ const StudentResults = () => {
                       <p><strong>Total:</strong> {result.totalQuestions}</p>
                       <p><strong>Correct:</strong> {result.correctAnswers}</p>
                       <p><strong>Wrong:</strong> {result.wrongAnswers}</p>
-                      <p><strong>Duration:</strong> {Math.floor(result.testDuration / 60)}m {result.testDuration % 60}s</p>
+                      <p><strong>Duration:</strong> {result.testDuration || 'N/A'}</p>
+                      <p><strong>Date:</strong> {new Date(result.date).toLocaleDateString()}</p>
                     </div>
-                    
-                    <p className="result-date">
-                      <strong>Date:</strong> {new Date(result.date).toLocaleDateString()}
-                    </p>
-                    
-                    <button 
-                      className="view-details-btn"
-                      onClick={() => window.open(`/student/test-results/${result._id}`, '_blank')}
-                    >
-                      View Details
-                    </button>
+
+                    <div className="result-actions">
+                      <button 
+                        className="view-details-btn"
+                        onClick={() => navigate(`/admin/result-details/${result._id}/${selectedStudent._id}`)}
+                      >
+                        View Details
+                      </button>
+                      <button 
+                        className="download-btn"
+                        onClick={() => {
+                          console.log('Download clicked for result:', result);
+                          handleDownloadResult(result._id, selectedStudent._id);
+                        }}
+                      >
+                        Download Result
+                      </button>
+                    </div>
                   </div>
                 ))
               ) : (
-                <div className="no-data-message">No test results found for this student.</div>
+                <div className="no-data-message">No results found for this student</div>
               )}
             </div>
           )}

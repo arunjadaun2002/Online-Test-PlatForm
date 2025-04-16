@@ -435,4 +435,45 @@
 
 .status-failed {
   background-color: #f44336;
+}
+
+.result-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 15px;
+  justify-content: space-between;
+}
+
+.view-details-btn,
+.download-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  flex: 1;
+}
+
+.view-details-btn {
+  background-color: #2196f3;
+  color: white;
+}
+
+.download-btn {
+  background-color: #4caf50;
+  color: white;
+}
+
+.view-details-btn:hover {
+  background-color: #1976d2;
+}
+
+.download-btn:hover {
+  background-color: #43a047;
+}
+
+.view-details-btn:active,
+.download-btn:active {
+  transform: scale(0.98);
 } 

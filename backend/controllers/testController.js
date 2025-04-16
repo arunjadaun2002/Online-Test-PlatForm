@@ -841,6 +841,101 @@ const getTestResultsByClass = async (req, res) => {
   }
 };
 
+const downloadTestResult = async (req, res) => {
+  try {
+    const { testId, userId } = req.params;
+
+    // Verify admin authorization
+    const admin = await User.findById(req.user.id);
+    if (!admin || admin.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized"
+      });
+    }
+
+    console.log('Finding submission with ID:', testId); // Debug log
+
+    // Find the submission by its ID (testId is actually the submission ID)
+    const submission = await Submission.findById(testId)
+      .populate('userId', 'name email class')
+      .populate('testId', 'title totalQuestion rightMarks class');
+
+    if (!submission) {
+      console.log('No submission found with ID:', testId); // Debug log
+      return res.status(404).json({
+        success: false,
+        message: "Test result not found"
+      });
+    }
+
+    // Verify this submission belongs to the requested user
+    if (submission.userId._id.toString() !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized: Result does not belong to this user"
+      });
+    }
+
+    console.log('Found submission:', {
+      studentName: submission.userId.name,
+      testTitle: submission.testId.title,
+      submittedAt: submission.submittedAt,
+      answers: submission.answers
+    });
+
+    // Ensure answers is an array
+    const answers = Array.isArray(submission.answers) ? submission.answers : [];
+
+    // Create a formatted result string
+    const formattedResult = `
+Test Result
+==========
+Student Name: ${submission.userId.name}
+Student Email: ${submission.userId.email}
+Student Class: ${submission.userId.class}
+Test Title: ${submission.testId.title}
+Date: ${new Date(submission.submittedAt).toLocaleString()}
+
+Score Summary
+============
+Total Questions: ${submission.testId.totalQuestion}
+Correct Answers: ${submission.correctAnswers}
+Wrong Answers: ${submission.wrongAnswers}
+Total Marks: ${submission.totalMarks}
+Percentage: ${((submission.totalMarks / (submission.testId.totalQuestion * submission.testId.rightMarks)) * 100).toFixed(2)}%
+
+Test Details
+===========
+Duration: ${submission.testDuration || 'N/A'}
+Tab Switches: ${submission.tabSwitchCount || 'N/A'}
+
+Answer Analysis
+==============
+${answers.map((answer, index) => `
+Question ${index + 1}:
+Student's Answer: ${answer || 'Not attempted'}
+`).join('\n')}
+    `.trim();
+
+    // Set headers for file download
+    res.setHeader('Content-Type', 'text/plain');
+    res.setHeader('Content-Disposition', `attachment; filename=result_${testId}_${userId}.txt`);
+
+    // Send the formatted result
+    res.send(formattedResult);
+
+  } catch (err) {
+    console.error("Error downloading test result:", err);
+    console.error("Error details:", err.message); // Debug log
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+};
+
 module.exports = {
   createTestWithFile,
   addTypedQuestion,
@@ -856,5 +951,6 @@ module.exports = {
   submitTest,
   getAttemptedTests,
   getTestResult,
-  getTestResultsByClass
+  getTestResultsByClass,
+  downloadTestResult
 };
