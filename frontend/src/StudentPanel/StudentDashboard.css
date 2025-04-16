@@ -1,6 +1,6 @@
 .dashboard-container {
-    display: flex;
-    min-height: 100vh;
+    padding-left: 55px;
+    padding-right: 35px;
 }
 
 /* Sidebar Styles */
@@ -72,17 +72,17 @@
 
 .content-wrapper {
     width: 100%;
-    padding: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
 }
 
 /* Banner Styles */
 .banner {
     width: 100%;
     height: 200px;
-    margin-bottom: 30px;
-    border-radius: 15px;
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
     overflow: hidden;
-    background: linear-gradient(135deg, #6C5CE7, #a393f0);
 }
 
 .banner img {
@@ -95,15 +95,14 @@
 .test-sections {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    gap: 30px;
-    margin-top: 20px;
+    gap: 1.5rem;
 }
 
 .test-section {
     background: white;
-    border-radius: 15px;
-    padding: 20px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .todays-tests {
@@ -119,8 +118,8 @@
 .section-header {
     display: flex;
     align-items: center;
-    margin-bottom: 20px;
-    gap: 10px;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
 }
 
 .section-header .icon {
@@ -128,53 +127,79 @@
 }
 
 .section-header h2 {
-    font-size: 1.2rem;
-    font-weight: 600;
+    font-size: 1.25rem;
     margin: 0;
+    color: inherit;
 }
 
 .test-list {
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 0.75rem;
 }
 
 .test-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 10px;
+    padding: 0.75rem 1rem;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    transition: transform 0.2s;
+    transition: all 0.2s ease;
 }
 
 .test-item:hover {
-    transform: translateX(5px);
+    background: rgba(255, 255, 255, 0.2);
 }
 
 .test-name {
     font-size: 1rem;
+    color: inherit;
 }
 
 .start-test {
     background: none;
     border: none;
-    color: white;
     cursor: pointer;
-    padding: 5px;
+    color: white;
+    font-size: 1.25rem;
+    padding: 0.5rem;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.start-test:hover {
+    background: rgba(255, 255, 255, 0.1);
 }
 
 .arrow {
-    font-size: 1.2rem;
+    font-size: 1.25rem;
 }
 
 .completed-icon {
-    color: #4CAF50;
-    font-size: 1.2rem;
+    color: white;
+    font-size: 1.25rem;
+}
+
+.no-tests {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+}
+
+.loading, .error {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+}
+
+.error {
+    color: #e74c3c;
 }
 
 /* Responsive Design */
@@ -197,6 +222,7 @@
 @media (max-width: 768px) {
     .dashboard-container {
         flex-direction: column;
+        padding: 0.75rem;
     }
 
     .sidebar {
@@ -210,6 +236,8 @@
 
     .test-sections {
         margin-left: 0;
+        grid-template-columns: 1fr;
+        gap: 1rem;
     }
     
     .content-wrapper {
@@ -218,17 +246,11 @@
 
     .banner {
         margin-left: 0;
-    }
-
-    .content-wrapper {
-        padding: 10px;
-    }
-
-    .banner {
         height: 150px;
+        margin-bottom: 1rem;
     }
 
-    .test-sections {
-        grid-template-columns: 1fr;
+    .test-section {
+        padding: 1.25rem;
     }
 } 

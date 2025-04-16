@@ -1,7 +1,6 @@
 .result-page {
-    padding: 2rem;
-    max-width: 1200px;
-    margin: 0 auto;
+    padding-left: 55px;
+    padding-right: 35px;
 }
 
 .result-header {

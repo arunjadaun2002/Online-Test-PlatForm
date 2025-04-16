@@ -1,11 +1,16 @@
 .attempt-page {
+    padding-left: 55px;
+    padding-right: 35px;
+ }
+
+/* .attempt-page {
     padding: 20px;
     max-width: 1800px;
     margin: 0 auto;
     margin-left: 300px;
     margin-right: 50px;
     width: calc(100% - 350px);
-}
+} */
 
 .attempt-header {
     background-color: #63579C;

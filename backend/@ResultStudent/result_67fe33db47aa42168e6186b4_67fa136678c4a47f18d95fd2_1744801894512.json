@@ -1,0 +1,47 @@
+{
+  "testId": "67fe33db47aa42168e6186b4",
+  "userId": "67fa136678c4a47f18d95fd2",
+  "testTitle": "computer test ",
+  "totalQuestions": 2,
+  "rightMarks": 10,
+  "negativeMarks": 0,
+  "answers": {
+    "0": "London",
+    "1": "Venus"
+  },
+  "tabSwitchCount": 2,
+  "testDuration": 39,
+  "totalMarks": 0,
+  "correctAnswers": 0,
+  "wrongAnswers": 2,
+  "questionResults": [
+    {
+      "question": "Question 1: What is the capital of France?",
+      "options": [
+        "London",
+        "Paris",
+        "Berlin",
+        "Madrid"
+      ],
+      "correctAnswer": "Paris",
+      "studentAnswer": "London",
+      "isCorrect": false,
+      "marksObtained": 0
+    },
+    {
+      "question": "Question 2: Which planet is known as the Red Planet?",
+      "options": [
+        "Venus",
+        "Mars",
+        "Jupiter",
+        "Saturn"
+      ],
+      "correctAnswer": "Mars",
+      "studentAnswer": "Venus",
+      "isCorrect": false,
+      "marksObtained": 0
+    }
+  ],
+  "percentage": "0.00",
+  "submittedAt": "2025-04-16T11:11:34.512Z"
+}

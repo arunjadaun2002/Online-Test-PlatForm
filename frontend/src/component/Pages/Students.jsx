@@ -216,51 +216,38 @@ const Students = () => {
   return (
     <div className="students-container">
       <div className="students-header">
-        <h2>Students</h2>
+        <h1>Students</h1>
         <div className="header-actions">
-          <button 
-            className="add-student-btn"
-            onClick={() => navigate('/admin/add-student')}
-          >
+          <button className="add-student-btn" onClick={() => navigate('/admin/add-student')}>
             Add Student
           </button>
-          <div className="filters">
-            <div className="search-bar">
-              <input
-                type="text"
-                placeholder="Search students..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-              />
-            </div>
-          </div>
+          <input
+            type="text"
+            placeholder="Search students..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="search-input"
+          />
         </div>
       </div>
 
-      <div className="class-sections">
-        {uniqueClasses.map(cls => {
-          const classStudents = studentsByClass[cls] || [];
-          return (
-            <div 
-              key={`class-${cls}`}
-              className={`class-section ${selectedClass === cls ? 'active' : ''}`}
-              onClick={() => handleClassClick(cls)}
-            >
-              <h3>Class {cls}</h3>
-              <span className="student-count">{classStudents.length} Students</span>
-            </div>
-          );
-        })}
+      <div className="class-grid">
+        {uniqueClasses.map((cls) => (
+          <div key={cls} className="class-card" onClick={() => handleClassClick(cls)}>
+            <h2>Class {cls}</h2>
+            <p>{studentsByClass[cls]?.length || 0} Students</p>
+          </div>
+        ))}
       </div>
 
       {selectedClass && (
-        <div className="class-modal">
-          <div className="class-modal-content">
-            <div className="class-modal-header">
-              <h3>Class {selectedClass} Students</h3>
-              <button className="close-btn" onClick={handleCloseClassModal}>×</button>
+        <div className="modal">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Class {selectedClass} Students</h2>
+              <button className="close-btn" onClick={handleCloseClassModal}>&times;</button>
             </div>
-            <div className="class-students-table-container">
+            <div className="students-table-container">
               <table className="students-table">
                 <thead>
                   <tr>
@@ -278,7 +265,7 @@ const Students = () => {
                       <td>{student.email}</td>
                       <td>{student.userId}</td>
                       <td>{student.class}</td>
-                      <td>
+                      <td className="action-buttons">
                         <button 
                           className="action-btn mail"
                           onClick={() => handleMail(student)}
@@ -307,108 +294,123 @@ const Students = () => {
         </div>
       )}
 
+      {/* Edit Student Modal */}
       {editingStudent && (
-        <div className="edit-modal">
-          <div className="edit-modal-content">
-            <h3>Edit Student</h3>
-            <form onSubmit={handleEditSubmit}>
-              <div className="form-group">
-                <label>Name:</label>
-                <input
-                  type="text"
-                  value={editForm.name}
-                  onChange={(e) => setEditForm({...editForm, name: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Email:</label>
-                <input
-                  type="email"
-                  value={editForm.email}
-                  onChange={(e) => setEditForm({...editForm, email: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>User ID:</label>
-                <input
-                  type="text"
-                  value={editForm.userId}
-                  onChange={(e) => setEditForm({...editForm, userId: e.target.value})}
-                  required
-                />
-              </div>
-              <div className="form-group">
-                <label>Class:</label>
-                <select
-                  value={editForm.class}
-                  onChange={(e) => setEditForm({...editForm, class: e.target.value})}
-                  required
-                >
-                  <option value="">Select Class</option>
-                  {uniqueClasses.map(cls => (
-                    <option key={`edit-class-${cls}`} value={cls}>Class {cls}</option>
-                  ))}
-                </select>
-              </div>
-              <div className="form-group">
-                <label>Password:</label>
-                <input
-                  type="password"
-                  value={editForm.password}
-                  onChange={(e) => setEditForm({...editForm, password: e.target.value})}
-                />
-              </div>
-              <div className="form-actions">
-                <button type="submit" className="save-btn">Save</button>
-                <button 
-                  type="button" 
-                  className="cancel-btn"
-                  onClick={() => setEditingStudent(null)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+        <div className="modal">
+          <div className="modal-content edit-modal-content">
+            <div className="modal-header">
+              <h2>Edit Student Information</h2>
+              <button className="close-btn" onClick={() => setEditingStudent(null)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={handleEditSubmit} className="edit-form">
+                <div className="form-group">
+                  <label>Full Name</label>
+                  <input
+                    type="text"
+                    value={editForm.name}
+                    onChange={(e) => setEditForm({...editForm, name: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Email Address</label>
+                  <input
+                    type="email"
+                    value={editForm.email}
+                    onChange={(e) => setEditForm({...editForm, email: e.target.value})}
+                    required
+                  />
+                </div>
+                <div className="form-row">
+                  <div className="form-group">
+                    <label>Class</label>
+                    <select
+                      value={editForm.class}
+                      onChange={(e) => setEditForm({...editForm, class: e.target.value})}
+                      required
+                    >
+                      {uniqueClasses.map(cls => (
+                        <option key={cls} value={cls}>{cls}</option>
+                      ))}
+                    </select>
+                  </div>
+                  <div className="form-group">
+                    <label>User ID</label>
+                    <input
+                      type="text"
+                      value={editForm.userId}
+                      onChange={(e) => setEditForm({...editForm, userId: e.target.value})}
+                      required
+                    />
+                  </div>
+                </div>
+                <div className="form-group">
+                  <label>New Password (Optional)</label>
+                  <input
+                    type="password"
+                    value={editForm.password}
+                    onChange={(e) => setEditForm({...editForm, password: e.target.value})}
+                    placeholder="Leave blank to keep current password"
+                  />
+                </div>
+                <div className="form-actions">
+                  <button type="button" className="cancel-btn" onClick={() => setEditingStudent(null)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="save-btn">
+                    Save Changes
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}
 
+      {/* Email Student Modal */}
       {emailingStudent && (
-        <div className="email-modal">
-          <div className="email-modal-content">
-            <h3>Send Email to {emailingStudent.name}</h3>
-            <form onSubmit={handleEmailSubmit}>
-              <div className="form-group">
-                <label>Subject:</label>
-                <input
-                  type="text"
-                  value={emailForm.subject}
-                  onChange={(e) => setEmailForm({...emailForm, subject: e.target.value})}
-                  required
-                />
+        <div className="modal">
+          <div className="modal-content email-modal-content">
+            <div className="modal-header">
+              <div className="email-header-info">
+                <h2>Send Email</h2>
+                <p className="email-recipient">To: {emailingStudent.name}</p>
               </div>
-              <div className="form-group">
-                <label>Message:</label>
-                <textarea
-                  value={emailForm.message}
-                  onChange={(e) => setEmailForm({...emailForm, message: e.target.value})}
-                  required
-                  rows="5"
-                />
-              </div>
-              <div className="form-actions">
-                <button type="submit" className="send-btn">Send</button>
-                <button 
-                  type="button" 
-                  className="cancel-btn"
-                  onClick={() => setEmailingStudent(null)}
-                >
-                  Cancel
-                </button>
-              </div>
-            </form>
+              <button className="close-btn" onClick={() => setEmailingStudent(null)}>&times;</button>
+            </div>
+            <div className="modal-body">
+              <form onSubmit={handleEmailSubmit} className="email-form">
+                <div className="form-group">
+                  <label>Subject</label>
+                  <input
+                    type="text"
+                    value={emailForm.subject}
+                    onChange={(e) => setEmailForm({...emailForm, subject: e.target.value})}
+                    placeholder="Enter email subject"
+                    required
+                  />
+                </div>
+                <div className="form-group">
+                  <label>Message</label>
+                  <textarea
+                    value={emailForm.message}
+                    onChange={(e) => setEmailForm({...emailForm, message: e.target.value})}
+                    placeholder="Type your message here..."
+                    rows="6"
+                    required
+                  />
+                </div>
+                <div className="form-actions">
+                  <button type="button" className="cancel-btn" onClick={() => setEmailingStudent(null)}>
+                    Cancel
+                  </button>
+                  <button type="submit" className="send-btn">
+                    Send Email
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       )}

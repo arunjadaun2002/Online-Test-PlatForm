@@ -96,60 +96,62 @@ const StudentDashboard = () => {
     }
 
     return (
-        <div className="content-wrapper">
-            {/* Banner Image */}
-            <div className="banner">
-                <img src="/assets/images/onlinetest.jpg" alt="Online Test Banner" />
-            </div>
-
-            {/* Test Sections */}
-            <div className="test-sections">
-                {/* Today's Tests Section */}
-                <div className="test-section todays-tests">
-                    <div className="section-header">
-                        <span className="icon">📝</span>
-                        <h2>Today's Tests</h2>
-                    </div>
-                    <div className="test-list">
-                        {!Array.isArray(allTests) || allTests.length === 0 ? (
-                            <div className="no-tests">No tests available</div>
-                        ) : (
-                            allTests.map((test, index) => (
-                                <div key={test._id || index} className="test-item">
-                                    <span className="test-name">
-                                        {index + 1}. {test.title || 'Untitled Test'}
-                                    </span>
-                                    <button 
-                                        className="start-test"
-                                        onClick={() => handleStartTest(test._id)}
-                                    >
-                                        <span className="arrow">→</span>
-                                    </button>
-                                </div>
-                            ))
-                        )}
-                    </div>
+        <div className="dashboard-container">
+            <div className="content-wrapper">
+                {/* Banner Image */}
+                <div className="banner">
+                    <img src="/assets/images/onlinetest.jpg" alt="Online Test Banner" />
                 </div>
 
-                {/* Recently Attempted Tests Section */}
-                <div className="test-section attempted-tests">
-                    <div className="section-header">
-                        <span className="icon">✓</span>
-                        <h2>Recently Attempted Tests</h2>
+                {/* Test Sections */}
+                <div className="test-sections">
+                    {/* Today's Tests Section */}
+                    <div className="test-section todays-tests">
+                        <div className="section-header">
+                            <span className="icon">📝</span>
+                            <h2>Today's Tests</h2>
+                        </div>
+                        <div className="test-list">
+                            {!Array.isArray(allTests) || allTests.length === 0 ? (
+                                <div className="no-tests">No tests available</div>
+                            ) : (
+                                allTests.map((test, index) => (
+                                    <div key={test._id || index} className="test-item">
+                                        <span className="test-name">
+                                            {index + 1}. {test.title || 'Untitled Test'}
+                                        </span>
+                                        <button 
+                                            className="start-test"
+                                            onClick={() => handleStartTest(test._id)}
+                                        >
+                                            <span className="arrow">→</span>
+                                        </button>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
-                    <div className="test-list">
-                        {!Array.isArray(attemptedTests) || attemptedTests.length === 0 ? (
-                            <div className="no-tests">No attempted tests yet</div>
-                        ) : (
-                            attemptedTests.map((test, index) => (
-                                <div key={test._id || index} className="test-item">
-                                    <span className="test-name">
-                                        {index + 1}. {test.title || 'Untitled Test'}
-                                    </span>
-                                    <span className="completed-icon">✓</span>
-                                </div>
-                            ))
-                        )}
+
+                    {/* Recently Attempted Tests Section */}
+                    <div className="test-section attempted-tests">
+                        <div className="section-header">
+                            <span className="icon">✓</span>
+                            <h2>Recently Attempted Tests</h2>
+                        </div>
+                        <div className="test-list">
+                            {!Array.isArray(attemptedTests) || attemptedTests.length === 0 ? (
+                                <div className="no-tests">No attempted tests yet</div>
+                            ) : (
+                                attemptedTests.map((test, index) => (
+                                    <div key={test._id || index} className="test-item">
+                                        <span className="test-name">
+                                            {index + 1}. {test.title || 'Untitled Test'}
+                                        </span>
+                                        <span className="completed-icon">✓</span>
+                                    </div>
+                                ))
+                            )}
+                        </div>
                     </div>
                 </div>
             </div>

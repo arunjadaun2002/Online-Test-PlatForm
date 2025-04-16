@@ -15,12 +15,26 @@
 /* Header Styles */
 .admin-header {
     display: flex;
-    justify-content: flex-end;
+    justify-content: space-between;
     align-items: center;
     padding: 0.5rem 2rem;
     position: sticky;
     top: 0;
     z-index: 100;
+}
+
+/* Page Title Styles */
+.page-title {
+    flex: 1;
+    text-align: center;
+    margin: 0 2rem;
+}
+
+.page-title h1 {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: #2c3e50;
 }
 
 /* Profile Styles */
@@ -157,6 +171,10 @@
 @media (max-width: 768px) {
     .admin-header {
         padding: 0.5rem 1rem;
+    }
+
+    .page-title h1 {
+        font-size: 1.25rem;
     }
 
     .admin-name {

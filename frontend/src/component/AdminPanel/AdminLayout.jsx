@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Route, Routes } from 'react-router-dom';
+import { Route, Routes, useLocation } from 'react-router-dom';
 import { useNavigate } from 'react-router-dom';
 import AddStudent from '../Pages/AddStudent';
 import CreateTest from '../Pages/CreateTest';
@@ -16,6 +16,22 @@ const AdminLayout = () => {
     const [showProfile, setShowProfile] = useState(false);
     const [adminName, setAdminName] = useState('');
     const navigate = useNavigate();
+    const location = useLocation();
+
+    // Function to get page title from current path
+    const getPageTitle = (path) => {
+        const routes = {
+            '/admin/dashboard': 'Dashboard',
+            '/admin/students': 'Student Information',
+            '/admin/quiz': 'Quiz Management',
+            '/admin/create-test': 'Create Test',
+            '/admin/reports': 'Student Reports',
+            '/admin/top-students': 'Top Students',
+            '/admin/settings': 'Settings',
+            '/admin/add-student': 'Add Student'
+        };
+        return routes[path] || 'Dashboard';
+    };
 
     useEffect(() => {
         const fetchAdminName = async () => {
@@ -79,6 +95,9 @@ const AdminLayout = () => {
             <div className="main-content">
                 {/* Header Section */}
                 <header className="admin-header">
+                    <div className="page-title">
+                        <h1>{getPageTitle(location.pathname)}</h1>
+                    </div>
                     <div className="profile-container">
                         <button className="profile-btn" onClick={() => setShowProfile(!showProfile)}>
                             <div className="avatar-small">{currentAdminName.charAt(0).toUpperCase()}</div>
