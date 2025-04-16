@@ -1,16 +1,50 @@
+:root {
+    --bg-primary: #ffffff;
+    --bg-secondary: #f5f5f5;
+    --text-primary: #1a1a2e;
+    --text-secondary: #666666;
+    --accent-color: #6C5CE7;
+    --border-color: rgba(0, 0, 0, 0.05);
+    --sidebar-bg: #1a1a2e;
+    --sidebar-text: #ffffff;
+    --card-bg: #ffffff;
+    --hover-bg: #f8f9ff;
+    --shadow-color: rgba(108, 92, 231, 0.1);
+    --danger-color: #ff4d4d;
+    --danger-hover: #ff3333;
+}
+
+.dark {
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #151521;
+    --text-primary: #ffffff;
+    --text-secondary: #a0a0a0;
+    --border-color: rgba(255, 255, 255, 0.05);
+    --sidebar-bg: #151521;
+    --card-bg: #1f1f2f;
+    --hover-bg: #252535;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+}
+
 .dashboard-container {
     display: flex;
     min-height: 100vh;
+    background-color: var(--bg-secondary);
+    color: var(--text-primary);
+    transition: background-color 0.3s ease;
 }
 
 .sidebar {
     width: 250px;
-    background-color: #1a1a2e;
-    color: white;
+    background-color: var(--sidebar-bg);
+    color: var(--sidebar-text);
     padding: 20px;
     display: flex;
     flex-direction: column;
     flex-shrink: 0;
+    height: 100vh;
+    position: fixed;
+    transition: background-color 0.3s ease;
 }
 
 .sidebar-header h2 {
@@ -25,6 +59,7 @@
     flex-direction: column;
     gap: 10px;
     flex: 1;
+    margin-bottom: 20px;
 }
 
 .nav-item {
@@ -45,27 +80,219 @@
 .logout-btn {
     display: flex;
     align-items: center;
+    justify-content: center;
     gap: 10px;
     padding: 12px;
-    color: #ff4d4d;
-    background: none;
+    color: white;
+    background: #ff4d4d;
     border: none;
     cursor: pointer;
     width: 100%;
     border-radius: 5px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
     margin-top: auto;
+    position: relative;
+    bottom: 50px;
 }
 
 .logout-btn:hover {
-    background-color: rgba(255, 77, 77, 0.1);
+    background-color: #ff3333;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(255, 77, 77, 0.2);
 }
 
 /* Main Content Styles */
 .main-content {
     flex: 1;
-    background-color: #f5f5f5;
+    background-color: var(--bg-secondary);
     padding: 20px;
-    overflow-y: auto;
+    margin-left: 250px;
+    min-height: 100vh;
+    width: calc(100% - 250px);
+    transition: background-color 0.3s ease;
+}
+
+/* Top Profile Styles */
+.top-profile {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 20px;
+    padding: 10px;
+}
+
+/* Profile Dropdown Styles */
+.profile-container {
+    position: relative;
+}
+
+.profile-link {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    text-decoration: none;
+    color: #000000;
+    padding: 8px 16px;
+    background-color: #ffffff;
+    border-radius: 30px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+}
+
+.profile-name {
+    font-size: 0.95rem;
+    color: #000000;
+    font-weight: 700;
+}
+
+.profile-icon {
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    color: #6C5CE7;
+}
+
+.profile-dropdown {
+    position: absolute;
+    top: calc(100% + 15px);
+    right: 0;
+    background-color: var(--card-bg);
+    border-radius: 16px;
+    box-shadow: 0 10px 25px var(--shadow-color);
+    min-width: 220px;
+    z-index: 1000;
+    overflow: hidden;
+    border: 1px solid var(--border-color);
+    animation: dropdownFade 0.2s ease-out;
+}
+
+@keyframes dropdownFade {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.dropdown-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 20px;
+    color: #000000;
+    text-decoration: none;
+    transition: all 0.2s ease;
+    border: none;
+    background: none;
+    width: 100%;
+    cursor: pointer;
+    font-size: 0.95rem;
+    font-weight: 700;
+}
+
+.dropdown-item svg {
+    font-size: 1.2rem;
+    color: var(--accent-color);
+}
+
+.dropdown-item:hover {
+    background-color: var(--hover-bg);
+    color: var(--accent-color);
+}
+
+.dropdown-item.logout {
+    color: var(--danger-color);
+    border-top: 1px solid var(--border-color);
+    margin-top: 5px;
+}
+
+.dropdown-item.logout svg {
+    color: var(--danger-color);
+}
+
+.dropdown-item.logout:hover {
+    background-color: var(--hover-bg);
+    color: var(--danger-hover);
+}
+
+/* Toggle Switch for Dark Mode */
+.toggle-switch {
+    margin-left: auto;
+    width: 44px;
+    height: 22px;
+    background-color: #e0e0e0;
+    border-radius: 30px;
+    position: relative;
+    transition: all 0.3s ease;
+    cursor: pointer;
+}
+
+.toggle-slider {
+    width: 18px;
+    height: 18px;
+    background-color: white;
+    border-radius: 50%;
+    position: absolute;
+    top: 2px;
+    left: 2px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.toggle-slider.active {
+    transform: translateX(22px);
+    background-color: #fff;
+}
+
+.toggle-switch.active {
+    background-color: #6C5CE7;
+}
+
+/* Divider for dropdown sections */
+.dropdown-divider {
+    height: 1px;
+    background-color: var(--border-color);
+    margin: 5px 0;
+}
+
+/* User info section in dropdown */
+.user-info {
+    padding: 15px 20px;
+    background-color: var(--hover-bg);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.user-name {
+    font-weight: 700;
+    color: #000000;
+    font-size: 1rem;
+    margin-bottom: 4px;
+}
+
+.user-email {
+    font-size: 0.85rem;
+    color: #000000;
+    font-weight: 600;
+}
+
+/* Dark mode overrides */
+.dark .profile-link,
+.dark .profile-name,
+.dark .user-name,
+.dark .user-email,
+.dark .dropdown-item {
+    color: #ffffff;
+}
+
+.dark .profile-link {
+    background-color: #1f1f2f;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
 }
 
 @media (max-width: 768px) {
@@ -75,10 +302,20 @@
 
     .sidebar {
         width: 100%;
+        height: auto;
+        position: relative;
         padding: 15px;
     }
 
     .main-content {
+        margin-left: 0;
+        width: 100%;
         padding: 15px;
+    }
+
+    .logout-btn {
+        position: static;
+        bottom: 0;
+        margin-top: 20px;
     }
 } 
