@@ -1,7 +1,6 @@
-import React, { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import './Quiz.css';
-
+import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import "./Quiz.css";
 function Quiz() {
   const navigate = useNavigate();
   const [selectedQuiz, setSelectedQuiz] = useState(null);
@@ -9,6 +8,7 @@ function Quiz() {
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     fetchQuizzes();
@@ -16,61 +16,64 @@ function Quiz() {
 
   const fetchQuizzes = async () => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/test/tests', {
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:4000/api/test/tests", {
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to fetch quizzes');
+        throw new Error("Failed to fetch quizzes");
       }
 
       const data = await response.json();
-      console.log('Fetched quizzes data:', data); // Debug log
+      console.log("Fetched quizzes data:", data); // Debug log
 
       if (data.success && data.data) {
-        const formattedQuizzes = data.data.map(quiz => ({
+        const formattedQuizzes = data.data.map((quiz) => ({
           ...quiz,
           rightMarks: quiz.rightMarks || 0,
           timeInMinutes: quiz.timeInMinutes || 0,
-          class: quiz.class || 'Not specified',
-          description: quiz.description || 'No description'
+          class: quiz.class || "Not specified",
+          description: quiz.description || "No description",
         }));
-        console.log('Formatted quizzes:', formattedQuizzes); // Debug log
+        console.log("Formatted quizzes:", formattedQuizzes); // Debug log
         setQuizzes(formattedQuizzes);
       } else {
-        throw new Error('Invalid response format');
+        throw new Error("Invalid response format");
       }
       setLoading(false);
     } catch (err) {
-      console.error('Error fetching quizzes:', err);
+      console.error("Error fetching quizzes:", err);
       setError(err.message);
       setLoading(false);
     }
   };
 
   const handleAddQuiz = () => {
-    navigate('/admin/create-test');
+    navigate("/admin/create-test");
   };
 
   const handleDelete = async (id) => {
-    if (!window.confirm('Are you sure you want to delete this quiz?')) {
+    if (!window.confirm("Are you sure you want to delete this quiz?")) {
       return;
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:4000/api/admin/quizzes/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`
+      const token = localStorage.getItem("token");
+      const response = await fetch(
+        `http://localhost:4000/api/admin/quizzes/${id}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
         }
-      });
+      );
 
       if (!response.ok) {
-        throw new Error('Failed to delete quiz');
+        throw new Error("Failed to delete quiz");
       }
 
       // Refresh the quiz list
@@ -81,21 +84,21 @@ function Quiz() {
   };
 
   const handleDeleteAll = async () => {
-    if (!window.confirm('Are you sure you want to delete all quizzes?')) {
+    if (!window.confirm("Are you sure you want to delete all quizzes?")) {
       return;
     }
 
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch('http://localhost:4000/api/admin/quizzes', {
-        method: 'DELETE',
+      const token = localStorage.getItem("token");
+      const response = await fetch("http://localhost:4000/api/admin/quizzes", {
+        method: "DELETE",
         headers: {
-          'Authorization': `Bearer ${token}`
-        }
+          Authorization: `Bearer ${token}`,
+        },
       });
 
       if (!response.ok) {
-        throw new Error('Failed to delete all quizzes');
+        throw new Error("Failed to delete all quizzes");
       }
 
       // Refresh the quiz list
@@ -107,7 +110,7 @@ function Quiz() {
 
   const handleEdit = (id) => {
     // Implement edit functionality
-    console.log('Edit quiz:', id);
+    console.log("Edit quiz:", id);
   };
 
   const handleViewQuestions = (quiz) => {
@@ -119,6 +122,10 @@ function Quiz() {
     setShowQuestionsModal(false);
     setSelectedQuiz(null);
   };
+
+  const filteredQuizzes = quizzes.filter((quiz) =>
+    quiz.title?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) return <div className="loading">Loading...</div>;
   if (error) return <div className="error">Error: {error}</div>;
@@ -135,57 +142,135 @@ function Quiz() {
           </button>
         </div>
         <div className="search-bar">
-          <input type="text" placeholder="Search ..." />
+          <input
+            type="text"
+            placeholder="Search ..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
         </div>
       </div>
 
-      <div className="quiz-table">
-        <table>
-          <thead>
-            <tr>
-              <th>#</th>
-              <th>Quiz Title</th>
-              <th>Description</th>
-              <th>Class</th>
-              <th>Per Question Mark</th>
-              <th>Time</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            {quizzes.map((quiz, index) => (
-              <tr key={quiz._id}>
-                <td>{index + 1}</td>
-                <td>{quiz.title}</td>
-                <td>{quiz.description || 'No description'}</td>
-                <td>{quiz.class || 'Not specified'}</td>
-                <td>{quiz.rightMarks || 0}</td>
-                <td>{quiz.timeInMinutes > 0 ? `${quiz.timeInMinutes} minutes` : 'Not specified'}</td>
-                <td className="action-buttons">
-                  <button 
-                    className="view-questions-btn"
-                    onClick={() => handleViewQuestions(quiz)}
-                  >
-                    View Questions
-                  </button>
-                  <button 
-                    className="edit-btn"
-                    onClick={() => handleEdit(quiz._id)}
-                  >
-                    Edit
-                  </button>
-                  <button 
-                    className="delete-btn"
-                    onClick={() => handleDelete(quiz._id)}
-                  >
-                    Delete
-                  </button>
-                </td>
+      {/* Show pop-up if there is a search term */}
+      {searchTerm && (
+        <div className="modal-overlay">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Search Results for "{searchTerm}"</h2>
+              <button className="close-btn" onClick={() => setSearchTerm("")}>
+                ×
+              </button>
+            </div>
+            <div className="quiz-table">
+              <table>
+                <thead>
+                  <tr>
+                    <th>#</th>
+                    <th>Quiz Title</th>
+                    <th>Description</th>
+                    <th>Class</th>
+                    <th>Per Question Mark</th>
+                    <th>Time</th>
+                    <th>Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredQuizzes.map((quiz, index) => (
+                    <tr key={quiz._id}>
+                      <td>{index + 1}</td>
+                      <td>{quiz.title}</td>
+                      <td>{quiz.description || "No description"}</td>
+                      <td>{quiz.class || "Not specified"}</td>
+                      <td>{quiz.rightMarks || 0}</td>
+                      <td>
+                        {quiz.timeInMinutes > 0
+                          ? `${quiz.timeInMinutes} minutes`
+                          : "Not specified"}
+                      </td>
+                      <td className="action-buttons">
+                        {/* Reuse existing quiz actions */}
+                        <button
+                          className="view-questions-btn"
+                          onClick={() => handleViewQuestions(quiz)}
+                        >
+                          View Questions
+                        </button>
+                        <button
+                          className="edit-btn"
+                          onClick={() => handleEdit(quiz._id)}
+                        >
+                          Edit
+                        </button>
+                        <button
+                          className="delete-btn"
+                          onClick={() => handleDelete(quiz._id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Original quiz list */}
+      {!searchTerm && (
+        <div className="quiz-table">
+          <table>
+            <thead>
+              <tr>
+                <th>#</th>
+                <th>Quiz Title</th>
+                <th>Description</th>
+                <th>Class</th>
+                <th>Per Question Mark</th>
+                <th>Time</th>
+                <th>Action</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
+            </thead>
+            <tbody>
+              {quizzes.map((quiz, index) => (
+                <tr key={quiz._id}>
+                  <td>{index + 1}</td>
+                  <td>{quiz.title}</td>
+                  <td>{quiz.description || "No description"}</td>
+                  <td>{quiz.class || "Not specified"}</td>
+                  <td>{quiz.rightMarks || 0}</td>
+                  <td>
+                    {quiz.timeInMinutes > 0
+                      ? `${quiz.timeInMinutes} minutes`
+                      : "Not specified"}
+                  </td>
+                  <td className="action-buttons">
+                    <button
+                      className="view-questions-btn"
+                      onClick={() => handleViewQuestions(quiz)}
+                    >
+                      View Questions
+                    </button>
+                    <button
+                      className="edit-btn"
+                      onClick={() => handleEdit(quiz._id)}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="delete-btn"
+                      onClick={() => handleDelete(quiz._id)}
+                    >
+                      Delete
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Questions Modal */}
       {showQuestionsModal && selectedQuiz && (
@@ -193,17 +278,23 @@ function Quiz() {
           <div className="modal-content">
             <div className="modal-header">
               <h2>Questions for: {selectedQuiz.title}</h2>
-              <button className="close-btn" onClick={closeModal}>×</button>
+              <button className="close-btn" onClick={closeModal}>
+                ×
+              </button>
             </div>
             <div className="questions-list">
               {selectedQuiz.questions.map((question, index) => (
                 <div key={index} className="question-item">
-                  <h3>Question {index + 1}: {question.question}</h3>
+                  <h3>
+                    Question {index + 1}: {question.question}
+                  </h3>
                   <div className="options">
                     {question.options.map((option, optIndex) => (
-                      <div 
-                        key={optIndex} 
-                        className={`option ${option === question.correctAnswer ? 'correct' : ''}`}
+                      <div
+                        key={optIndex}
+                        className={`option ${
+                          option === question.correctAnswer ? "correct" : ""
+                        }`}
                       >
                         {String.fromCharCode(65 + optIndex)}) {option}
                       </div>

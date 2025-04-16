@@ -27,6 +27,14 @@ const Students = () => {
     fetchStudents();
   }, []);
 
+  useEffect(() => {
+    if (searchTerm.trim()) {
+      fetchSearchedStudents(searchTerm);
+    } else {
+      fetchStudents();
+    }
+  }, [searchTerm]);
+
   const fetchStudents = async () => {
     try {
       const token = localStorage.getItem('token');
@@ -47,6 +55,24 @@ const Students = () => {
     } catch (err) {
       setError(err.message);
       setLoading(false);
+    }
+  };
+
+  const fetchSearchedStudents = async (term) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:4000/api/student/search?q=${term}`, {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      if (!response.ok) {
+        throw new Error('Failed to search students');
+      }
+      const data = await response.json();
+      setStudents(data.data);
+    } catch (err) {
+      setError(err.message);
     }
   };
 
@@ -260,6 +286,61 @@ const Students = () => {
                 </thead>
                 <tbody>
                   {studentsByClass[selectedClass]?.map((student) => (
+                    <tr key={student._id}>
+                      <td>{student.name}</td>
+                      <td>{student.email}</td>
+                      <td>{student.userId}</td>
+                      <td>{student.class}</td>
+                      <td className="action-buttons">
+                        <button 
+                          className="action-btn mail"
+                          onClick={() => handleMail(student)}
+                        >
+                          Mail
+                        </button>
+                        <button 
+                          className="action-btn edit"
+                          onClick={() => handleEdit(student)}
+                        >
+                          Edit
+                        </button>
+                        <button 
+                          className="action-btn delete"
+                          onClick={() => handleDelete(student._id)}
+                        >
+                          Delete
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Add a new modal to display search results if searchTerm is present */}
+      {searchTerm && (
+        <div className="modal">
+          <div className="modal-content">
+            <div className="modal-header">
+              <h2>Search Results for "{searchTerm}"</h2>
+              <button className="close-btn" onClick={() => setSearchTerm('')}>&times;</button>
+            </div>
+            <div className="students-table-container">
+              <table className="students-table">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Email</th>
+                    <th>User ID</th>
+                    <th>Class</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {filteredStudents.map((student) => (
                     <tr key={student._id}>
                       <td>{student.name}</td>
                       <td>{student.email}</td>

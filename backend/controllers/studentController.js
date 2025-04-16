@@ -150,3 +150,22 @@ exports.updateProfile = async (req, res) => {
         });
     }
 };
+
+exports.searchStudents = async (req, res) => {
+  try {
+    const { q } = req.query;
+    const students = await Student.find({
+      name: { $regex: q, $options: 'i' }
+    });
+    return res.status(200).json({
+      success: true,
+      data: students
+    });
+  } catch (err) {
+    return res.status(500).json({
+      success: false,
+      message: 'Internal Server error',
+      error: err.message
+    });
+  }
+};
