@@ -24,6 +24,7 @@ const TakeTest = () => {
   const [sections, setSections] = useState([]);
   const [showFullscreenWarning, setShowFullscreenWarning] = useState(false);
   const [warningCount, setWarningCount] = useState(0);
+  const [selectedQuestion, setSelectedQuestion] = useState(0);
 
   useEffect(() => {
     fetchTestData();
@@ -410,14 +411,18 @@ const TakeTest = () => {
     )}:${String(secs).padStart(2, "0")}`;
   };
 
+  const handleQuestionClick = (index) => {
+    setCurrentQuestion(index);
+    setSelectedQuestion(index);
+  };
+
   const getQuestionStatus = (index) => {
     if (markedForReview.includes(index)) {
-      return answers[index] ? "answered-marked" : "marked-review";
+      return "marked";
     }
-    if (answers[index] !== undefined) {
+    if (answers[index]) {
       return "answered";
     }
-    if (index === currentQuestion) return "current";
     return "not-answered";
   };
 
@@ -426,7 +431,118 @@ const TakeTest = () => {
   if (!test) return <div className="error">Test not found</div>;
 
   return (
-    <div className="take-test-page">
+    <div className="test-container">
+      {showInstructions ? (
+        <div className="instructions-content">
+          <h2>Test Instructions</h2>
+          <div className="instructions-list">
+            <p>Please read the following instructions carefully:</p>
+            <ul>
+              <li>Total Questions: {test?.questions?.length || 0}</li>
+              <li>Time Duration: {test?.timeInMinutes || 0} minutes</li>
+              <li>Each question carries {test?.rightMarks || 0} marks</li>
+              <li>Negative marking: {test?.negativeMarks || 0} marks</li>
+            </ul>
+            <button 
+              className="start-test-btn" 
+              onClick={() => setShowInstructions(false)}
+            >
+              Start Test
+            </button>
+          </div>
+        </div>
+      ) : (
+        <div className="test-content">
+          <div className="test-header">
+            <h2>{test?.title}</h2>
+            <div className="test-info">
+              <span>Time Remaining: {formatTime(remainingTime)}</span>
+              <span>Questions: {currentQuestion + 1}/{test?.questions?.length || 0}</span>
+            </div>
+          </div>
+          
+          <div className="test-main-content">
+            {/* Left side - Question and options */}
+            <div className="question-section">
+              {test?.questions && test.questions[currentQuestion] ? (
+                <div className="question-content">
+                  <h3>Question {currentQuestion + 1}</h3>
+                  <p>{test.questions[currentQuestion].question}</p>
+                  <div className="options-list">
+                    {test.questions[currentQuestion].options.map((option, optionIndex) => (
+                      <label 
+                        key={`question-${currentQuestion}-option-${optionIndex}`} 
+                        className="option-label"
+                      >
+                        <input
+                          type="radio"
+                          name={`question-${currentQuestion}`}
+                          value={option}
+                          checked={answers[currentQuestion] === option}
+                          onChange={() => handleAnswerSelect(currentQuestion, option)}
+                        />
+                        <span>{option}</span>
+                      </label>
+                    ))}
+                  </div>
+                  <div className="question-actions">
+                    <button onClick={handleClearResponse}>Clear Response</button>
+                    <button onClick={handleMarkForReview}>
+                      {markedForReview.includes(currentQuestion)
+                        ? "Unmark for Review"
+                        : "Mark for Review"}
+                    </button>
+                    <button onClick={handleSaveAndNext}>Save & Next</button>
+                  </div>
+                </div>
+              ) : (
+                <div className="error">Question not found</div>
+              )}
+            </div>
+
+            {/* Right side - Question Navigation Panel */}
+            <div className="question-navigation-panel">
+              <div className="navigation-header">
+                <h3>Question Navigation</h3>
+                <div className="navigation-legend">
+                  <div className="legend-item">
+                    <span className="legend-color not-answered"></span>
+                    <span>Not Answered</span>
+                  </div>
+                  <div className="legend-item">
+                    <span className="legend-color answered"></span>
+                    <span>Answered</span>
+                  </div>
+                  <div className="legend-item">
+                    <span className="legend-color marked"></span>
+                    <span>Marked for Review</span>
+                  </div>
+                </div>
+              </div>
+              <div className="question-grid">
+                {test?.questions?.map((_, index) => (
+                  <button
+                    key={`nav-question-${index}`}
+                    className={`question-number ${getQuestionStatus(index)} ${
+                      currentQuestion === index ? "current" : ""
+                    }`}
+                    onClick={() => handleQuestionClick(index)}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+              </div>
+              <button 
+                className="submit-test-btn"
+                onClick={handleSubmitTest}
+              >
+                Submit Test
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {showWarning && (
         <div className="warning-modal">
           <div className="warning-content">
@@ -452,86 +568,6 @@ const TakeTest = () => {
           <button onClick={enterFullscreen}>Return to Fullscreen</button>
         </div>
       )}
-      <div className="test-header">
-        <h1>{test.title}</h1>
-        <div className="test-info">
-          <div className="timer">
-            <span className="timer-label">Remaining Time:</span>
-            <span
-              className={`timer-value ${remainingTime <= 300 ? "warning" : ""}`}
-            >
-              {formatTime(remainingTime)}
-            </span>
-          </div>
-          <div className="progress-info">
-            <span className="progress-label">Progress:</span>
-            <span className="progress-value">
-              {answeredQuestions}/{test.questions.length} Questions Answered
-            </span>
-          </div>
-          {!isFullscreen && (
-            <div className="security-warning">
-              <span className="warning-message">
-                Warning: Exit fullscreen detected!
-              </span>
-            </div>
-          )}
-        </div>
-      </div>
-
-      <div className="test-content">
-        <div className="question-section">
-          <div className="question-header">
-            <h2>Question {currentQuestion + 1}</h2>
-            <div className="marks-info">
-              <span>Marks for Correct Response: {test.rightMarks}</span>
-              <span>Negative Marking: {test.negativeMarks || 0}</span>
-            </div>
-          </div>
-
-          <div className="question-content">
-            <p>{test.questions[currentQuestion].question}</p>
-            <div className="options-list">
-              {test.questions[currentQuestion].options.map((option, index) => (
-                <div
-                  key={`${currentQuestion}-${index}`}
-                  className={`option ${
-                    answers[currentQuestion] === index ? "selected" : ""
-                  }`}
-                  onClick={() => handleAnswerSelect(currentQuestion, index)}
-                >
-                  <input
-                    type="radio"
-                    checked={answers[currentQuestion] === index}
-                    onChange={() => handleAnswerSelect(currentQuestion, index)}
-                  />
-                  <label>{option}</label>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          <div className="question-actions">
-            <button className="mark-review-btn" onClick={handleMarkForReview}>
-              {markedForReview.includes(currentQuestion)
-                ? "Unmark for Review"
-                : "Mark for Review"}
-            </button>
-            <button
-              className="clear-response-btn"
-              onClick={handleClearResponse}
-            >
-              Clear Response
-            </button>
-            <button className="save-next-btn" onClick={handleSaveAndNext}>
-              Save & Next
-            </button>
-            <button className="submit-btn" onClick={handleSubmitTest}>
-              Submit Test
-            </button>
-          </div>
-        </div>
-      </div>
     </div>
   );
 };

@@ -1,0 +1,31 @@
+{
+  "testId": "67fe0535cf045d6c7fc1defd",
+  "userId": "67f90385b46ddedeaa493df6",
+  "testTitle": "abc",
+  "totalQuestions": 1,
+  "rightMarks": 1,
+  "negativeMarks": 0,
+  "answers": {},
+  "tabSwitchCount": 3,
+  "testDuration": 59,
+  "totalMarks": 0,
+  "correctAnswers": 0,
+  "wrongAnswers": 0,
+  "questionResults": [
+    {
+      "question": "abc.",
+      "options": [
+        "e",
+        "f",
+        "d",
+        "g"
+      ],
+      "correctAnswer": "d",
+      "studentAnswer": null,
+      "isCorrect": false,
+      "marksObtained": 0
+    }
+  ],
+  "percentage": "0.00",
+  "submittedAt": "2025-04-16T13:08:50.625Z"
+}

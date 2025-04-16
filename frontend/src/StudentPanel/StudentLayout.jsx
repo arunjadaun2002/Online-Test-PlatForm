@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaBook, FaHistory, FaHome, FaSignOutAlt, FaUser, FaMoon, FaSun } from 'react-icons/fa';
+import { FaBook, FaHistory, FaHome, FaMoon, FaSignOutAlt, FaSun, FaUser } from 'react-icons/fa';
 import { Link, Outlet, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import './StudentLayout.css';
@@ -16,8 +16,12 @@ const StudentLayout = () => {
         navigate('/login');
     };
 
-    const toggleDropdown = () => {
-        setIsDropdownOpen(!isDropdownOpen);
+    const handleMouseEnter = () => {
+        setIsDropdownOpen(true);
+    };
+
+    const handleMouseLeave = () => {
+        setIsDropdownOpen(false);
     };
 
     const handleThemeToggle = () => {
@@ -60,11 +64,15 @@ const StudentLayout = () => {
             <div className="main-content">
                 {/* Top Profile Section */}
                 <div className="top-profile">
-                    <div className="profile-container">
-                        <button onClick={toggleDropdown} className="profile-link">
+                    <div 
+                        className="profile-container"
+                        onMouseEnter={handleMouseEnter}
+                        onMouseLeave={handleMouseLeave}
+                    >
+                        <div className="profile-link">
                             <div className="profile-icon">👤</div>
                             <span className="profile-name">{user.name || 'Student'}</span>
-                        </button>
+                        </div>
                         {isDropdownOpen && (
                             <div className="profile-dropdown">
                                 <div className="user-info">
