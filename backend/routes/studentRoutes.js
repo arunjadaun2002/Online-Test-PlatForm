@@ -17,7 +17,7 @@ router.get('/tests', getTestsByClass);
 router.get('/tests/:id', getTestByIdForStudent);
 router.post('/tests/:id/submit', submitTest);
 router.get('/attempted-tests', getAttemptedTests);
-router.get('/result/:testId', getTestResult);
+router.get('/tests/:testId/result', getTestResult);
 
 // Profile routes
 router.get('/profile', studentController.getProfile);

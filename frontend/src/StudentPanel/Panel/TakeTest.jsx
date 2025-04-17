@@ -1,4 +1,6 @@
+import axios from "axios";
 import React, { useEffect, useState } from "react";
+import { toast, Toaster } from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import "./TakeTest.css";
 
@@ -25,6 +27,7 @@ const TakeTest = () => {
   const [showFullscreenWarning, setShowFullscreenWarning] = useState(false);
   const [warningCount, setWarningCount] = useState(0);
   const [selectedQuestion, setSelectedQuestion] = useState(0);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useEffect(() => {
     fetchTestData();
@@ -329,74 +332,81 @@ const TakeTest = () => {
     }
   };
 
+  const exitFullscreen = () => {
+    if (document.exitFullscreen) {
+      document.exitFullscreen();
+    } else if (document.webkitExitFullscreen) {
+      document.webkitExitFullscreen();
+    } else if (document.msExitFullscreen) {
+      document.msExitFullscreen();
+    }
+  };
+
   const handleSubmitTest = async () => {
-    if (isTestSubmitted) return; // Prevent multiple submissions
-
     try {
-      setIsTestSubmitted(true);
+      setIsSubmitting(true);
 
-      // Convert answer indices to actual answer text
-      const answerTexts = {};
-      Object.keys(answers).forEach(questionIndex => {
-        const selectedOptionIndex = answers[questionIndex];
-        answerTexts[questionIndex] = test.questions[questionIndex].options[selectedOptionIndex];
-      });
+      // Convert marks to numbers and ensure they're not NaN
+      const rightMarksNum = parseFloat(test.rightMarks) || 0;
+      const wrongMarksNum = parseFloat(test.wrongMarks) || 0;
 
-      // Prepare result data
-      const resultData = {
-        testId: testId,
-        answers: answerTexts,
+      // Prepare the submission data
+      const submissionData = {
+        answers,
         tabSwitchCount: parseInt(localStorage.getItem("tabSwitchCount") || "0"),
-        testDuration: test.timeInMinutes * 60 - remainingTime,
+        testDuration: Math.max(0, test.timeInMinutes * 60 - remainingTime),
         testTitle: test.title,
         totalQuestions: test.questions.length,
-        rightMarks: test.rightMarks,
-        negativeMarks: test.negativeMarks || 0,
-        questions: test.questions.map((q, index) => ({
-          question: q.question,
-          options: q.options,
-          correctAnswer: q.correctAnswer,
-          selectedAnswer: answerTexts[index] || null,
-          isCorrect: answerTexts[index] === q.correctAnswer
-        }))
+        rightMarks: rightMarksNum,
+        negativeMarks: wrongMarksNum
       };
 
       console.log('Submitting test with data:', {
-        testId,
-        resultData
+        testId: test._id,
+        totalQuestions: submissionData.totalQuestions,
+        answeredQuestions: Object.keys(answers).length,
+        rightMarks: submissionData.rightMarks,
+        negativeMarks: submissionData.negativeMarks,
+        answers: submissionData.answers
       });
 
-      // Send result data to backend
       const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error('No authentication token found');
+        throw new Error("Authentication token not found");
       }
 
-      const response = await fetch(`http://localhost:4000/api/student/tests/${testId}/submit`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': `Bearer ${token}`
-        },
-        body: JSON.stringify(resultData)
-      });
+      const response = await axios.post(
+        `http://localhost:4000/api/student/tests/${test._id}/submit`,
+        submissionData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json'
+          },
+        }
+      );
 
-      const responseData = await response.json();
-      
-      if (!response.ok) {
-        console.error('Submit test error response:', responseData);
-        throw new Error(responseData.message || 'Failed to submit test');
+      if (response && response.data && response.data.success) {
+        // Exit fullscreen mode
+        exitFullscreen();
+        
+        setIsTestSubmitted(true);
+        toast.success("Test submitted successfully!");
+        
+        // Wait a bit for the fullscreen to exit and toast to show
+        setTimeout(() => {
+          // Navigate to the result page with the submission ID
+          navigate(`/student/result/${response.data.data.submission._id}`);
+        }, 1000);
+      } else {
+        throw new Error(response?.data?.message || "Failed to submit test");
       }
-
-      console.log('Test submitted successfully:', responseData);
-      
-      // Show success message and navigate to attempted tests page
-      alert('Test submitted successfully!');
-      navigate("/student/attempted");
-    } catch (err) {
-      console.error("Error submitting test:", err);
-      setError(err.message || 'Failed to submit test');
-      setIsTestSubmitted(false); // Allow retry if submission fails
+    } catch (error) {
+      console.error("Submit test error:", error);
+      console.error("Error details:", error.response?.data || error);
+      toast.error(error.response?.data?.message || "Failed to submit test. Please try again.");
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -432,6 +442,7 @@ const TakeTest = () => {
 
   return (
     <div className="test-container">
+      <Toaster position="top-center" />
       {showInstructions ? (
         <div className="instructions-content">
           <h2>Test Instructions</h2>
@@ -522,7 +533,7 @@ const TakeTest = () => {
               <div className="question-grid">
                 {test?.questions?.map((_, index) => (
                   <button
-                    key={`nav-question-${index}`}
+                    key={`nav-${test._id}-question-${index}`}
                     className={`question-number ${getQuestionStatus(index)} ${
                       currentQuestion === index ? "current" : ""
                     }`}
@@ -535,8 +546,9 @@ const TakeTest = () => {
               <button 
                 className="submit-test-btn"
                 onClick={handleSubmitTest}
+                disabled={isSubmitting || isTestSubmitted}
               >
-                Submit Test
+                {isSubmitting ? "Submitting..." : "Submit Test"}
               </button>
             </div>
           </div>

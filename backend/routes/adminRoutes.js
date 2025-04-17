@@ -1,6 +1,6 @@
 const express = require('express');
 const { adminSignup, adminLogin, adminForgotPassword, registerStudent, verifyAdmin, getAllStudents, deleteStudent, updateStudent, sendEmail, changeStudentPassword, getStudentsByClass, getStudentResults, getTestResultDetail, getAdminInfo } = require('../controllers/adminController');
-const { getAllQuizzes, deleteQuiz, deleteAllQuizzes, getTestsByClass, getTestResultsByClass, createTestWithFile, addTypedQuestion, uplaodTypedTest, downloadTestResult } = require('../controllers/testController');
+const { getAllQuizzes, deleteQuiz, deleteAllQuizzes, getTestsByClassForAdmin, getTestResultsByClass, createTestWithFile, addTypedQuestion, uplaodTypedTest, downloadTestResult } = require('../controllers/testController');
 const authentication = require('../middlewares/authMiddleware');
 const upload = require('../middleware/multer');
 
@@ -36,12 +36,12 @@ router.get('/student/results', getStudentResults);
 
 // Test management routes
 router.get('/test-result/:resultId', getTestResultDetail);
-router.get('/tests/class/:classNumber', getTestsByClass);
+router.get('/tests/class/:classNumber', getTestsByClassForAdmin);
 router.get('/test/results', getTestResultsByClass);
+router.get('/test-results', getTestResultsByClass);
 router.post('/create-test', upload.single('file'), createTestWithFile);
 router.post('/add-question', addTypedQuestion);
 router.post('/upload-typed-test', uplaodTypedTest);
-router.get('/test-results', getTestResultsByClass);
 router.get('/download-result/:testId/:userId', downloadTestResult);
 
 // Admin info

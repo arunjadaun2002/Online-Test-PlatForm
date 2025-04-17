@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import './Result.css';
 
 const Result = () => {
@@ -20,18 +20,26 @@ const Result = () => {
                 throw new Error('No authentication token found');
             }
 
-            const response = await fetch(`http://localhost:4000/api/student/result/${testId}`, {
+            console.log('Fetching result for submission ID:', testId);
+
+            const response = await fetch(`http://localhost:4000/api/student/tests/${testId}/result`, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
                 }
             });
 
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                throw new Error(errorData.message || 'Failed to fetch result');
+            }
+
             const data = await response.json();
-            if (!response.ok || !data.success) {
+            if (!data.success) {
                 throw new Error(data.message || 'Failed to fetch result');
             }
 
+            console.log('Received result data:', data.data);
             setResult(data.data);
             setLoading(false);
         } catch (err) {
@@ -42,7 +50,7 @@ const Result = () => {
     };
 
     const handleBackToTests = () => {
-        navigate('/student/attempted');
+        navigate('/student/tests');
     };
 
     if (loading) return <div className="loading">Loading...</div>;

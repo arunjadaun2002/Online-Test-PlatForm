@@ -35,6 +35,18 @@ const submissionSchema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    questionResults: [{
+        question: String,
+        options: [String],
+        correctAnswer: String,
+        studentAnswer: String,
+        isCorrect: Boolean,
+        marksObtained: Number
+    }],
+    percentage: {
+        type: Number,
+        default: 0
+    },
     submittedAt: {
         type: Date,
         default: Date.now

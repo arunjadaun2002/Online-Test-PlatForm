@@ -305,10 +305,16 @@ const getTestsByClass = async (req, res) => {
       });
     }
 
-    // Get only Class 12 tests
-    const tests = await Test.find({ class: 'Class 12' }).select(
+    // Get student's class
+    const studentClass = `Class ${student.class}`;
+    console.log('Fetching tests for class:', studentClass);
+
+    // Get tests for the student's class
+    const tests = await Test.find({ class: studentClass }).select(
       "title description totalQuestion rightMarks wrongMarks sectionId subject class timeInMinutes createdAt updatedAt"
     );
+    
+    console.log('Found tests:', tests.length);
     
     res.status(200).json({
       success: true,
@@ -372,21 +378,48 @@ const shuffleTest = (test) => {
   // Create a deep copy of the test
   const shuffledTest = JSON.parse(JSON.stringify(test));
   
-  // Shuffle questions
+  // Create a mapping of original question indices to shuffled indices
+  const originalQuestions = [...shuffledTest.questions];
   shuffledTest.questions = shuffleArray(shuffledTest.questions);
   
-  // Shuffle options for each question while maintaining correct answer
-  shuffledTest.questions.forEach(question => {
-    const options = question.options;
-    const correctAnswer = question.correctAnswer;
-    const correctIndex = options.indexOf(correctAnswer);
+  // For each question, shuffle options and track correct answer
+  shuffledTest.questions.forEach((question, shuffledIndex) => {
+    // Store the original correct answer and its index before shuffling
+    const originalCorrectAnswer = question.correctAnswer;
+    const originalCorrectIndex = question.options.indexOf(originalCorrectAnswer);
     
-    // Shuffle options
-    const shuffledOptions = shuffleArray(options);
+    // Create an array of option objects with their original indices and values
+    const optionsWithIndices = question.options.map((option, index) => ({
+      value: option,
+      originalIndex: index
+    }));
     
-    // Update correct answer to match new position
-    question.correctAnswer = shuffledOptions[correctIndex];
-    question.options = shuffledOptions;
+    // Shuffle the options with their indices
+    const shuffledOptionsWithIndices = shuffleArray(optionsWithIndices);
+    
+    // Create a mapping of original indices to shuffled indices
+    const optionMapping = {};
+    shuffledOptionsWithIndices.forEach((item, newIndex) => {
+      optionMapping[item.originalIndex] = newIndex;
+    });
+    
+    // Find the new position of the correct answer
+    const shuffledCorrectIndex = optionMapping[originalCorrectIndex];
+    
+    // Update the question with shuffled options and correct answer
+    question.options = shuffledOptionsWithIndices.map(item => item.value);
+    question.correctAnswer = question.options[shuffledCorrectIndex];
+    
+    // Store the mapping information
+    question.answerMapping = optionMapping;
+    question.originalCorrectAnswer = originalCorrectAnswer;
+    question.originalCorrectIndex = originalCorrectIndex;
+    question.shuffledCorrectIndex = shuffledCorrectIndex;
+    
+    // Store the original question index
+    question.originalIndex = originalQuestions.findIndex(
+      q => q.question === question.question
+    );
   });
   
   return shuffledTest;
@@ -506,12 +539,23 @@ const submitTest = async (req, res) => {
   try {
     console.log('Submit test request received:', {
       params: req.params,
-      body: req.body,
-      user: req.user
+      userId: req.user?.id,
+      testTitle: req.body.testTitle,
+      totalQuestions: req.body.totalQuestions,
+      answersCount: Object.keys(req.body.answers || {}).length
     });
 
     const { id: testId } = req.params;
-    const { answers, tabSwitchCount, testDuration, testTitle, totalQuestions, rightMarks, negativeMarks, questions } = req.body;
+    const { 
+      answers, 
+      tabSwitchCount, 
+      testDuration, 
+      testTitle, 
+      totalQuestions, 
+      rightMarks, 
+      negativeMarks
+    } = req.body;
+    
     const userId = req.user?.id;
 
     if (!userId) {
@@ -537,29 +581,46 @@ const submitTest = async (req, res) => {
     let totalMarks = 0;
     let correctAnswers = 0;
     let wrongAnswers = 0;
-    const questionResults = [];
-
-    test.questions.forEach((question, index) => {
-      const studentAnswer = answers[index];
-      const isCorrect = studentAnswer === question.correctAnswer;
+    let totalPossibleMarks = 0;
+    const questionResults = test.questions.map((question, index) => {
+      // Get the student's answer for this question
+      const studentAnswer = answers[index] || null;
       
-      if (isCorrect) {
-        totalMarks += rightMarks;
-        correctAnswers++;
-      } else if (studentAnswer) {
-        totalMarks -= negativeMarks;
-        wrongAnswers++;
-      }
-
-      questionResults.push({
+      // Initialize result object
+      const result = {
         question: question.question,
         options: question.options,
-        correctAnswer: question.correctAnswer,
-        studentAnswer: studentAnswer || null,
-        isCorrect: isCorrect,
-        marksObtained: isCorrect ? rightMarks : (studentAnswer ? -negativeMarks : 0)
-      });
+        correctAnswer: question.originalCorrectAnswer,
+        studentAnswer: studentAnswer,
+        isCorrect: false,
+        marksObtained: 0
+      };
+
+      // If student provided an answer
+      if (studentAnswer) {
+        // Compare the student's answer with the original correct answer
+        result.isCorrect = studentAnswer === question.originalCorrectAnswer;
+        
+        // Calculate marks
+        if (result.isCorrect) {
+          result.marksObtained = rightMarks;
+          totalMarks += rightMarks;
+          correctAnswers++;
+        } else {
+          result.marksObtained = -negativeMarks;
+          totalMarks -= negativeMarks;
+          wrongAnswers++;
+        }
+      }
+      
+      // Add to total possible marks
+      totalPossibleMarks += rightMarks;
+
+      return result;
     });
+
+    // Calculate percentage based on total possible marks
+    const percentage = ((totalMarks / totalPossibleMarks) * 100).toFixed(2);
 
     // Create a new submission record
     const submission = new Submission({
@@ -571,55 +632,23 @@ const submitTest = async (req, res) => {
       totalMarks,
       correctAnswers,
       wrongAnswers,
-      submittedAt: new Date(),
+      questionResults,
+      percentage,
+      submittedAt: new Date()
     });
-    await submission.save();
-    console.log('Submission saved to database');
 
-    // Ensure ResultStudent directory exists and is writable
-    const resultDir = path.join(process.cwd(), '@ResultStudent');
-    console.log('Result directory path:', resultDir);
-
-    try {
-      if (!fs.existsSync(resultDir)) {
-        fs.mkdirSync(resultDir, { recursive: true });
-        console.log('Created @ResultStudent directory');
-      }
-    } catch (dirError) {
-      console.error('Error creating directory:', dirError);
-      throw new Error('Failed to create result directory');
-    }
-
-    // Prepare result data
-    const resultData = {
+    console.log('Saving submission with details:', {
       testId,
       userId,
-      testTitle,
-      totalQuestions,
-      rightMarks,
-      negativeMarks,
-      answers,
-      tabSwitchCount,
-      testDuration,
       totalMarks,
+      totalPossibleMarks,
       correctAnswers,
       wrongAnswers,
-      questionResults,
-      percentage: ((totalMarks / (totalQuestions * rightMarks)) * 100).toFixed(2),
-      submittedAt: new Date(),
-    };
+      percentage
+    });
 
-    // Save result to JSON file
-    const fileName = `result_${testId}_${userId}_${Date.now()}.json`;
-    const filePath = path.join(resultDir, fileName);
-    
-    try {
-      fs.writeFileSync(filePath, JSON.stringify(resultData, null, 2));
-      console.log('Result saved to:', filePath);
-    } catch (fileError) {
-      console.error('Error writing result file:', fileError);
-      throw new Error('Failed to write result file');
-    }
+    await submission.save();
+    console.log('Submission saved successfully with ID:', submission._id);
 
     return res.status(200).json({
       success: true,
@@ -629,15 +658,21 @@ const submitTest = async (req, res) => {
         totalMarks,
         correctAnswers,
         wrongAnswers,
-        percentage: resultData.percentage
-      },
+        percentage
+      }
     });
   } catch (error) {
-    console.error("Submit test error:", error);
+    console.error("Error submitting test:", error);
+    console.error("Error details:", {
+      message: error.message,
+      name: error.name,
+      code: error.code,
+      stack: error.stack
+    });
     return res.status(500).json({ 
       success: false, 
-      message: error.message,
-      stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      message: "Failed to submit test",
+      error: process.env.NODE_ENV === 'development' ? error.message : undefined
     });
   }
 };
@@ -716,52 +751,56 @@ const getAttemptedTests = async (req, res) => {
 
 const getTestResult = async (req, res) => {
   try {
-    const { testId } = req.params;
+    const { testId } = req.params;  // testId is actually the submission ID
     const userId = req.user.id;
 
-    console.log('Getting test result for:', { testId, userId }); // Debug log
+    console.log('Getting test result for:', { testId, userId });
 
-    if (!testId) {
-      return res.status(400).json({
-        success: false,
-        message: "Test ID is required"
-      });
-    }
+    // Find the submission in the database
+    const submission = await Submission.findById(testId)
+      .populate('testId', 'title totalQuestion rightMarks class');
 
-    // Find the most recent result file for this test and user
-    const resultDir = path.join(process.cwd(), '@ResultStudent');
-    const files = fs.readdirSync(resultDir);
-    
-    console.log('Found result files:', files); // Debug log
-    
-    const resultFile = files
-      .filter(file => file.startsWith(`result_${testId}_${userId}_`))
-      .sort()
-      .pop();
-
-    console.log('Selected result file:', resultFile); // Debug log
-
-    if (!resultFile) {
+    if (!submission) {
       return res.status(404).json({
         success: false,
         message: "Test result not found"
       });
     }
 
-    const filePath = path.join(resultDir, resultFile);
-    const resultData = JSON.parse(fs.readFileSync(filePath, 'utf8'));
+    // Verify this submission belongs to the requesting user
+    if (submission.userId.toString() !== userId) {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized: This result does not belong to you"
+      });
+    }
 
-    console.log('Returning result data:', resultData); // Debug log
+    // Format the response
+    const resultData = {
+      testTitle: submission.testId.title,
+      totalQuestions: submission.testId.totalQuestion,
+      rightMarks: submission.testId.rightMarks,
+      answers: submission.answers,
+      tabSwitchCount: submission.tabSwitchCount,
+      testDuration: submission.testDuration,
+      totalMarks: submission.totalMarks,
+      correctAnswers: submission.correctAnswers,
+      wrongAnswers: submission.wrongAnswers,
+      questionResults: submission.questionResults,
+      percentage: ((submission.totalMarks / (submission.testId.totalQuestion * submission.testId.rightMarks)) * 100).toFixed(2),
+      submittedAt: submission.submittedAt
+    };
 
     res.status(200).json({
       success: true,
       data: resultData
     });
   } catch (err) {
-    console.log("Error fetching test result: ", err);
+    console.error("Error fetching test result: ", err);
     res.status(500).json({
       success: false,
-      message: "Internal Server Error"
+      message: "Internal Server Error",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
     });
   }
 };
@@ -884,8 +923,11 @@ const downloadTestResult = async (req, res) => {
       answers: submission.answers
     });
 
-    // Ensure answers is an array
-    const answers = Array.isArray(submission.answers) ? submission.answers : [];
+    // Handle answers as an object where keys are question indices
+    const answersArray = Object.entries(submission.answers || {}).map(([index, answer]) => ({
+      questionNumber: parseInt(index) + 1,
+      answer
+    })).sort((a, b) => a.questionNumber - b.questionNumber);
 
     // Create a formatted result string
     const formattedResult = `
@@ -912,8 +954,8 @@ Tab Switches: ${submission.tabSwitchCount || 'N/A'}
 
 Answer Analysis
 ==============
-${answers.map((answer, index) => `
-Question ${index + 1}:
+${answersArray.map(({ questionNumber, answer }) => `
+Question ${questionNumber}:
 Student's Answer: ${answer || 'Not attempted'}
 `).join('\n')}
     `.trim();
@@ -928,6 +970,50 @@ Student's Answer: ${answer || 'Not attempted'}
   } catch (err) {
     console.error("Error downloading test result:", err);
     console.error("Error details:", err.message); // Debug log
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+      error: process.env.NODE_ENV === 'development' ? err.message : undefined
+    });
+  }
+};
+
+const getTestsByClassForAdmin = async (req, res) => {
+  try {
+    // Verify admin authorization
+    const admin = await User.findById(req.user.id);
+    if (!admin || admin.role !== "admin") {
+      return res.status(403).json({
+        success: false,
+        message: "Unauthorized - Admin access required"
+      });
+    }
+
+    const { classNumber } = req.params;
+    if (!classNumber) {
+      return res.status(400).json({
+        success: false,
+        message: "Class number is required"
+      });
+    }
+
+    // Standardize class format
+    const standardizedClass = classNumber.startsWith("Class ") ? classNumber : `Class ${classNumber}`;
+    console.log('Fetching tests for class:', standardizedClass);
+
+    // Get tests for the specified class
+    const tests = await Test.find({ class: standardizedClass }).select(
+      "title description totalQuestion rightMarks wrongMarks sectionId subject class timeInMinutes createdAt updatedAt"
+    );
+    
+    console.log('Found tests:', tests.length);
+    
+    res.status(200).json({
+      success: true,
+      data: tests
+    });
+  } catch (err) {
+    console.error("Error fetching tests by class for admin:", err);
     res.status(500).json({
       success: false,
       message: "Internal Server Error",
@@ -952,5 +1038,6 @@ module.exports = {
   getAttemptedTests,
   getTestResult,
   getTestResultsByClass,
-  downloadTestResult
+  downloadTestResult,
+  getTestsByClassForAdmin
 };

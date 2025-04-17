@@ -1,0 +1,61 @@
+{
+  "testId": "67ff9e892099452a3aebf8c1",
+  "userId": "67f90385b46ddedeaa493df6",
+  "testTitle": "suffelted test for class 12 ",
+  "totalQuestions": 3,
+  "rightMarks": 5,
+  "negativeMarks": 0,
+  "answers": {
+    "0": "Mars",
+    "1": "Paris",
+    "2": "both"
+  },
+  "tabSwitchCount": 0,
+  "testDuration": 12,
+  "totalMarks": 0,
+  "correctAnswers": 0,
+  "wrongAnswers": 3,
+  "questionResults": [
+    {
+      "question": "Question : Which planet is known as the Red Planet?",
+      "options": [
+        "Venus",
+        "Jupiter",
+        "Saturn",
+        "Mars"
+      ],
+      "correctAnswer": "Jupiter",
+      "studentAnswer": "Mars",
+      "isCorrect": false,
+      "marksObtained": 0
+    },
+    {
+      "question": "Question : What is the capital of France?",
+      "options": [
+        "Paris",
+        "Madrid",
+        "London",
+        "Berlin"
+      ],
+      "correctAnswer": "Madrid",
+      "studentAnswer": "Paris",
+      "isCorrect": false,
+      "marksObtained": 0
+    },
+    {
+      "question": "Question : Mouse is a ?",
+      "options": [
+        "Hardware",
+        "both",
+        "None",
+        "Software"
+      ],
+      "correctAnswer": "Hardware",
+      "studentAnswer": "both",
+      "isCorrect": false,
+      "marksObtained": 0
+    }
+  ],
+  "percentage": "0.00",
+  "submittedAt": "2025-04-17T11:51:12.182Z"
+}
