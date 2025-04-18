@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import './StudentDashboard.css';
 
@@ -116,7 +116,7 @@ const StudentDashboard = () => {
                                 <div className="no-tests">No tests available</div>
                             ) : (
                                 allTests.map((test, index) => (
-                                    <div key={test._id || index} className="test-item">
+                                    <div key={`test-${test._id}-${index}`} className="test-item">
                                         <span className="test-name">
                                             {index + 1}. {test.title || 'Untitled Test'}
                                         </span>
@@ -143,7 +143,7 @@ const StudentDashboard = () => {
                                 <div className="no-tests">No attempted tests yet</div>
                             ) : (
                                 attemptedTests.map((test, index) => (
-                                    <div key={test._id || index} className="test-item">
+                                    <div key={`attempted-${test._id}-${index}`} className="test-item">
                                         <span className="test-name">
                                             {index + 1}. {test.title || 'Untitled Test'}
                                         </span>

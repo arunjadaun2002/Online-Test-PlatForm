@@ -1,6 +1,6 @@
 import axios from "axios";
 import React, { useEffect, useState } from "react";
-import { toast, Toaster } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
 import "./TakeTest.css";
 
@@ -28,6 +28,7 @@ const TakeTest = () => {
   const [warningCount, setWarningCount] = useState(0);
   const [selectedQuestion, setSelectedQuestion] = useState(0);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [startTime, setStartTime] = useState(null);
 
   useEffect(() => {
     fetchTestData();
@@ -285,6 +286,7 @@ const TakeTest = () => {
       const duration = data.data.timeInMinutes * 60;
       setRemainingTime(duration);
       setLoading(false);
+      setStartTime(new Date());
     } catch (err) {
       console.error("Error fetching test:", err);
       setError(err.message || "Failed to load test. Please try again later.");
@@ -292,9 +294,10 @@ const TakeTest = () => {
     }
   };
 
-  const handleAnswerSelect = (questionIndex, selectedOption) => {
+  const handleAnswerSelect = (questionIndex, option) => {
+    // Store the actual option value directly
     setAnswers((prev) => {
-      const newAnswers = { ...prev, [questionIndex]: selectedOption };
+      const newAnswers = { ...prev, [questionIndex]: option };
       const answeredCount = Object.keys(newAnswers).length;
       setAnsweredQuestions(answeredCount);
       return newAnswers;
@@ -346,65 +349,93 @@ const TakeTest = () => {
     try {
       setIsSubmitting(true);
 
-      // Convert marks to numbers and ensure they're not NaN
-      const rightMarksNum = parseFloat(test.rightMarks) || 0;
-      const wrongMarksNum = parseFloat(test.wrongMarks) || 0;
-
-      // Prepare the submission data
-      const submissionData = {
-        answers,
-        tabSwitchCount: parseInt(localStorage.getItem("tabSwitchCount") || "0"),
-        testDuration: Math.max(0, test.timeInMinutes * 60 - remainingTime),
-        testTitle: test.title,
-        totalQuestions: test.questions.length,
-        rightMarks: rightMarksNum,
-        negativeMarks: wrongMarksNum
-      };
-
-      console.log('Submitting test with data:', {
-        testId: test._id,
-        totalQuestions: submissionData.totalQuestions,
-        answeredQuestions: Object.keys(answers).length,
-        rightMarks: submissionData.rightMarks,
-        negativeMarks: submissionData.negativeMarks,
-        answers: submissionData.answers
-      });
-
+      // Validate token
       const token = localStorage.getItem("token");
       if (!token) {
-        throw new Error("Authentication token not found");
+        toast.error("You are not authenticated. Please login again.");
+        navigate("/login");
+        return;
       }
 
-      const response = await axios.post(
-        `http://localhost:4000/api/student/tests/${test._id}/submit`,
-        submissionData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-          },
+      // Validate if there are any answers
+      if (Object.keys(answers).length === 0) {
+        toast.error("Please attempt at least one question before submitting");
+        return;
+      }
+
+      // Format answers object - ensure all values are strings
+      const formattedAnswers = {};
+      Object.entries(answers).forEach(([index, answer]) => {
+        if (answer !== null && answer !== undefined) {
+          formattedAnswers[index] = answer.toString();
         }
-      );
+      });
 
-      if (response && response.data && response.data.success) {
-        // Exit fullscreen mode
-        exitFullscreen();
+      // Calculate test duration in minutes
+      const endTime = new Date();
+      const durationInMinutes = Math.round((endTime - startTime) / (1000 * 60));
+
+      const submissionData = {
+        answers: formattedAnswers,
+        tabSwitchCount: parseInt(localStorage.getItem("tabSwitchCount") || "0"),
+        testDuration: durationInMinutes,
+        testTitle: test.title,
+        totalQuestions: test.questions.length,
+        rightMarks: parseFloat(test.rightMarks) || 0,
+        negativeMarks: parseFloat(test.wrongMarks) || 0
+      };
+
+      console.log('Submitting test with data:', submissionData);
+
+      try {
+        const response = await axios.post(
+          `http://localhost:4000/api/student/tests/${test._id}/submit`,
+          submissionData,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          }
+        );
+
+        if (response?.data?.success) {
+          toast.success("Test submitted successfully");
+          // Clear local storage data
+          localStorage.removeItem("tabSwitchCount");
+          // Navigate to attempted tests section
+          navigate("/student/attempted");
+        } else {
+          throw new Error(response?.data?.message || "Failed to submit test");
+        }
+      } catch (error) {
+        console.error("Error submitting test:", error);
         
-        setIsTestSubmitted(true);
-        toast.success("Test submitted successfully!");
-        
-        // Wait a bit for the fullscreen to exit and toast to show
-        setTimeout(() => {
-          // Navigate to the result page with the submission ID
-          navigate(`/student/result/${response.data.data.submission._id}`);
-        }, 1000);
-      } else {
-        throw new Error(response?.data?.message || "Failed to submit test");
+        // Handle different error cases
+        if (error.response) {
+          switch (error.response.status) {
+            case 401:
+              toast.error("Session expired. Please login again.");
+              navigate("/login");
+              break;
+            case 403:
+              toast.error("You are not authorized to submit this test. Please ensure you're taking a test for your class.");
+              navigate("/student/tests");
+              break;
+            case 404:
+              toast.error("Test not found or has been removed.");
+              navigate("/student/tests");
+              break;
+            case 500:
+              toast.error("Server error. Please try again later.");
+              break;
+            default:
+              toast.error(error.response.data?.message || "Failed to submit test");
+          }
+        } else {
+          toast.error("Network error. Please check your connection and try again.");
+        }
       }
-    } catch (error) {
-      console.error("Submit test error:", error);
-      console.error("Error details:", error.response?.data || error);
-      toast.error(error.response?.data?.message || "Failed to submit test. Please try again.");
     } finally {
       setIsSubmitting(false);
     }

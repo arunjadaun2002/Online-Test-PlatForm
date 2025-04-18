@@ -20,7 +20,13 @@ const Result = () => {
                 throw new Error('No authentication token found');
             }
 
+            if (!testId) {
+                throw new Error('No submission ID provided');
+            }
+
             console.log('Fetching result for submission ID:', testId);
+            setLoading(true);
+            setError(null);
 
             const response = await fetch(`http://localhost:4000/api/student/tests/${testId}/result`, {
                 headers: {
@@ -29,22 +35,36 @@ const Result = () => {
                 }
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                const errorData = await response.json().catch(() => ({}));
-                throw new Error(errorData.message || 'Failed to fetch result');
+                console.error('Error response:', data);
+                throw new Error(data.message || data.details || 'Failed to fetch result');
             }
 
-            const data = await response.json();
             if (!data.success) {
                 throw new Error(data.message || 'Failed to fetch result');
             }
 
-            console.log('Received result data:', data.data);
+            if (!data.data || !data.data.questionResults) {
+                throw new Error('Invalid result data received');
+            }
+
+            console.log('Received result data:', {
+                testTitle: data.data.testTitle,
+                totalQuestions: data.data.totalQuestions,
+                questionResults: data.data.questionResults.length
+            });
+
             setResult(data.data);
-            setLoading(false);
         } catch (err) {
             console.error('Error fetching result:', err);
-            setError(err.message);
+            setError(err.message || 'Failed to fetch result');
+            // If unauthorized, redirect to login
+            if (err.message.toLowerCase().includes('unauthorized')) {
+                navigate('/login');
+            }
+        } finally {
             setLoading(false);
         }
     };

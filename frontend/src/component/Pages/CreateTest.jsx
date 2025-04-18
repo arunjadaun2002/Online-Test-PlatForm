@@ -150,17 +150,30 @@ function CreateTest() {
     }
 
     try {
+      // Ensure all questions have valid correct answers
+      const validatedQuestions = questions.map(q => {
+        // If correctAnswer is a letter (A, B, C, D), convert it to the actual value
+        if (q.correctAnswer && /^[A-D]$/i.test(q.correctAnswer)) {
+          const index = q.correctAnswer.toUpperCase().charCodeAt(0) - 65; // A=0, B=1, etc.
+          return {
+            ...q,
+            correctAnswer: q.options[index]
+          };
+        }
+        return q;
+      });
+
       const newQuiz = {
         title: testData.title,
         description: testData.description || '',
-        totalQuestion: questions.length,
+        totalQuestion: validatedQuestions.length,
         rightMarks: parseInt(testData.perQuestionMark),
         wrongMarks: 0,
         subject: 'General',
         sectionId: Date.now().toString(),
         class: testData.class,
         timeInMinutes: parseInt(testData.timeInMinutes),
-        questions: questions.map(q => ({
+        questions: validatedQuestions.map(q => ({
           question: q.question,
           options: q.options,
           correctAnswer: q.correctAnswer

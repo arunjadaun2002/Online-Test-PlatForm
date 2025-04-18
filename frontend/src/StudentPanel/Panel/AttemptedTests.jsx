@@ -52,6 +52,7 @@ const AttemptedTests = () => {
                 }
                 return {
                     id: test.testId._id.toString(),
+                    submissionId: test._id.toString(),
                     title: test.testId.title,
                     totalQuestion: test.testId.totalQuestion,
                     rightMarks: test.testId.rightMarks,
@@ -73,15 +74,15 @@ const AttemptedTests = () => {
         }
     };
 
-    const handleViewResult = (testId) => {
-        console.log('Viewing result for test ID:', testId);
-        if (!testId) {
-            console.error('Invalid test ID provided');
-            setError('Invalid test ID');
+    const handleViewResult = (submissionId) => {
+        console.log('Viewing result for submission ID:', submissionId);
+        if (!submissionId) {
+            console.error('Invalid submission ID provided');
+            setError('Invalid submission ID');
             return;
         }
-        console.log('Navigating to result page with test ID:', testId);
-        navigate(`/student/result/${testId}`);
+        console.log('Navigating to result page with submission ID:', submissionId);
+        navigate(`/student/result/${submissionId}`);
     };
 
     if (loading) return <div className="loading">Loading...</div>;
@@ -117,7 +118,7 @@ const AttemptedTests = () => {
                                     </span>
                                     <button 
                                         className="view-result-btn"
-                                        onClick={() => handleViewResult(test.id)}
+                                        onClick={() => handleViewResult(test.submissionId)}
                                     >
                                         View Result
                                     </button>

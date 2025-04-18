@@ -25,7 +25,15 @@ const studentSchema = new mongoose.Schema({
     type: String,
     required: [true, 'Class is required'],
     enum: ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'],
-    trim: true
+    trim: true,
+    get: function(value) {
+      // When retrieving, return just the number
+      return value ? value.replace('Class ', '').trim() : value;
+    },
+    set: function(value) {
+      // When setting, store just the number
+      return value ? value.replace('Class ', '').trim() : value;
+    }
   },
   password: {
     type: String,
@@ -40,6 +48,9 @@ const studentSchema = new mongoose.Schema({
     type: Date,
     default: Date.now
   }
+}, {
+  toJSON: { getters: true },
+  toObject: { getters: true }
 });
 
 // Method to compare password
