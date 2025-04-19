@@ -1150,6 +1150,40 @@ const getTestsByClassForAdmin = async (req, res) => {
   }
 };
 
+const getTestsByClassTop = async (req, res) => {
+  try {
+    // Check if user is authenticated
+    const user = await User.findById(req.user.id);
+    const student = await Student.findById(req.user.id);
+    if (!user && !student) {
+      return res.status(403).json({
+        success: false,
+        message: "Access denied",
+      });
+    }
+
+    const { classNumber } = req.params;
+    // Map "1" -> "Class 1"
+    const requestedClass = `Class ${classNumber}`;
+
+    // Fetch tests for that specific class
+    const tests = await Test.find({ class: requestedClass }).select(
+      "title description totalQuestion rightMarks wrongMarks sectionId subject class timeInMinutes createdAt updatedAt"
+    );
+
+    res.status(200).json({
+      success: true,
+      data: tests,
+    });
+  } catch (err) {
+    console.log("Error fetching tests by class:", err);
+    res.status(500).json({
+      success: false,
+      message: "Internal Server Error",
+    });
+  }
+};
+
 module.exports = {
   createTestWithFile,
   addTypedQuestion,
@@ -1167,5 +1201,6 @@ module.exports = {
   getTestResult,
   getTestResultsByClass,
   downloadTestResult,
-  getTestsByClassForAdmin
+  getTestsByClassForAdmin,
+  getTestsByClassTop
 };
